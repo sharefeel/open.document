@@ -19,7 +19,7 @@
 
 __마음에 안정이 좀 되시나요?__
 
-![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png){: height="36px" width="36px"}
+![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png){:height="36px" width="36px"}
 
 ## RDBMS
 
