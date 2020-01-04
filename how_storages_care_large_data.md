@@ -17,6 +17,12 @@
 * 블럭단위의 Random Access
 * 최적화: Cache, Sequential Access가 되도록 블럭 배치
 
+__`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
+
+![](https://t1.daumcdn.net/cfile/tistory/264EE6445509188C1A)
+
+이미지 출처: https://queue.acm.org/detail.cfm?id=1563874
+
 __마음에 안정이 좀 되시나요?__
 
 ![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
@@ -74,7 +80,7 @@ Delete와 update를 지원하지 않거나 insert 대비 비효율적이다. 두
 현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 가격이 매우 높기 때문에 가격적으로 불리하다.
 
 __SSD vs. HDD__ 
-![k](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
+![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
 
 이런 이유로 데이터 저장은 HDD에 하고 SSD는 random access, low latency가 필요한 작업에 한정하여 사용한다. 카산드라의 경우 데이터는 HDD에, commit log는 SSD에 구성하기도 한다.
 
