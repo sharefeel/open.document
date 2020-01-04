@@ -19,7 +19,7 @@
 
 __마음에 안정이 좀 되시나요?__
 
-![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png){:height="36px" width="36px"}
+![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
 
 ## RDBMS
 
@@ -30,7 +30,7 @@ __마음에 안정이 좀 되시나요?__
 
 카프카 역시 저장소이다.
 
-![](http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png)
+<img src="http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png" width=500>
 
 이미지출처: [http://cloudurable.com/blog/kafka-architecture-topics/index.html](http://cloudurable.com/blog/kafka-architecture-topics/index.html)
 
