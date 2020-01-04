@@ -21,6 +21,28 @@ __마음에 안정이 좀 되시나요?__
 
 ![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png "Norton speed disk")
 
+## RDBMS
+
+
+
+
+## Kafka
+
+![Kafka Topic Partitions Layout](http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png)
+
+이미지출처: [](http://cloudurable.com/blog/kafka-architecture-topics/index.html)
+
+
+## Cassandra
+
+## HDFS
+
+## Bigquery
+
+
+
+
+
 ## C
 
 # 기술적 경향
