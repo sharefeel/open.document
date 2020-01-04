@@ -28,9 +28,25 @@ __마음에 안정이 좀 되시나요?__
 
 ## Kafka
 
+카프카 역시 저장소이다.
+
 ![Kafka Topic Partitions Layout](http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png)
 
-이미지출처: [](http://cloudurable.com/blog/kafka-architecture-topics/index.html)
+이미지출처: [http://cloudurable.com/blog/kafka-architecture-topics/index.html](http://cloudurable.com/blog/kafka-architecture-topics/index.html)
+
+* 토폴로지
+   * 멀티 파티션으로 데이터 분산해서 전송. 수평확장 가능
+   * Producer에 의한 밸런싱 (기본밸런싱 알고리즘은 RR)
+   * Master slave 없음 / 메타정보는 zookeeper를 통해서 관리
+   * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
+* IO 최적화
+   * Read / Write 모두 sequential io. (Read의 경우 시작지점은 지정 가능)
+   * OS 버퍼캐쉬 적극 활용
+* 요약
+   * 현존하는 저장소중 최고의 throughput, iops를 보임
+   * 매우 단순한 I/O API만 제공하며 사용은 각자 알아서.
+
+
 
 
 ## Cassandra
