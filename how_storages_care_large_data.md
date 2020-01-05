@@ -21,13 +21,13 @@ __`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
 
 ![](https://t1.daumcdn.net/cfile/tistory/264EE6445509188C1A)
 
-이미지 출처: https://queue.acm.org/detail.cfm?id=1563874
+(이미지 출처: https://queue.acm.org/detail.cfm?id=1563874 )
 
 __마음에 안정이 좀 되시나요?__
 
 ![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
 
-## RDBMS
+## RDBMS1
 
 
 
@@ -38,24 +38,46 @@ __마음에 안정이 좀 되시나요?__
 
 <img src="http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png" width=500>
 
-이미지출처: [http://cloudurable.com/blog/kafka-architecture-topics/index.html](http://cloudurable.com/blog/kafka-architecture-topics/index.html)
+(이미지출처: http://cloudurable.com/blog/kafka-architecture-topics/index.html )
 
 * 토폴로지
-   * 멀티 파티션으로 데이터 분산해서 전송. 수평확장 가능
+   * 멀티 파티션으로 데이터 분산해서 저장
+   * 수평확장 가능
    * Producer에 의한 밸런싱 (기본밸런싱 알고리즘은 RR)
-   * Master slave 없음 / 메타정보는 zookeeper를 통해서 관리
-   * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
+   * 메타 관리
+      * Zookeeper로 멤버쉽과 토픽정보만 관리
+      * Replication을 제외하면 장비간 통신 없음
+      * 매우 단순한 구조로써 동기화 비용이 제거됨
 * IO 최적화
    * Read / Write 모두 sequential io. (Read의 경우 시작지점은 지정 가능)
    * OS 버퍼캐쉬 적극 활용
+   * 동시에 쓸수 있는 디스크수를 늘리는 것이 핵심
 * 요약
-   * 현존하는 저장소중 최고의 throughput, iops를 보임
-   * 매우 단순한 I/O API만 제공하며 사용은 각자 알아서.
-
-
+   * 현존하는 저장소중 최고의 throughput, iops
+   * 매우 단순한 I/O API만 제공
 
 
 ## Cassandra
+
+* 토폴로지
+   * 
+   * Producer에 의한 밸런싱 (기본밸런싱 알고리즘은 RR)
+   * Master slave 없음 / 메타정보각
+   * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
+* IO 최적화
+   * 쿼리별 동작
+      * INSERT: 파일 뒤에 append
+      * DELETE: 해당 row에 삭제되었음을 마킹 (tombstone) 
+      * UPDATE: Insert & delete
+   * Compaction
+      * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커지게됨 (SELECT 성능도 저하)
+      * Compaction을 실행하면 tomestone 마킹된 row를 제외하고 다시 파일을 생성함
+      * 단 compaction은 시스템 리소스를 많이 소모함
+   * ㅇㅇ
+
+* 요약
+   * 카산드라는 매우 복잡한 소프트웨어
+
 
 ## HDFS
 
