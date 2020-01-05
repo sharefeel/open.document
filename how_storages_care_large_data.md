@@ -1,29 +1,33 @@
-# 저장소는 많은 데이터를 어떻게 다루는가?
-알아봅시다.
+# 저장소는 많은 양의 데이터를 어떻게 다루는가?
 
-# 관점
+세상에는 많은 수의 저장소 SW가 있다. 기존 RDBMS는 최대한 많은 기능을 제공하는 것에 초점을 뒀다면 현대의 저장소들은 그 사용처의 요구사항에 최대한 부합하는데 초점을 두고 있다. 대량 데이터를 처리하는 것이 최근의 트렌드이며 그것을 위해 기능의 제약을 감수한다. 대신 각각의 요구사항을 만족시키기 위한 여러가지 저장소 또는 저장소 조합이 나타나게 된다. RDBMS가 무수히 많은 기능을 제공하지만 HDFS, elastic, cassandra, redis, bigquery 등의 신규 저장소들이 하고 있는 일을 대신하기 어려우며, 그 반대도 마찬가지고 또한 신규 저장소끼리도 대체제로 쓰이긴 어렵다. 결국 이 업계에서 일하기는 더 빡쎄졌다.
 
-## 기술적 관점
-* 저장구조
-* 네트웍 토폴로지
-   * 서버
-   * 클라이언트
+다음 관점에서 각 저장소들의 특징을 살펴보려고 한다.
+
+* __`네트웍 토폴로지`__ 장비구성, 데이터저장, 메타관리, 클라이언트 역할을 설명한다.
+* __`IO 최적화`__ 데이터 저장 포맷, 접근 방법을 설명한다.
 
 # 배경 지식
 
-## CAP 이론
+들어가기 전에 몇가지 배경 지식을 알아보자. 
 
-분산환경에서 CAP (Consistency, Availibility, Partition Tolerance)를 모두 만족하는 것은 불가능하다. 현생하는 저장소들은 이 중 두가지 속성을 만족시키면서 각자의 길을 가고 있다. (각 속성의 뜻을 읽어보고 자신이 알고 있는 저장소가 어디에 위치하는지를 보면서 고개를 끄덕이시면 됩니다.)
+## 우리는 HDD를 쓸 수 밖에 없다.
 
-![](resources/how_storages_care_large_data/cap.png)
+현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 가격이 매우 높기 때문에 가격적으로 불리하기 때문에 HDD를 쓸수밖에 없다. 그리고 SW적으로 이를 보완하여 사용하는 것이 어렵지만 더 나은 선택이다.
 
-__`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 stroing consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 write 하면 각 분산 노드에 저장된 데이터는 언젠가는 동기화되다는 것을 보장한다.
+__SSD vs. HDD__ 비싸다.
+![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
+
+돈이 꽤 있어서 HDD 대신 SSD를 살 수 있다고 그것을 실천하는 것은 현명하지 않을 수 있다. 
+1. __`최대용량`__ 그리고 HDD대비 용량이 낮기 때문에 같은 용량을 위해서는 HDD보다 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다. 
+2. __`리소스간 밸런스`__ 많은 경우 HDD는 bottleneck 이지만 "항상" 그런 것은 아니다. SDD에 투자할 비용을 다른 리소스에 투자함으로써 전체적인 성능이 더 올라갈 수 있다.
+   1. __`Spark, presto`__ In-memory 프로세싱 작업을 할 것이라면 좋은 CPU와 많은 메모리를 사라.
+   2. __`데이터레이크`__ 디스크는 중요하다. 하지만 그돈을 아껴서 높은 대역폭의 스위치를 이중화하는 데 써라.
 
 ## 파일시스템
-
 * 파일 = 헤더+데이터블럭의 조합
 * 블럭단위의 Random Access
-* 최적화: Cache, Sequential Access가 되도록 블럭 배치
+* OS 최적화: Cache, Sequential Access가 되도록 블럭 배치
 
 __`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
 
@@ -35,18 +39,31 @@ __마음에 안정이 좀 되시나요?__
 
 ![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
 
-## RDBMS1
+## CAP 이론
 
+분산환경에서 CAP (Consistency, Availibility, Partition Tolerance)를 모두 만족하는 것은 불가능하다. 현생하는 저장소들은 이 중 두가지 속성을 만족시키면서 각자의 길을 가고 있다. (자신이 알고 있는 저장소가 어디에 위치하는지를 보면서 고개를 끄덕이시면 됩니다.)
+
+![](resources/how_storages_care_large_data/cap.png)
+
+__`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 stroing consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 write 하면 각 분산 노드에 저장된 데이터는 언젠가는 동기화되다는 것을 보장한다.
 
 # 저장소별 특성
+
+## RDBMS
+
+* 토폴로지
+  * 기본적으로 DBMS 서버 한대에서 모든 데이터를 저장
+  * 장비 스펙이 곧 성능
+* IO 최적화
+  * 인덱싱, 파티션, .. 잘 모름
 
 ## Kafka
 
 카프카 역시 저장소이다.
 
-<img src="http://cloudurable.com/images/kafka-architecture-topic-partition-layout-offsets.png" width=500>
+<img src="resources/how_storages_care_large_data/kafka-topic-partition-layout.png" width=500>
 
-(이미지출처: http://cloudurable.com/blog/kafka-architecture-topics/index.html )
+(이미지출처: http://cloudurable.com/blog/kafka-architecture-topics/index.html)
 
 * 토폴로지
    * 멀티 파티션으로 데이터 분산해서 저장
@@ -86,16 +103,17 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카
    * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
    * 클라이언트
 * IO 최적화
+   * 데이터 저장 구조
+     * `MemTable / SSTable / CommitLog` write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 리턴. 주기적으로 SSTable로 flush가 있어나며 이때 
    * 쿼리별 동작
-      * INSERT: 파일 뒤에 append
-      * DELETE: 해당 row에 삭제되었음을 마킹 (tombstone) 
-      * UPDATE: Insert & delete
+     * INSERT: 파일 뒤에 append
+     * DELETE: 해당 row에 삭제되었음을 마킹 (tombstone) 
+     * UPDATE: Insert & delete
    * Compaction
-      * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커지게됨 (SELECT 성능도 저하)
-      * Compaction을 실행하면 tomestone 마킹된 row를 제외하고 다시 파일을 생성함
-      * 단 compaction은 시스템 리소스를 많이 소모함
-   * ㅇㅇ
-
+     * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커지게됨 (SELECT 성능도 저하)
+     * Compaction을 실행하면 tomestone 마킹된 row를 제외하고 다시 파일을 생성함
+     * 단 compaction은 시스템 리소스를 많이 소모함
+   * 
 * 요약
    * 
 
@@ -117,29 +135,4 @@ Delete와 update를 지원하지 않거나 insert 대비 비효율적이다. 두
 - Delete, Update : Random Access
 - Read 역시 sequantial 하게 처리
 
-### 디스크의 특성
-#### 우리는 HDD를 쓸 수 밖에 없다.
 
-현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 가격이 매우 높기 때문에 가격적으로 불리하다.
-
-__SSD vs. HDD__ 
-![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
-
-이런 이유로 데이터 저장은 HDD에 하고 SSD는 random access, low latency가 필요한 작업에 한정하여 사용한다. 카산드라의 경우 데이터는 HDD에, commit log는 SSD에 구성하기도 한다.
-
-#### 만약 당신이 SSD와 HDD 중 선택권이 있다면? (보통 없겠지만)
-위 그림에서 볼때 SSD는 HDD의 6.5배 가격이다. 만약 HDFS를 SSD로 구성했을 경우 HDD 대비 두배의 속도가 나온다면 SSD를 선택할 것인가? 대체로는 SSD를 선택하지 않는다.
-
-##### 비용
-
-__`가격`__ 기본적으로 SSD는 비싸다.
-
-__`최대용량`__ 그리고 HDD대비 용량이 낮기 때문에 같은 용량을 위해서는 HDD보다 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다. 
-   
-__리소스간 밸런스__
-   1. 디스크는 여러 상황에서 bottleneck이지만 항상 그런 것은 아니다. 또한 많은 현대적인 SW는 sequential access 를 가정하고 만들어져 있다. 실제 HDFS 역시 SSD와 HDD의 성능차는 몇십 퍼센트 수준이다.
-   2. Spark, presto를 돌릴 것이라면 많은 core와 메모리에 사라.
-   3. 데이터레이크 구성이라 디스크만 좋으면 된다고? 아니다. 높은 대역폭의 스위치를 이중화하는데 써라.
-
-
-## Read
