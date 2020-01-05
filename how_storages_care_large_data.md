@@ -9,7 +9,15 @@
    * 서버
    * 클라이언트
 
-# 저장소별 특성
+# 배경 지식
+
+## CAP 이론
+
+분산환경에서 CAP (Consistency, Availibility, Partition Tolerance)를 모두 만족하는 것은 불가능하다. 현생하는 저장소들은 이 중 두가지 속성을 만족시키면서 각자의 길을 가고 있다. (각 속성의 뜻을 읽어보고 자신이 알고 있는 저장소가 어디에 위치하는지를 보면서 고개를 끄덕이시면 됩니다.)
+
+![](resources/how_storages_care_large_data/cap.png)
+
+__`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 stroing consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 write 하면 각 분산 노드에 저장된 데이터는 언젠가는 동기화되다는 것을 보장한다.
 
 ## 파일시스템
 
@@ -30,7 +38,7 @@ __마음에 안정이 좀 되시나요?__
 ## RDBMS1
 
 
-
+# 저장소별 특성
 
 ## Kafka
 
@@ -59,11 +67,24 @@ __마음에 안정이 좀 되시나요?__
 
 ## Cassandra
 
-* 토폴로지
-   * 
-   * Producer에 의한 밸런싱 (기본밸런싱 알고리즘은 RR)
-   * Master slave 없음 / 메타정보각
+__`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카산드라는 
+
+![](https://www.scnsoft.com/blog-pictures/business-intelligence/cassandra-vs-hdfs-02_1.png)
+
+* 토폴로지    
+   * NoSQL, Colomn-oriented
+   * 데이터는 각 노드에 분산되어 저장되며 저장 위치는 primary key 기반으로 샤딩
+     * 노드 다운에 대비해 consistency hashing을 사용. 
+   * 메타 관리
+     * 멤버쉽, 스키마 정보가 운영에 필요
+     * 각 노드가 클러스터 전체의 메타를 가지고 있음 
+     * 특정 노드에서 스키마변화(테이블 생성등)를 실행하면 해당 정보는 전체 클러스터에 동기화 과정이 필요
+     * 동기화 이전까지 추가 스키마 변경은 불가능
+     * 동기화 되지 않은 상태로 남아 버리는 현상이 발생면 난감함
+       * 라이브에서 발생하면 원인을 찾기도 대응을 하기도 힘듬. 다 그렇지만 이런 문제는 재현도 안됨
+       * 믿을건 stackoverflow와 조직장의 결단 뿐
    * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
+   * 클라이언트
 * IO 최적화
    * 쿼리별 동작
       * INSERT: 파일 뒤에 append
@@ -76,7 +97,7 @@ __마음에 안정이 좀 되시나요?__
    * ㅇㅇ
 
 * 요약
-   * 카산드라는 매우 복잡한 소프트웨어
+   * 
 
 
 ## HDFS
