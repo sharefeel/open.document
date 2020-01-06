@@ -5,7 +5,7 @@
 다음 관점에서 각 저장소들의 특징을 살펴보려고 한다.
 
 * __`네트웍 토폴로지`__ 장비구성, 데이터저장, 메타관리, 클라이언트 역할을 설명한다.
-* __`IO 최적화`__ 데이터 저장 포맷, 접근 방법을 설명한다.
+* __`IO 최적화`__ 데이터 저장 포맷, IO 패턴을 설명한다.
 
 # 배경 지식
 
@@ -120,9 +120,27 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카
 
 ## HDFS
 
+__`Namenode + Datanode + Client library`__ 
+
+![](resources/how_storages_care_large_data/hdfs_simple_picture.png)
+
+* 토폴로지
+  * Namenode + Datanode
+    * Namenode 는 메타데이터를, datanode는 데이터 블럭을 나눠가진다.
+    * Client는 namendoe에서 metadata를 읽어온 후 그 정보를 바탕으로 datanode에서 데이터를 읽어온다.
+    * Namenode가 죽으면 hadoop 전체가 사용불가능 --> Namenode HA 필수
+  * 
+* IO 최적화
+  * 블럭 단위 지정
+
+
 ## Bigquery
-
-
+* 토폴로지
+  * Managed Service이다보니 알려진 것이 적음
+* IO 최적화
+  * INSERT / SELECT 만 가능
+  * UPDATE / DELETE 를 위해서는 신규테이블 생성
+    * 예) 테이블에서 row2를 지우려면? Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지
 
 
 
