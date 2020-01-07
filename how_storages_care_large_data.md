@@ -13,7 +13,7 @@
 
 ## 우리는 HDD를 쓸 수 밖에 없다. 
 
-현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 가격이 매우 높기 때문에 가격적으로 불리하기 때문에 HDD를 쓸수밖에 없다. 그리고 SW적으로 이를 보완하여 사용하는 것이 어렵지만 더 나은 선택이다.
+현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 매우 비싸다. 따라서 우리는 HDD를 쓸수밖에 없다. SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
 
 __SSD vs. HDD__ 비싸다.
 ![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
@@ -46,15 +46,40 @@ __마음에 안정이 좀 되시나요?__
 ![](resources/how_storages_care_large_data/cap.png)
 
 __`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 stroing consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 write 하면 각 분산 노드에 저장된 데이터는 언젠가는 동기화되다는 것을 보장한다.
+__`Eventual Consistency`__ 사실상 분산 storage에서 eventual consistency는 성능상 불가항력적인 선택이다. 이는 strong consistency를 지원하는 분산스토리지인 zookeeper가 동기화 비용으로 인해 극단적으로 낮은 write throughput을 보이는 것을 보면 알 수 있다. 
+
+## 정규화에 대한 태도
+
+RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 별도 테이블로 분리하고 조회시에 두 테이블을 join함으로써 row를 완성하며 장점들을 가지고 있다.
+* 공통된 데이터에 대한 update
+* 관계의 정의를 통한 데이터 정합성 확보
+* 공간의 절약 (공간은 비싼 리소스)
+
+반면 nosql 계열은 성능을 위해 의도적으로 정규화를 하지 않는다.
+* Update IO는 없거나 매우 드뭄 (write-once read-many에 최적화)
+* Join 없이 하나의 row에 모든 데이터를 저장함으로써 read시 탐색과 로딩 비용 감소
+* 분산 저장소이기 때문에 RDBMS 대비 공간의 값어치는 낮음
+* Random access의 배제
+* 데이터 정합성은 애플리케이션의 책임
+
 
 # 저장소별 특성
 
+사실상 이 글을 쓴 목적은 기존의 RDBMS와 비교하여 현재 많이 사용되는 저장소들의 특징을 알아보자는 것이다.
+
 ## RDBMS
 
+기본적으로 RDBMS 장비 1대이며 다수이더라도 HA, Master-slave 등의 구성이다. 오라클에서 쓸만한 분산 RDB라는 엄청난걸 만들었다던데 모르긴 해도 오라클이니만큼 가격이 자비없지 않을까 생각된다.
+
 * 토폴로지
-  * 기본적으로 DBMS 서버 한대에서 모든 데이터를 저장
+  * 태생적으로 서버 한대에서 모든 데이터를 저장 및 프로세싱하며 여러 변종들이 추가되지만 기본 뼈대는 크게 벗어나지 않는다.
   * 장비 스펙이 곧 성능
+* 막강한 기능
+  * 데이터간 relation
+  * 정규화
 * IO 최적화
+  * Write-many read-many (이런 용어가 있는지 모르지만, 요즘 저장소들이 write-once read-many에 최적화된 것과는 대비된다.)
+  * 
   * 인덱싱, 파티션, .. 잘 모름
 
 ## Kafka
@@ -143,5 +168,7 @@ __`Namenode + Datanode + Client library`__
     * 예) 테이블에서 row2를 지우려면? Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지
   * 빅쿼리는 테이블의 스캔 범위가 넓을 수록 다른 저장소에 비해서 압도적인 성능을 보임. 비록 과금 체계가 처리되는 데이터량에 비례하기 때문에 scan 범위를 줄여야 한다.
 
-# 요약
-* #sequential access, #append, #write-once read-many, #fullscan
+# Keywords
+위에서 살펴본 저장소들은 RDBMS가 제공하는 강력한 기능을 포기하는 대신
+* #sequential access #append #write-once read-many #fullscan #weak consistency
+
