@@ -141,16 +141,7 @@ __`Namenode + Datanode + Client library`__
   * INSERT / SELECT 만 가능
   * UPDATE / DELETE 를 위해서는 신규테이블 생성
     * 예) 테이블에서 row2를 지우려면? Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지
+  * 빅쿼리는 테이블의 스캔 범위가 넓을 수록 다른 저장소에 비해서 압도적인 성능을 보임. 비록 과금 체계가 처리되는 데이터량에 비례하기 때문에 scan 범위를 줄여야 한다.
 
-
-
-## C
-
-# 기술적 경향
-## Append 최적화
-Delete와 update를 지원하지 않거나 insert 대비 비효율적이다. 두 작업은 다음과 같은 특성을 가진다.
-- Insert : Sequential Access
-- Delete, Update : Random Access
-- Read 역시 sequantial 하게 처리
-
-
+# 요약
+* #sequential access, #append, #write-once read-many, #fullscan
