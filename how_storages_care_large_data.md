@@ -7,19 +7,21 @@
 * __`네트웍 토폴로지`__ 장비구성, 데이터저장, 메타관리, 클라이언트 역할을 설명한다.
 * __`IO 최적화`__ 데이터 저장 포맷, IO 패턴을 설명한다.
 
-# 배경지식
+# 배경지식/전제
 
 들어가기 전에 몇가지에 대해서 알아보자.
 
 ## 우리는 HDD를 쓸 수 밖에 없다. 
 
-현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 매우 비싸다. 따라서 우리는 HDD를 쓸수밖에 없다. SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
+현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 매우 비싸다. 아래 그림은 서버용 HDD와 SSD를 비교한 것이다. 즉 우리는 HDD를 쓸수밖에 없다. SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
 
 __SSD vs. HDD__ 비싸다.
 ![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
 
-돈이 꽤 있어서 HDD 대신 SSD를 살 수 있다고 그것을 실천하는 것은 현명하지 않을 수 있다. 
-1. __`최대용량`__ 그리고 HDD대비 용량이 낮기 때문에 같은 용량을 위해서는 HDD보다 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다. 
+돈이 넉넉히 있어서 HDD 대신 SSD를 살 수 있다고 그것을 실천하는 것은 현명하지 않을 수 있다. 
+1. __`가격`__ 일단 비싸다.
+   1. __`SSD 비용`__ 가격 대비 용량이 낮다.
+   2. __`서버비용`__ HDD대비 용량이 작기 때문에 같은 용량을 확보하기 위해서는 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다. 
 2. __`리소스간 밸런스`__ 많은 경우 HDD는 bottleneck 이지만 "항상" 그런 것은 아니다. SDD에 투자할 비용을 다른 리소스에 투자함으로써 전체적인 성능이 더 올라갈 수 있다.
    1. __`Spark, presto`__ In-memory 프로세싱 작업을 할 것이라면 좋은 CPU와 많은 메모리를 사라.
    2. __`데이터레이크`__ 디스크는 중요하다. 하지만 그돈을 아껴서 높은 대역폭의 스위치를 이중화하는 데 써라.
@@ -31,9 +33,8 @@ __SSD vs. HDD__ 비싸다.
 
 __`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
 
-![](https://t1.daumcdn.net/cfile/tistory/264EE6445509188C1A)
-
-(이미지 출처: https://queue.acm.org/detail.cfm?id=1563874 )
+<img src="resources/how_storages_care_large_data/ssh_hdd_seq_write.png" width="200">
+<img src="resources/how_storages_care_large_data/ssh_hdd_random_write.png" width="200">
 
 __마음에 안정이 좀 되시나요?__
 
@@ -178,7 +179,7 @@ __`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터�
         * 더 많은 프로세싱 필요
         * 클라이언트와 통신량 증가
         * NameNode 시작시간이 길어진다
-    * 작은 파일을 작은 블럭사이즈로 저장하는 것은 HDFS 목표에 맞지 않는다.
+    * 작은 블럭사이즈에 작은 파일들을 저장하는 것은 HDFS 목표에 맞지 않는다.
 
 ## Bigquery
 * 토폴로지
