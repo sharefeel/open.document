@@ -20,11 +20,11 @@ __SSD vs. HDD__ 비싸다.
 
 돈이 넉넉히 있어서 HDD 대신 SSD를 살 수 있다고 그것을 실천하는 것은 현명하지 않을 수 있다. 
 1. __`가격`__ 일단 비싸다.
-   1. __`SSD 비용`__ 가격 대비 용량이 낮다.
-   2. __`서버비용`__ HDD대비 용량이 작기 때문에 같은 용량을 확보하기 위해서는 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다. 
+   1. __`SSD 비용`__ 용량 대비 가격이 비싸다.
+   2. __`서버비용`__ HDD대비 디스크당 용량이 작기 때문에 같은 용량을 확보하기 위해서는 더 많은 서버수가 필요하다. 그만큼 서버구매비용, 상면비용, 운영비용이 추가투입되어야 한다.
 2. __`리소스간 밸런스`__ 많은 경우 HDD는 bottleneck 이지만 "항상" 그런 것은 아니다. SDD에 투자할 비용을 다른 리소스에 투자함으로써 전체적인 성능이 더 올라갈 수 있다.
    1. __`Spark, presto`__ In-memory 프로세싱 작업을 할 것이라면 좋은 CPU와 많은 메모리를 사라.
-   2. __`데이터레이크`__ 디스크는 중요하다. 하지만 그돈을 아껴서 높은 대역폭의 스위치를 이중화하는 데 써라.
+   2. __`데이터레이크`__ 디스크 성능은 중요하지만 네트워크 성능 역시 중요하다. 높은 대역폭의 스위치를 이중화해라.
 
 ## 파일시스템
 * 파일 = 헤더+데이터블럭의 조합
@@ -33,8 +33,10 @@ __SSD vs. HDD__ 비싸다.
 
 __`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
 
-<img src="resources/how_storages_care_large_data/ssh_hdd_seq_write.png" width="200">
-<img src="resources/how_storages_care_large_data/ssh_hdd_random_write.png" width="200">
+<img src="resources/how_storages_care_large_data/ssd_hdd_seq_write.png" width="400">
+<img src="resources/how_storages_care_large_data/ssd_hdd_random_write.png" width="400">
+
+HDD는 random access에 매우 취약하다. 물론 이는 단순 벤치마크이며 application이 동작할때의 퍼포먼스의 격차는 적다. [자료출처: 테크스팟](https://www.techspot.com/review/1956-storage-performance/)
 
 __마음에 안정이 좀 되시나요?__
 
@@ -42,17 +44,20 @@ __마음에 안정이 좀 되시나요?__
 
 ## CAP 이론
 
-분산환경에서 CAP (Consistency, Availibility, Partition Tolerance)를 모두 만족하는 것은 불가능하다. 현생하는 저장소들은 이 중 두가지 속성을 만족시키면서 각자의 길을 가고 있다. (자신이 알고 있는 저장소가 어디에 위치하는지를 보면서 고개를 끄덕이시면 됩니다.)
+분산환경에서 CAP (Consistency, Availibility, Partition Tolerance)를 모두 만족하는 것은 불가능하다. 현생하는 저장소들은 다음 세가지 중 두가지 속성을 만족시키면서 각자의 길을 가고 있다. (자신이 알고 있는 저장소가 어디에 위치하는지를 보면서 고개를 끄덕이시면 됩니다.)
+* Availability
+* Consistency 
+* Partition Tolerance
 
 ![](resources/how_storages_care_large_data/cap.png)
 
-__`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 stroing consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 write 하면 각 분산 노드에 저장된 데이터는 언젠가는 동기화되다는 것을 보장한다.
+__`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 strong consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 eventual consistency는 write하면 언젠가는 각 분산노드가 같은 데이터를 가지게 되는 것을 의미한다. 즉 최종적으로는 데이터가 반영되지 않고 유실되거나 각기 다른 두 write의 결과가 섞이는 일은 없다.
 
-__`Eventual Consistency`__ 사실상 분산 storage에서 eventual consistency는 성능상 불가항력적인 선택이다. 이는 strong consistency를 지원하는 분산스토리지인 zookeeper가 동기화 비용으로 인해 극단적으로 낮은 write throughput을 보이는 것을 보면 알 수 있다. 
+__`Eventual Consistency의 선택`__ 사실상 분산 storage에서 eventual consistency는 성능측면에서 불가항력적인 선택이다. 이는 strong consistency를 지원하는 분산스토리지인 zookeeper가 동기화 비용으로 인해 극단적으로 낮은 write throughput을 보이는 것을 보면 알 수 있다.
 
 ## 정규화에 대한 태도
 
-RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 별도 테이블로 분리하도록 설계하고, 분리된 두 테이블을 join 함으로써 하나의 데이터가 완성한다.
+RDBMS 데이터 모델링의 덕목중 하나로 정규화가 있다. 공통된 데이터를 별도 테이블로 분리하도록 설계하고, 분리된 두 테이블을 join 함으로써 하나의 데이터가 완성한다.
 
 ![](resources/how_storages_care_large_data/rdb_nosql_model.png)
 
@@ -68,6 +73,21 @@ RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 
 * Sequential write
 * 데이터 정합성은 애플리케이션의 책임
 
+### 테이블 설계 먼저냐? 쿼리 작성이 먼저냐?
+테이블을 먼저 설계하고 쿼리를 작성해야할까? 아니면 그 반대일까? 둘 작업이 100% 선후관계는 있지 않겠지만 대체로 다음 순서로 진행된다.
+* RDBMS는 데이터모델에 따라 테이블을 설계한 후 그에 맞게 쿼리를 작성한다.
+* nosql은 유연함이 떨어지기 때문에 원하는 쿼리를 먼저 정의하고 그에 맞게 테이블을 설계한다.
+
+## 파티셔닝, 파티션 내 정렬
+
+쿼리가 있는 저장소는 파티셔닝과 파티션내 정렬을 통해서 성능향상을 지원함. 파티션, 클러스터링, predicated pushdown 등 이름은 다양하더라도 결국 추구하는 바는 "스캔범위 감소"이다. 
+
+![](resources/how_storages_care_large_data/cassandra_partition_clustering.png)
+
+(자료출처: https://www.instaclustr.com/cassandra-data-partitioning/)
+
+위 그림은 cassandra의 파티셔닝과 클러스터링을 보여준다. 파티션키인 date를 통해서 노드를 찾음으로써 읽어야할 데이터의 수를 감소하고, 클러스터링키인 timestamp를 검색에 힌트로써 활용한다. Hive의 경우에도 데이터파일인 orc를 특정 컬럼을 기준으로 분할(파티션)하여 저장하는 최적화 기능을 제공하며, 특정 컬럼을 기준으로 데이터를 정렬하여 저장한다.
+
 
 # 저장소별 특성
 
@@ -79,7 +99,7 @@ RDBMS는 막강한 기능을 가지고 있지만 대량 데이터처리에 있�
 
 * 토폴로지
   * 태생적으로 서버 한대에서 모든 데이터를 저장 및 프로세싱
-  * 장비 스펙이 곧 성능
+  * 장비 스펙이 곧 저장소 성능
 * 막강한 기능
   * 데이터간 relation
   * 정규화
@@ -99,38 +119,35 @@ RDBMS는 막강한 기능을 가지고 있지만 대량 데이터처리에 있�
 * 토폴로지
    * 멀티 파티션으로 데이터 분산해서 저장
    * 수평확장 가능
-   * Producer에 의한 밸런싱 (기본밸런싱 알고리즘은 RR)
-   * 메타 관리
+   * 파티션간 밸런싱은 producer에 위임
+      * Broker 부하 없음
+      * 기본 정책은 가용한 파티션에 대해서 round-robin
+   * 메타 관리를 zookeeper에 위임
       * Zookeeper로 멤버쉽과 토픽정보만 관리
       * Replication을 제외하면 장비간 통신 없음
-      * 매우 단순한 구조로써 동기화 비용이 제거됨
+   * 전체적으로 볼때 카프카 각 서버는 zookeeper의 지령을 받아서 각자도생하는 매우 단순한 구조
 * IO 최적화
-   * Read / Write 모두 sequential io. (Read의 경우 시작지점은 지정 가능)
+   * Read / Write 모두 sequential io. (Read는 예외가 있음)
    * OS 버퍼캐쉬 적극 활용
    * 동시에 쓸수 있는 디스크수를 늘리는 것이 핵심
-   * Write-once read-many
-* 요약
-   * 현존하는 저장소중 최고의 throughput, iops
-   * 매우 단순한 I/O API만 제공
-
+   * HDD와 SSD 사용에 따른 성능 차이 없음
 
 ## Apache Cassandra
 
 [카산드라가 뭔가?](https://meetup.toast.com/posts/58)
 
-__`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리 카산드라는 모든 노드가 동등한 역할을 한다. Seed 노드 개념이 있으나 클라이언트가 장비의 discovery를 하기 위해서만 사용되며 다수의 노드가 seed가 될 수 있다.
+__`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리 카산드라는 모든 노드가 동등한 역할을 한다. Seed 노드 개념이 있으나 서버 discovery용도로만 사용되며 또한 다수의 노드가 seed가 될 수 있다. (카산드라 클러스터 시작시 최소 하나의 seed 노드가 먼저 시작되어야 한다)
 
 ![](https://www.scnsoft.com/blog-pictures/business-intelligence/cassandra-vs-hdfs-02_1.png)
 
-* 토폴로지    
+* 토폴로지
    * 모든 노드는 데이터의 저장과 프로세싱에서 동등한 역할을 수행
    * 데이터는 각 노드에 분산되어 저장
      * 테이블 생성시 전체 장비에 동일한 디렉토리가 생성됨
-     * 데이터 저장 위치는 primary key를 샤딩하여 결정
-     * 노드 다운에 대비해 consistency hashing + vnode 개념을 사용
+     * 데이터 저장 위치는 primary key를 샤딩하여 결정 / key를 잘못잡으면 특정 노드에 데이터 몰림
    * 메타 관리
      * 멤버쉽 및 테이블 스키마 정보
-     * 모든 노드가 클러스터 전체의 메타를 가지고 있음
+     * 모든 노드가 클러스터 전체의 메타를 복제해서 가지고 있음
      * 특정 노드에서 스키마변화(테이블 생성등)를 실행하면 해당 정보는 전체 클러스터에 동기화 과정이 필요
      * 동기화 이전까지 추가 스키마 변경은 불가능
      * 클러스터가 동기화 되지 않은 상태로 남아 버리는 현상이 발생면 난감함
@@ -138,11 +155,11 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리 카�
        * 믿을건 stackoverflow와 조직장의 결단 뿐
 * IO 최적화
    * 데이터 저장 구조
-     * `MemTable / SSTable / CommitLog` write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 리턴. 주기적으로 디스크의 SSTable로 flush
+     * `MemTable / SSTable / CommitLog` Write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 클라이언트로 리턴. 주기적으로 디스크의 SSTable로 flush
        * `SSD for commitlog` Write ahead log 성격인 commit log는 IOPS가 매우 높기 때문에 SSD에 분리저장하기도 함
    * 쿼리별 동작
-     * `INSERT` 파일 뒤에 append
-     * `DELETE` 해당 row에 삭제되었음을 마킹(tombstone). 데이터는 삭제하지 않음
+     * `INSERT` SSTable 파일에 append, index 파일 업데이트
+     * `DELETE` 해당 row에 삭제되었음을 마킹(tombstone). 쿼리시 데이터는 삭제하지 않음
      * `UPDATE` Insert & delete
    * Compaction
      * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커짐
@@ -179,17 +196,28 @@ __`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터�
         * 더 많은 프로세싱 필요
         * 클라이언트와 통신량 증가
         * NameNode 시작시간이 길어진다
-    * 작은 블럭사이즈에 작은 파일들을 저장하는 것은 HDFS 목표에 맞지 않는다.
+  * 작은 많은 파일은 HDFS 사상에 맞지 않는다.
+    * 파일 갯수 감소 필요
+      * hive에 저장된 데이터파일이 너무 많다! 파일들을 머지해서 큰 파일 생성 --> 테이블의 데이터 경로를 변경하는 식으로 관리.
+      * 잘 안쓰는 파일은 압축해서 저장
+    * `Name node federation` 네임노드를 여러개두고 hdfs 파일 경로를 샤딩하여 네임노드들이 나누어가짐
 
-## Bigquery
+## GCP Bigquery
+
+구글 클라우드에서 지원하는 빅쿼리는 대량의 데이터에 대해서 매우 빠른 속도로 처리를 한다. 다들 자기네 서비스 좋다고 광고해서 써보면 별로인 경우가 대다수인데, 빅쿼리는 정말로 빠르다.
+
+[얼마나 빠른지 직접 보자](https://cloud.google.com/blog/products/gcp/anatomy-of-a-bigquery-query)
+
 * 토폴로지
   * Managed Service이다보니 알려진 것이 적음
 * IO 최적화
-  * Insert 시 append. Create 
-  * SELECT : 범위 미지정시 full 스캔
-  * UPDATE / DELETE 를 위해서는 신규테이블 생성
-    * 예) 테이블에서 row2를 지우려면? Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지
-  * 빅쿼리는 테이블의 스캔 범위가 넓을 수록 다른 저장소에 비해서 압도적인 성능을 보임. 비록 과금 체계가 처리되는 데이터량에 비례하기 때문에 scan 범위를 줄여야 한다.
+  * 쿼리별 동작
+    * `INSERT` 시 append
+    * `SELECT` 범위 미지정시 full 스캔
+    * `UPDATE / DELETE` 미지원
+      * 만약 테이블에서 row2를 지우려면? ___Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지___
+  * `파티션` 스캔범위를 줄임으로써 쿼리 성능향상, 비용감소
+  * `클러스터링` 특정열을 기준으로 정렬. 해당열을 사용하는 작업시 성능향상
 
 # Keywords
-    #sequential access #append #write-once read-many #fullscan #weak consistency
+#sequential access #append #write-once read-many #scan #partition #clustering #weak consistency #sharding
