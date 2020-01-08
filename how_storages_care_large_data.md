@@ -62,9 +62,9 @@ RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 
 
 반면 nosql 계열은 성능을 위해 의도적으로 정규화를 하지 않는다.
 * Update IO는 없거나 매우 드뭄 (write-once read-many에 최적화)
-* Join 없이 하나의 row에 모든 데이터를 저장함으로써 read시 탐색과 로딩 비용 감소
-* 분산 저장소이기 때문에 RDBMS 대비 공간의 값어치는 낮음
-* Random access의 배제
+* Join이 없으므로 read시 탐색 및 로딩 횟수가 줄어듬
+* 공간은 확장 가능
+* Sequential write
 * 데이터 정합성은 애플리케이션의 책임
 
 
@@ -72,24 +72,24 @@ RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 
 
 사실상 이 글을 쓴 목적은 기존의 RDBMS와 비교하여 현재 많이 사용되는 저장소들의 특징을 알아보자는 것이다.
 
-## RDBMS
+## RDBMS (비교 대상)
 
-기본적으로 RDBMS 장비 1대이며 다수이더라도 HA, Master-slave 등의 구성이다. 오라클에서 쓸만한 분산 RDB라는 엄청난걸 만들었다던데 모르긴 해도 오라클이니만큼 가격이 자비없지 않을까 생각된다.
+RDBMS는 막강한 기능을 가지고 있지만 대량 데이터처리에 있어서 한계를 가지고 있다.
 
 * 토폴로지
-  * 태생적으로 서버 한대에서 모든 데이터를 저장 및 프로세싱하며 여러 변종들이 추가되지만 기본 뼈대는 크게 벗어나지 않는다.
+  * 태생적으로 서버 한대에서 모든 데이터를 저장 및 프로세싱
   * 장비 스펙이 곧 성능
 * 막강한 기능
   * 데이터간 relation
   * 정규화
+  * ACID
 * IO 최적화
-  * Write-many read-many (이런 용어가 있는지 모르지만, 요즘 저장소들이 write-once read-many에 최적화된 것과는 대비된다.)
-  * 
+  * Write-many read-many (이런 용어가 있는지 모르지만 분명히 write 성능이 우수하다) 
   * 인덱싱, 파티션, .. 잘 모름
 
 ## Apache Kafka
 
-카프카 역시 저장소이다.
+단순하지만 확장성, latency, throughput 면에서 최고의 저장소
 
 <img src="resources/how_storages_care_large_data/kafka-topic-partition-layout.png" width=500>
 
@@ -115,41 +115,45 @@ RDBMS 설계의 덕목중 하나로 정규화가 있다. 공통된 데이터를 
 
 ## Apache Cassandra
 
-__`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카산드라는 
+[카산드라가 뭔가?](https://meetup.toast.com/posts/58)
+
+__`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리 카산드라는 모든 노드가 동등한 역할을 한다. Seed 노드 개념이 있으나 클라이언트가 장비의 discovery를 하기 위해서만 사용되며 다수의 노드가 seed가 될 수 있다.
 
 ![](https://www.scnsoft.com/blog-pictures/business-intelligence/cassandra-vs-hdfs-02_1.png)
 
 * 토폴로지    
-   * NoSQL, Colomn-oriented
-   * 데이터는 각 노드에 분산되어 저장되며 저장 위치는 primary key 기반으로 샤딩
-     * 노드 다운에 대비해 consistency hashing을 사용. 
+   * 모든 노드는 데이터의 저장과 프로세싱에서 동등한 역할을 수행
+   * 데이터는 각 노드에 분산되어 저장
+     * 테이블 생성시 전체 장비에 동일한 디렉토리가 생성됨
+     * 데이터 저장 위치는 primary key를 샤딩하여 결정
+     * 노드 다운에 대비해 consistency hashing + vnode 개념을 사용
    * 메타 관리
-     * 멤버쉽, 스키마 정보가 운영에 필요
-     * 각 노드가 클러스터 전체의 메타를 가지고 있음 
+     * 멤버쉽 및 테이블 스키마 정보
+     * 모든 노드가 클러스터 전체의 메타를 가지고 있음
      * 특정 노드에서 스키마변화(테이블 생성등)를 실행하면 해당 정보는 전체 클러스터에 동기화 과정이 필요
      * 동기화 이전까지 추가 스키마 변경은 불가능
-     * 동기화 되지 않은 상태로 남아 버리는 현상이 발생면 난감함
+     * 클러스터가 동기화 되지 않은 상태로 남아 버리는 현상이 발생면 난감함
        * 라이브에서 발생하면 원인을 찾기도 대응을 하기도 힘듬. 다 그렇지만 이런 문제는 재현도 안됨
        * 믿을건 stackoverflow와 조직장의 결단 뿐
 * IO 최적화
    * 데이터 저장 구조
-     * `MemTable / SSTable / CommitLog` write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 리턴. 주기적으로 SSTable로 flush가 있어나며 이때 
+     * `MemTable / SSTable / CommitLog` write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 리턴. 주기적으로 디스크의 SSTable로 flush
+       * `SSD for commitlog` Write ahead log 성격인 commit log는 IOPS가 매우 높기 때문에 SSD에 분리저장하기도 함
    * 쿼리별 동작
-     * INSERT: 파일 뒤에 append
-     * DELETE: 해당 row에 삭제되었음을 마킹 (tombstone) 
-     * UPDATE: Insert & delete
+     * `INSERT` 파일 뒤에 append
+     * `DELETE` 해당 row에 삭제되었음을 마킹(tombstone). 데이터는 삭제하지 않음
+     * `UPDATE` Insert & delete
    * Compaction
-     * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커지게됨 (SELECT 성능도 저하)
-     * Compaction을 실행하면 tomestone 마킹된 row를 제외하고 다시 파일을 생성함
-     * 단 compaction은 시스템 리소스를 많이 소모함
-   * Write-once read-many
-* 요약
-   * 
+     * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커짐
+     * Compaction을 실행하면 tomestone row를 제외하고 다시 파일을 생성함
+     * Compaction은 시스템 리소스를 많이 소모
 
 
 ## HDFS (Hadoop Distributed File System)
 
-__`Namenode + Datanode + Client library`__ 
+대용량 분산저장소의 대명사인 HDFS에 대해서도 알아보자.
+
+__`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터에 접근하는 flow
 
 ![](resources/how_storages_care_large_data/hdfs_simple_picture.png)
 
@@ -160,7 +164,7 @@ __`Namenode + Datanode + Client library`__
     * `Client` Namenode에 접속하여 메타를 가져오고 그것을 기반으로 datanode로 데이터를 송수신
   * 장비 스펙
     * `NameNode` 높은 CPU, 비싼 디스크, 많은 메모리
-    * `DataNode` 저사양 CPU, 메모리, 많은 디스크 / 프로세싱(spark, hive 등)에 사용할경우 CPU 메모리도 높아져야함 
+    * `DataNode` 저사양 CPU, 메모리, 많은 디스크 / 프로세싱(spark, hive 등)에 사용할경우 CPU 메모리도 높아져야함
 * IO 최적화
   * HDFS의 목표
     * 짧은 latency 보다 높은 throughput에 최적화
@@ -174,12 +178,7 @@ __`Namenode + Datanode + Client library`__
         * 더 많은 프로세싱 필요
         * 클라이언트와 통신량 증가
         * NameNode 시작시간이 길어진다
-    * 작은 파일을 작은 블럭사이즈로 저장하는 것은 HDFS 목표에 맞지 않는다. 
-  * Write-once read-many
-
-
-## Hive
-
+    * 작은 파일을 작은 블럭사이즈로 저장하는 것은 HDFS 목표에 맞지 않는다.
 
 ## Bigquery
 * 토폴로지
