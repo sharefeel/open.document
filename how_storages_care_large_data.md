@@ -57,7 +57,7 @@ __`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하�
 * IO 최적화
   * 인덱싱, 파티션, .. 잘 모름
 
-## Kafka
+## Apache Kafka
 
 카프카 역시 저장소이다.
 
@@ -77,12 +77,13 @@ __`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하�
    * Read / Write 모두 sequential io. (Read의 경우 시작지점은 지정 가능)
    * OS 버퍼캐쉬 적극 활용
    * 동시에 쓸수 있는 디스크수를 늘리는 것이 핵심
+   * Write-once read-many
 * 요약
    * 현존하는 저장소중 최고의 throughput, iops
    * 매우 단순한 I/O API만 제공
 
 
-## Cassandra
+## Apache Cassandra
 
 __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카산드라는 
 
@@ -100,8 +101,6 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카
      * 동기화 되지 않은 상태로 남아 버리는 현상이 발생면 난감함
        * 라이브에서 발생하면 원인을 찾기도 대응을 하기도 힘듬. 다 그렇지만 이런 문제는 재현도 안됨
        * 믿을건 stackoverflow와 조직장의 결단 뿐
-   * 데이터복제를 제외하면 장비간 통신 없음 --> 정보 동기화에 의한 지연시간 없음
-   * 클라이언트
 * IO 최적화
    * 데이터 저장 구조
      * `MemTable / SSTable / CommitLog` write 요청이 오면 메모리의 MemTable에 업데이트한 후 CommitLog에 write 사실을 기록하고 성공했음을 리턴. 주기적으로 SSTable로 flush가 있어나며 이때 
@@ -113,12 +112,12 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리, 카
      * delete / update가 반복되면 실제 테이블에 저장된 row 대비 파일 사이즈가 커지게됨 (SELECT 성능도 저하)
      * Compaction을 실행하면 tomestone 마킹된 row를 제외하고 다시 파일을 생성함
      * 단 compaction은 시스템 리소스를 많이 소모함
-   * 
+   * Write-once read-many
 * 요약
    * 
 
 
-## HDFS
+## HDFS (Hadoop Distributed File System)
 
 __`Namenode + Datanode + Client library`__ 
 
@@ -126,31 +125,38 @@ __`Namenode + Datanode + Client library`__
 
 * 토폴로지
   * Namenode + Datanode
-    * Namenode 는 메타데이터를, datanode는 데이터 블럭을 나눠가진다.
-    * Client는 namendoe에서 metadata를 읽어온 후 그 정보를 바탕으로 datanode에서 데이터를 읽어온다.
-    * Namenode가 죽으면 hadoop 전체가 사용불가능 --> Namenode HA 필수
-  * 
+    * `NameNode` 네임스페이스 역할을 하며 모든파일의 저장위치(datanode, 블럭정보)를 관리
+    * `DataNode` 데이터를 저장하고 클라이언트와 데이터를 송수신
+    * `Client` Namenode에 접속하여 메타를 가져오고 그것을 기반으로 datanode로 데이터를 송수신
+  * 장비 스펙
+    * `NameNode` 높은 CPU, 비싼 디스크, 많은 메모리
+    * `DataNode` 저사양 CPU, 메모리, 많은 디스크 / 프로세싱(spark, hive 등)에 사용할경우 CPU 메모리도 높아져야함 
 * IO 최적화
-  * 블럭 단위 지정
+  * HDFS의 목표
+    * 짧은 latency 보다 높은 throughput에 최적화
+    * 기가 또는 테라단위의 큰 파일에 최적화 
+  * 큰 블럭 사이즈
+    * default 64MB
+    * 블럭사이즈가 큰 경우 작은 파일을 저장할 경우 공간이 낭비된다
+    * 하지만 작아졌을때 발생하는 문제가 더 심각하다.
+      * `NameNode 리소스 사용량` 블럭의 수가 많아지면 namenode가 저장해야하는 정보가 그만큼 많아지므로 부하가 커진다. 
+        * 더 많은 메모리 필요
+        * 더 많은 프로세싱 필요
+        * 클라이언트와 통신량 증가
+        * NameNode 시작시간이 길어진다
+    * 작은 파일을 작은 블럭사이즈로 저장하는 것은 HDFS 목표에 맞지 않는다. 
+  * Write-once read-many
+
+
+## Hive
 
 
 ## Bigquery
 * 토폴로지
   * Managed Service이다보니 알려진 것이 적음
 * IO 최적화
-  * INSERT / SELECT 만 가능
+  * Insert 시 append. Create 
+  * SELECT : 범위 미지정시 full 스캔
   * UPDATE / DELETE 를 위해서는 신규테이블 생성
     * 예) 테이블에서 row2를 지우려면? Insert 새테이블 SELECT * FROM 기존테이블 WHERE row2 제외한나머지
-
-
-
-## C
-
-# 기술적 경향
-## Append 최적화
-Delete와 update를 지원하지 않거나 insert 대비 비효율적이다. 두 작업은 다음과 같은 특성을 가진다.
-- Insert : Sequential Access
-- Delete, Update : Random Access
-- Read 역시 sequantial 하게 처리
-
 
