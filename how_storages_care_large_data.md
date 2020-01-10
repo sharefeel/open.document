@@ -13,7 +13,7 @@
 
 ## 우리는 HDD를 쓸 수 밖에 없다. 
 
-현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 매우 비싸다. 아래 그림은 서버용 HDD와 SSD를 비교한 것이다. 즉 우리는 HDD를 쓸수밖에 없다. SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
+현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 매우 비싸다. 아래 그림은 서버용 HDD와 SSD를 비교한 것이다. 따라서 우리는 HDD를 쓸수밖에 없고, SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
 
 __SSD vs. HDD__ 비싸다.
 ![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
