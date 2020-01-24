@@ -27,11 +27,12 @@ __SSD vs. HDD__ 비싸다.
    2. __`데이터레이크`__ 디스크 성능은 중요하지만 네트워크 성능 역시 중요하다. 높은 대역폭의 스위치를 이중화해라.
 
 ## 파일시스템
+파일 시스템 특징 (중 이 글하고 관련된 내용)
 * 파일 = 헤더+데이터블럭의 조합
 * 블럭단위의 Random Access
 * OS 최적화: Cache, Sequential Access가 되도록 블럭 배치
 
-__`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
+__`비교: HDD vs SDD vs RAM`__ 아래 그림은 왜 sequential 하게 배치하는지를 보여준다.
 
 <img src="resources/how_storages_care_large_data/ssd_hdd_seq_write.png" width="400">
 <img src="resources/how_storages_care_large_data/ssd_hdd_random_write.png" width="400">
@@ -39,6 +40,7 @@ __`비교: HDD vs SDD vs RAM`__ 왜 sequential하게 관리하나?
 HDD는 random access에 매우 취약하다. 물론 이는 단순 벤치마크이며 application이 동작할때의 퍼포먼스의 격차는 적다. [자료출처: 테크스팟](https://www.techspot.com/review/1956-storage-performance/)
 
 __마음에 안정이 좀 되시나요?__
+실제 우리는 OS가 해주는 것 이상으로 파일시스템을 sequential 하게 관리하려고 노력하다.
 
 ![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
 
@@ -55,7 +57,7 @@ __`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하�
 
 __`Eventual Consistency의 선택`__ 사실상 분산 storage에서 eventual consistency는 성능측면에서 불가항력적인 선택이다. 이는 strong consistency를 지원하는 분산스토리지인 zookeeper가 동기화 비용으로 인해 극단적으로 낮은 write throughput을 보이는 것을 보면 알 수 있다.
 
-## 정규화에 대한 태도
+## 정규화에 대한 스탠스
 
 RDBMS 데이터 모델링의 덕목중 하나로 정규화가 있다. 공통된 데이터를 별도 테이블로 분리하도록 설계하고, 분리된 두 테이블을 join 함으로써 하나의 데이터가 완성한다.
 
@@ -64,29 +66,29 @@ RDBMS 데이터 모델링의 덕목중 하나로 정규화가 있다. 공통된 
 정규화를 통할 경우 다음과 같은 장점을 얻을 수 있다.
 * 공통된 데이터에 대한 update
 * 관계의 정의를 통한 데이터 정합성 확보
-* 공간의 절약 (공간은 비싼 리소스)
+* 공간의 절약 (공간은 매우 비싼 리소스이자 최대 용량에 한계가 있음)
 
 반면 nosql 계열은 성능을 위해 의도적으로 정규화를 하지 않는다.
 * Update IO는 없거나 매우 드뭄 (write-once read-many에 최적화)
 * Join이 없으므로 read시 탐색 및 로딩 횟수가 줄어듬
-* 공간은 확장 가능
+* 공간은 확장가능 (투자에 선형적으로 비례하여 늘어나는 무한한 리소스)
 * Sequential write
 * 데이터 정합성은 애플리케이션의 책임
 
 ### 테이블 설계 먼저냐? 쿼리 작성이 먼저냐?
-테이블을 먼저 설계하고 쿼리를 작성해야할까? 아니면 그 반대일까? 둘 작업이 100% 선후관계는 있지 않겠지만 대체로 다음 순서로 진행된다.
-* RDBMS는 데이터모델에 따라 테이블을 설계한 후 그에 맞게 쿼리를 작성한다.
-* nosql은 유연함이 떨어지기 때문에 원하는 쿼리를 먼저 정의하고 그에 맞게 테이블을 설계한다.
+테이블을 먼저 설계하고 쿼리를 작성해야할까? 아니면 그 반대일까? 두 작업이 100% 선후관계는 아니겠지만 대체로 다음 순서로 진행된다.
+* `RDBMS` 데이터모델에 따라 테이블을 설계한 후 그에 맞게 쿼리를 작성한다.
+* `nosql` 유연함이 떨어지기 때문에 원하는 쿼리를 먼저 정의하고 그에 맞게 테이블을 설계한다.
 
 ## 파티셔닝, 파티션 내 정렬
 
-쿼리가 있는 저장소는 파티셔닝과 파티션내 정렬을 통해서 성능향상을 지원함. 파티션, 클러스터링, predicated pushdown 등 이름은 다양하더라도 결국 추구하는 바는 "스캔범위 감소"이다. 
+저장소는 데이터를 파일에 할때 파티셔닝과 파티션내 정렬을 통해서 성능의 저하를 감소시킨다. 파티션, 클러스터링, predicated pushdown 등 이름은 다양하더라도 결국 추구하는 바는 __스캔범위의 감소__ 이다. 그러니 적극적으로 __잘__ 써야한다.
 
 ![](resources/how_storages_care_large_data/cassandra_partition_clustering.png)
 
 (자료출처: https://www.instaclustr.com/cassandra-data-partitioning/)
 
-위 그림은 cassandra의 파티셔닝과 클러스터링을 보여준다. 파티션키인 date를 통해서 노드를 찾음으로써 읽어야할 데이터의 수를 감소하고, 클러스터링키인 timestamp를 검색에 힌트로써 활용한다. Hive의 경우에도 데이터파일인 orc를 특정 컬럼을 기준으로 분할(파티션)하여 저장하는 최적화 기능을 제공하며, 특정 컬럼을 기준으로 데이터를 정렬하여 저장한다.
+위 그림은 cassandra의 파티셔닝과 클러스터링을 보여준다. 파티션키인 date를 통해서 데이터가 저장된 노드를 찾음으로써 읽어야할 데이터의 수를 감소하고, 클러스터링키인 timestamp를 검색에 힌트로써 활용한다. Hive의 경우에도 데이터파일인 orc를 특정 컬럼을 기준으로 분할(파티션)하여 저장하는 최적화 기능을 제공하며, 특정 컬럼을 기준으로 데이터를 정렬하여 저장한다.
 
 
 # 저장소별 특성
@@ -204,7 +206,7 @@ __`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터�
 
 ## GCP Bigquery
 
-구글 클라우드에서 지원하는 빅쿼리는 대량의 데이터에 대해서 매우 빠른 속도로 처리를 한다. 다들 자기네 서비스 좋다고 광고해서 써보면 별로인 경우가 대다수인데, 빅쿼리는 정말로 빠르다.
+구글 클라우드에서 지원하는 빅쿼리는 대량의 데이터에 대해서 매우 빠른 속도로 처리를 한다. 다들 자기네 서비스 좋다고 광고해서 써보면 별로인 경우가 대다수인데 반해서 빅쿼리는 정말로 광고하는 것처럼 빠르다.
 
 [얼마나 빠른지 직접 보자](https://cloud.google.com/blog/products/gcp/anatomy-of-a-bigquery-query)
 
@@ -220,4 +222,4 @@ __`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터�
   * `클러스터링` 특정열을 기준으로 정렬. 해당열을 사용하는 작업시 성능향상
 
 # Keywords
-#sequential access #append #write-once read-many #scan #partition #clustering #weak consistency #sharding
+ #sequential access #append #write-once read-many #scan #partition #clustering #weak consistency #sharding
