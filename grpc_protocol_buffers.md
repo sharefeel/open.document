@@ -20,39 +20,40 @@ protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이�
 스키마(데이터 타입)를 정의하는 .proto 파일을 작성하자. Json과 달리 avro, protobuf 등의 IDL은 스키마를 미리 정의한다.
 
 ```
+// code came from https://developers.google.com/protocol-buffers/docs/javatutorial
 syntax = "proto2";
 
-package tutorial;
+package net.youngrok.gist.protos;
 
-option java_package = "com.example.tutorial";
-option java_outer_classname = "AddressBookProtos";
+option java_package = "net.youngrok.gist.protos";
+option java_outer_classname = "AddressBookMessage";
 
 message Person {
-  required string name = 1;
-  required int32 id = 2;
-  optional string email = 3;
+    required string name = 1;
+    required int32 id = 2;
+    optional string email = 3;
 
-  enum PhoneType {
-    MOBILE = 0;
-    HOME = 1;
-    WORK = 2;
-  }
+    enum PhoneType {
+        MOBILE = 0;
+        HOME = 1;
+        WORK = 2;
+    }
 
-  message PhoneNumber {
-    required string number = 1;
-    optional PhoneType type = 2 [default = HOME];
-  }
+    message PhoneNumber {
+        required string number = 1;
+        optional PhoneType type = 2 [default = HOME];
+    }
 
-  repeated PhoneNumber phones = 4;
+    repeated PhoneNumber phones = 4;
 }
 
 message AddressBook {
-  repeated Person people = 1;
+    repeated Person people = 1;
 }
 ```
 서두에 언급했듯이 이 .proto 정의 version 2 이다. 실제 언어 스펙은 아래 링크를 참고
-- `language spec v2` https://developers.google.com/protocol-buffers/docs/reference/proto2-spec
-- `language spec v3` https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
+- `language guide v2` https://developers.google.com/protocol-buffers/docs/proto
+- `language guide v3` https://developers.google.com/protocol-buffers/docs/proto3
 
 위 protobuf 파일을 기반으로 json 샘플을 작성하면 대충 이런 식을 것이다.
 
@@ -68,10 +69,17 @@ message AddressBook {
         },
         {
             "number": "02-3273-8783",
+            "type": "HOME"
         }
     ]
 }
 ```
+
+### .proto 파일 컴파일
+
+설치했던 protobuf 컴포일러로 .proto 파일을 컴파일하여 언어의 클래스를 생성한다. 기본적인 protoc 사용법은 다음과 같다.
+
+
 
 
 ### IDE 플러그인
