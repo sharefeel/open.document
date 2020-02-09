@@ -50,7 +50,9 @@ message AddressBook {
   repeated Person people = 1;
 }
 ```
-서두에 언급했듯이 이 .proto 정의 version 2 
+서두에 언급했듯이 이 .proto 정의 version 2 이다. 실제 언어 스펙은 아래 링크를 참고
+- `language spec v2` https://developers.google.com/protocol-buffers/docs/reference/proto2-spec
+- `language spec v3` https://developers.google.com/protocol-buffers/docs/reference/proto3-spec
 
 위 protobuf 파일을 기반으로 json 샘플을 작성하면 대충 이런 식을 것이다.
 
@@ -62,7 +64,10 @@ message AddressBook {
     "phones": [
         {
             "number": "010-1024-2048",
-
+            "type": "MOBILE"
+        },
+        {
+            "number": "02-3273-8783",
         }
     ]
 }
