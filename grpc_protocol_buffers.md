@@ -2,6 +2,10 @@
 
 ## 해보자
 
+Java 에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 참고했으며 약간의 살을 더했다.
+
+돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서의 한글화를 안해준다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다.
+
 ### protoc 설치
 protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이다.
 
@@ -11,11 +15,20 @@ protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이�
 
 기본적으로 protobuf 컴파일러는 c++ 로 개발되어 있으며 소스코드 버전은 configure와 make 기반으로 빌드가 필요하다. 이 글에서는 prebuild된 컴파일러 기준으로 설명한다. (압축을 푼 디렉토리는 $PROTO_HOME으로 가정)
 
+### .proto 작성
+
+
+
 ### IDE 플러그인
 IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자.
 
+![](resources/grpc/protobuf_plugin_screenshot.png)
 
+Syntax error check, syntax highlighting, code formatting 등의 기능을 제공한다.
 
+### Maven plugin
+
+.proto 파일을 java 소스로 컴파일해주는 플러그인이다.
 
 
 # 참고
