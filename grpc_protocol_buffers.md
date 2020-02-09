@@ -4,7 +4,7 @@
 
 Java 에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 참고했으며 약간의 살을 더했다.
 
-돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서의 한글화를 안해준다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다.
+돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서의 한글화를 안해준다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2이다.
 
 ### protoc 설치
 protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이다.
@@ -17,14 +17,64 @@ protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이�
 
 ### .proto 작성
 
+스키마(데이터 타입)를 정의하는 .proto 파일을 작성하자. Json과 달리 avro, protobuf 등의 IDL은 스키마를 미리 정의한다.
+
+```
+syntax = "proto2";
+
+package tutorial;
+
+option java_package = "com.example.tutorial";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+  repeated PhoneNumber phones = 4;
+}
+
+message AddressBook {
+  repeated Person people = 1;
+}
+```
+서두에 언급했듯이 이 .proto 정의 version 2 
+
+위 protobuf 파일을 기반으로 json 샘플을 작성하면 대충 이런 식을 것이다.
+
+```
+{
+    "name": "이름",
+    "id" : 32,
+    "email": "이메일 주소",
+    "phones": [
+        {
+            "number": "010-1024-2048",
+
+        }
+    ]
+}
+```
 
 
 ### IDE 플러그인
-IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자.
+IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자. Syntax validation, syntax highlighting, code formatting 등의 개발 편의기능을 제공한다. 아래는 실제 적용한 예이며 formatting도 플러그인의 도움을 받았다.
 
 ![](resources/grpc/protobuf_plugin_screenshot.png)
 
-Syntax error check, syntax highlighting, code formatting 등의 기능을 제공한다.
+
 
 ### Maven plugin
 
