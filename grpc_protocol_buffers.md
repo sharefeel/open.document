@@ -161,9 +161,11 @@ public void writeMessage() {
     }
 }    
 ```
-위 코드를 실행하면 serialize된 데이터가 다음과 같이 addressbook.message 파일에 저장된다. 파일 용량은 107바이트로 같은 데이터 저장시 674바이트가 필요한 json보다 훨씬 작다.
+위 코드를 실행하면 serialize된 데이터가 다음과 같이 addressbook.message 파일에 저장된다. (Builder 기반으로 코드를 작성하긴 했는데 더 간결한 방법이 있는지는 모르겠다) 생성된 파일의 용량은 107바이트로써 같은 데이터 저장시 674바이트가 필요한 json보다 훨씬 작다.
 
 ![](resources/grpc/serialized_addressbook.png)
+
+파일에서 읽은 후 deserialize (parseFrom)을 거쳐서 제공되는 toString() 메소드로 화면에 출력하는 코드이다. AddressBook 객체를 생성해내는 것은 한줄이면 된다. (물론 exception 처리코드는 추가되야 한다.)
 
 ```java
 @Test
@@ -254,19 +256,38 @@ protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 
 # 타 IDL과의 비교
 
 ## JSON / XML
-이 글을 쓴 목적이지 사실
 
-- 스키마 있음 --> 오류가 적음
-- 바이너리
-  - 빠름 (serialize/deserialize >> json parsing
-  - human readable 하지 않음
-  - POJO 형태의 access / json object는 map기반 or pojo로 쓰기위해서는 object mapping 필요 (에러시 어떻게 되나?)
-- 작은사이즈 --> 전송량 감소, 메모리사용량감소
+Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다. 무책임한가? 컨셉이다.
+
+|  | Json | ProtoBuf |
+|---|---|---|
+| 스키마정의 | 없음 | 있음 |
+| 포맷 | 문자열 | 바이너리|
+| 파싱 | Json 파싱 | serialize/deserialize |
+| 범용성 | 매우 높음 | 낮음 |
+| 데이터타입 | 모호함 | 명확함 |
+
+
+항목별로 설명을 더해보자.
 
 ## Avro
 
+스키마정의/컴파일/(de)serialization 과정을 거친다는 면에서 avro와 protobuf의 기본적인 사용 패턴은 동일하다. 실제로 .avro와 .proto라는 파일명만 다를뿐 메세지를 만드는 과정은 완전히 동일하다. 하지만 serialize된 파일 포맷에 있어서 둘은 큰 차이를 가진다. Protobuf의 경우 serialize된 데이터는 value만을 가지고 있는 것과는 달리 avro는 self-describing 방식으로 value의 스키마 또는 스키마 버전을 포함하고 있다.
+
+- 당연히 value만 있는 것이 경량이며 통신에 유리하다. 하지만 이를 위해서는 생성자와 소비자가 동일한 스키마를 공유하고 있어야 하는 문제가 있다. 
+- 하지만 스키마가 변할 수 있는 경우 self-describing 방식이 더 적합하다. 특히 스키마의 life-cycle이 긴 경우 하위호환성 유지가 필수적이기 때문에 avro 쪽이 더 유리하다. 
+  - 장기간의 데이터를 하나의 테이블에 누적하여 저장하는 경우. 예) Hive table
+  - 통신의 두 peer의 스키마 버전 업데이트 시점이 별개인 경우. 예) 업데이트된 서버가 업데이트 되지 않은 클라이언트를 지원
+
+스키마의 진화(버전업) 측면에서도 avro가 protobuf방식보다 더 유리하다고 하는데 정확히 파악은 못했다. (Protobuf 역시 진화를 지원한다.) 다만 schema-registry와 kafka, hive에 사용되고 있다는 면에서 보자면 유연성에 있어서 protobuf보다 avro가 더 높은 점수를 받고 있다는 것을 알 수 있다.
+
+참고문서: http://sjava.net/2012/12/%EB%B2%88%EC%97%AD-%EC%97%90%EC%9D%B4%EB%B8%8C%EB%A1%9Cavro-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%EB%B2%84%ED%8D%BCprotocol-buffers-%EC%93%B0%EB%A6%AC%ED%94%84%ED%8A%B8thrift%EC%9D%98-%EC%8A%A4/
+
+이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. ``__하지만 이미 하둡쪽은 avro 세상이니 둘중 하나만 익히겠다고 하면 avro를 권한다.__``
 
 ## Thrift
+
+역사가 긴 IDL로써 그만큼 사용되는 곳이 매우 많다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
 
 
 ### IDE 플러그인
