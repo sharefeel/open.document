@@ -59,7 +59,7 @@ message AddressBook {
     repeated Person people = 1;
 }
 ```
-서두에 언급했듯이 이 .proto 정의 version 2 이다. 실제 언어 스펙은 아래 링크를 참고
+서두에 언급했듯이 이 .proto 정의 version 2 이다. 언어별 매뉴얼은 아래 링크 참고.
 - `language guide v2` https://developers.google.com/protocol-buffers/docs/proto
 - `language guide v3` https://developers.google.com/protocol-buffers/docs/proto3
 
@@ -102,14 +102,14 @@ message AddressBook {
 
 설치했던 protobuf 컴포일러로 .proto 파일을 컴파일하여 언어의 클래스를 생성한다. 기본적인 protoc 사용법은 다음과 같다.
 ```bash
-$ protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/addressbook.proto
+$ protoc -I=$SRC_DIR --java_out=$DST_DIR filetocomple.proto
 ```
 - `$SRC_DIR` .proto 파일 위치
 - `$DST_DIR` 자바 소스 디렉토리
-- `$SRC_DIR/addressbook.proto` 컴파일할
+- `filetocomple.proto` 컴파일할 .proto 정의 파일
 
 실행 예)
-Java 프로젝트를 생성하고 src/main/proto 디렉토리에 위 .proto 파일을 저장한후 컴파일 해보자. 명령어 실행위치는 프로젝트 홈디렉토리이다.
+Java 프로젝트를 생성하고 src/main/proto 디렉토리에 위 .proto 파일을 저장한후 컴파일 해보자. 명령어 실행위치는 프로젝트 홈디렉토리 즉 ${project.basedir} 이다.
 
 실행한 명령어
 ```bash
@@ -273,11 +273,7 @@ message PhoneNumber {
 
 protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources 단계에서 클래스를 생성하도록 설정해보자. Maven 플러그인을 통해서 할 수 있는데 maven-antrun-plugin과 maven두가지 방법이 대표적이지 않을까 한다.
 
-### 방법1 maven-antrun-plugin
-
-
-
-### 방법2 protobuf-maven-plugin
+protobuf-maven-plugin 이란 플러그인도 있는데 딱히 쓸만한게 못된다.
 
 
 
