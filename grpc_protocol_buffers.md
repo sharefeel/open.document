@@ -4,9 +4,9 @@
 
 # 해보자
 
-Java 에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 참고했으며 약간의 살을 더했다.
+Java 에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 좀 더 실생활에 쓸만하게 만들었다.
 
-돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서의 한글화를 안해준다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2이다.
+여담인데 protobuf가 돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서를 한글화해주지 않는다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2이다.
 
 ## 준비작업
 
@@ -257,9 +257,9 @@ Person ID: 33
 
 toString으로 출력했을때와의 차이가 보이는가? 메세지 작성시 02-3273-8783의 경우 전화번호 타입(MOBILE, HOME, WORK)를 선택하지 않았고 toString() 출력했을때는 타입이 보이지 않았다.
 ```
-  phones {
-    number: "02-3273-8783"
-  }
+phones {
+  number: "02-3273-8783"
+}
 ```
 하지만 .proto에서 PhoneNumber 정의시 PhoneType 디폴트값을 HOME으로 지정했기 때문에 02-3273-8783의 phoneNumber.getType()은 HOME을 리턴한다.
 ```
@@ -269,22 +269,55 @@ message PhoneNumber {
 }
 ```    
 
-## 좀 더 편하게 사용 (Maven Plugin)
+## 좀 더 편하게 사용
 
-protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources 단계에서 클래스를 생성하도록 설정해보자. Maven 플러그인을 통해서 할 수 있는데 maven-antrun-plugin과 maven두가지 방법이 대표적이지 않을까 한다.
+### .proto compile within maven
+protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources phase에서 protoc 명령어를 실행되도록 설정해보자. 여기서는 exec-maven-plugin을 사용했는데 maven-antrun-plugin을 사용해도 될 듯하다. (더 좋은 방법 있으면 알려주세요) Protobuf 컴파일러가 설치된 곳으로 ${protoc.home} 설정하고 argument 지정해서 사용하면 된다.
 
-protobuf-maven-plugin 이란 플러그인도 있는데 딱히 쓸만한게 못된다.
+```xml
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>exec-maven-plugin</artifactId>
+    <version>1.6.0</version>
+    <executions>
+        <execution>
+            <phase>generate-sources</phase>
+            <goals>
+                <goal>exec</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <executable>${protoc.home}/bin/protoc</executable>
+        <workingDirectory>${project.basedir}</workingDirectory>
+        <arguments>
+            <argument>-I=src/main/proto</argument>
+            <argument>--java_out=src/main/java</argument>
+            <argument>addressbook.proto</argument>
+        </arguments>
+    </configuration>
+</plugin>
+```
 
+플러그인: https://www.mojohaus.org/exec-maven-plugin/usage.html
 
+### IDE 플러그인
+IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자. Syntax validation, syntax highlighting, code formatting 등의 개발 편의기능을 제공한다. 아래는 실제 적용한 예이며 formatting도 플러그인의 도움을 받았다.
+
+![](resources/grpc/protobuf_plugin_screenshot.png)
+
+또한 compile 후 생성된 클래스를 지울때 safe-delete 기능도 제공한다. 아래는 java_outer_classname에 클래스이름이 지정되어 있어서 지울수 없는 예시인데 사실 이 기능은 오히려 귀찮다. "Search in comments and strings"를 해제하면 삭제 가능하다.
+
+![](resources/grpc/safe_delete_class.png)
 
 # 타 IDL과의 비교
 
 ## JSON / XML
 
-Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다. ~~무책임한가? 컨셉이다.~~
+Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다.
 
-|  | Json | ProtoBuf |
-|---|---|---|
+| | Json | ProtoBuf |
+|-|-|-|
 | 스키마정의 | 없음 | 있음 |
 | 포맷 | 문자열 | 바이너리|
 | 파싱 | Json 파싱 | serialize/deserialize |
@@ -307,18 +340,11 @@ Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protob
 
 참고문서: http://sjava.net/2012/12/%EB%B2%88%EC%97%AD-%EC%97%90%EC%9D%B4%EB%B8%8C%EB%A1%9Cavro-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%EB%B2%84%ED%8D%BCprotocol-buffers-%EC%93%B0%EB%A6%AC%ED%94%84%ED%8A%B8thrift%EC%9D%98-%EC%8A%A4/
 
-이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. ``__하지만 이미 하둡쪽은 avro 세상이니 protobuf와 avro둘중 하나만 익히겠다고 하면 avro를 권한다.__``
+이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. __`하지만 이미 하둡쪽은 avro 세상이니 protobuf와 avro둘중 하나만 익히겠다고 하면 avro를 권한다.`__ 구글이 하는 것이니만큼 avro보다 더 발전했을 수 있으나 적용된데가 없으면 무쓸모 아니겠는가.
 
 ## Thrift
 
 역사가 긴 IDL로써 그만큼 사용되는 곳이 매우 많다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
-
-
-### IDE 플러그인
-IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자. Syntax validation, syntax highlighting, code formatting 등의 개발 편의기능을 제공한다. 아래는 실제 적용한 예이며 formatting도 플러그인의 도움을 받았다.
-
-![](resources/grpc/protobuf_plugin_screenshot.png)
-
 
 # 참고
 
@@ -328,6 +354,6 @@ Java 프로그램 가이드: https://developers.google.com/protocol-buffers/docs
 
 프로토콜 버퍼 컴파일러: https://github.com/protocolbuffers/protobuf/releases/tag/v3.11.3
 
-Maven protocol buffers plugin: https://www.xolstice.org/protobuf-maven-plugin/examples/protoc-artifact.html
+Exec maven plugin: https://www.mojohaus.org/exec-maven-plugin/usage.html
 
 IntelliJ protobuf 플러그인: https://plugins.jetbrains.com/plugin/8277-protobuf-support
