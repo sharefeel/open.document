@@ -133,18 +133,86 @@ person.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBo
 </dependency>
 ```
 
-### Maven plugin
+## 사용
+
+백문이 불여일견. 코더는 코드로 말한다.
+
+```
+public class ProtocolBuffers {
+    private static final String SERIALIZED_ADDRESS_BOOK = "addressbook.message";
+
+    @Test
+    public void writeMessage() {
+        // Two persons
+        Person rock = Person.newBuilder().setName("rock").setId(32).setEmail("rock@nroll.com")
+                .addPhones(PhoneNumber.newBuilder().setNumber("010-1024-2048").setType(PhoneType.MOBILE).build())
+                .addPhones(PhoneNumber.newBuilder().setNumber("02-3273-8783")).build();
+        Person kai = Person.newBuilder().setName("kai").setId(33).setEmail("kai@database.org")
+                .addPhones(PhoneNumber.newBuilder().setNumber("010-1677-7216").setType(PhoneType.MOBILE).build())
+                .build();
+
+        // Addressbook
+        AddressBook addressBook = AddressBook.newBuilder().addPeople(rock).addPeople(kai).build();
+
+        // Write to file
+        try (OutputStream outputStream = new FileOutputStream(SERIALIZED_ADDRESS_BOOK)) {
+            addressBook.writeTo(outputStream);
+        } catch (IOException ignore) {
+        }
+    }
+
+    @Test
+    public void readMessage() {
+        try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
+            AddressBook addressBook = AddressBook.parseFrom(inputStream);
+            System.out.println(addressBook.toString());
+        } catch (IOException ignore) {
+        }
+    }
+
+    @Test
+    public void loopAddressBook() {
+        try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
+            AddressBook addressBook = AddressBook.parseFrom(inputStream);
+            for (Person person : addressBook.getPeopleList()) {
+                System.out.println("Person ID: " + person.getId());
+                System.out.println("  Name: " + person.getName());
+                if (person.hasEmail()) {
+                    System.out.println("  E-mail address: " + person.getEmail());
+                }
+
+                for (Person.PhoneNumber phoneNumber : person.getPhonesList()) {
+                    switch (phoneNumber.getType()) {
+                        case MOBILE:
+                            System.out.print("  Mobile phone #: ");
+                            break;
+                        case HOME:
+                            System.out.print("  Home phone #: ");
+                            break;
+                        case WORK:
+                            System.out.print("  Work phone #: ");
+                            break;
+                    }
+                    System.out.println(phoneNumber.getNumber());
+                }
+            }
+        } catch (IOException ignore) {
+        }
+    }
+}
+```
+
+## 좀 더 편하게 사용 (Maven Plugin)
 
 protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources 단계에서 클래스를 생성하도록 설정해보자. Maven 플러그인을 통해서 할 수 있는데 두가지 방법이 대표적이지 않을까 한다.
 
-#### 방법1 maven-ant-plugin
+### 방법1 maven-ant-plugin
 
 
 
-#### 방법2 protobuf-maven-plugin
+### 방법2 protobuf-maven-plugin
 
 
-## 사용
 
 
 
