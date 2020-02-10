@@ -109,11 +109,11 @@ $ protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/addressbook.proto
 - `$SRC_DIR/addressbook.proto` 컴파일할
 
 실행 예)
-Java 프로젝트를 생성하고 resource/protos 디렉토리에 위 .proto 파일을 위치 시킨후 컴파일 해보자. protoc는 resource/protos 즉 .proto 파일이 저장된 디렉토리에서 실행했다
+Java 프로젝트를 생성하고 src/main/proto 디렉토리에 위 .proto 파일을 저장한후 컴파일 해보자. 명령어 실행위치는 프로젝트 홈디렉토리이다.
 
 실행한 명령어
 ```bash
-$ protoc -I=. --java_out=../../java ./addressbook.proto
+$ protoc -I=src/main/proto --java_out=src/main/java addressbook.proto
 ```
 결과
 
@@ -135,12 +135,13 @@ person.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBo
 
 ## 사용
 
-백문이 불여일견. 코더는 코드로 말한다.
+백문이 불여일견. 코더는 코드로 말한다. 다음 세개의 예를 통해 사용법을 간단히 보자.
 
 - `writeMessage()` rock, kai 두 Person이 포함되어 있는 AddressBook 메세지를 파일에 저장
 - `readMessage()` 파일에 저장된 AddressBook을 읽어서 화면에 출력. 기본제공되는 toString() 사용
 - `loopAddressBook()` 실제 AddressBook 메세지를 사용하는 예제
 
+### 메세지 작성
 
 ```java
 private static final String SERIALIZED_ADDRESS_BOOK = "addressbook.message";
@@ -165,6 +166,7 @@ public void writeMessage() {
 
 ![](resources/grpc/serialized_addressbook.png)
 
+### 메세지 읽기
 파일에서 읽은 후 deserialize (parseFrom)을 거쳐서 제공되는 toString() 메소드로 화면에 출력하는 코드이다. AddressBook 객체를 생성해내는 것은 한줄이면 된다. (물론 exception 처리코드는 추가되야 한다.)
 
 ```java
@@ -177,9 +179,10 @@ public void readMessage() {
     }
 }
 ```
-출력 결과
 
-```json
+<details><summary>출력 결과(클릭)</summary>
+
+```
 people {
   name: "rock"
   id: 32
@@ -202,6 +205,9 @@ people {
   }
 }
 ```
+</details>
+
+### 실제 AddressBook을 navigate하는 코드
 
 ```java
 @Test
@@ -234,15 +240,40 @@ public void loopAddressBook() {
 }
 
 ```
+<details><summary>출력 결과</summary>
 
+```
+Person ID: 32
+  Name: rock
+  E-mail address: rock@nroll.com
+  Mobile phone #: 010-1024-2048
+  Home phone #: 02-3273-8783
+Person ID: 33
+  Name: kai
+  E-mail address: kai@database.org
+  Mobile phone #: 010-1677-7216
+```
+</details>
 
-
+toString으로 출력했을때와의 차이가 보이는가? 메세지 작성시 02-3273-8783의 경우 전화번호 타입(MOBILE, HOME, WORK)를 선택하지 않았고 toString() 출력했을때는 타입이 보이지 않았다.
+```
+  phones {
+    number: "02-3273-8783"
+  }
+```
+하지만 .proto에서 PhoneNumber 정의시 PhoneType 디폴트값을 HOME으로 지정했기 때문에 02-3273-8783의 phoneNumber.getType()은 HOME을 리턴한다.
+```
+message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+}
+```    
 
 ## 좀 더 편하게 사용 (Maven Plugin)
 
-protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources 단계에서 클래스를 생성하도록 설정해보자. Maven 플러그인을 통해서 할 수 있는데 두가지 방법이 대표적이지 않을까 한다.
+protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 maven의 generate-sources 단계에서 클래스를 생성하도록 설정해보자. Maven 플러그인을 통해서 할 수 있는데 maven-antrun-plugin과 maven두가지 방법이 대표적이지 않을까 한다.
 
-### 방법1 maven-ant-plugin
+### 방법1 maven-antrun-plugin
 
 
 
@@ -250,14 +281,11 @@ protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 
 
 
 
-
-
-
 # 타 IDL과의 비교
 
 ## JSON / XML
 
-Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다. 무책임한가? 컨셉이다.
+Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다. ~~무책임한가? 컨셉이다.~~
 
 |  | Json | ProtoBuf |
 |---|---|---|
@@ -283,7 +311,7 @@ Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protob
 
 참고문서: http://sjava.net/2012/12/%EB%B2%88%EC%97%AD-%EC%97%90%EC%9D%B4%EB%B8%8C%EB%A1%9Cavro-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%EB%B2%84%ED%8D%BCprotocol-buffers-%EC%93%B0%EB%A6%AC%ED%94%84%ED%8A%B8thrift%EC%9D%98-%EC%8A%A4/
 
-이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. ``__하지만 이미 하둡쪽은 avro 세상이니 둘중 하나만 익히겠다고 하면 avro를 권한다.__``
+이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. ``__하지만 이미 하둡쪽은 avro 세상이니 protobuf와 avro둘중 하나만 익히겠다고 하면 avro를 권한다.__``
 
 ## Thrift
 
