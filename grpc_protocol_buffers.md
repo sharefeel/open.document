@@ -25,9 +25,9 @@ protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이�
 
 ### .proto 작성
 
-다음은 전화부(AddressBook)의 스키마(데이터 타입)를 정의하는 .proto 파일이다. 
+다음은 전화부(AddressBook)의 스키마(데이터 타입)를 정의하는 .proto 파일이다. Github 마크다운은 protobuf 문법도 지원한다!
 
-```
+```protobuf
 // code came from https://developers.google.com/protocol-buffers/docs/javatutorial
 syntax = "proto2";
 
@@ -65,7 +65,7 @@ message AddressBook {
 
 위 protobuf 파일을 기반으로 json 샘플을 작성하면 대충 이런 식을 것이다.
 
-```
+```json
 {
     "people": [
         {
@@ -101,7 +101,7 @@ message AddressBook {
 ### .proto 파일 컴파일
 
 설치했던 protobuf 컴포일러로 .proto 파일을 컴파일하여 언어의 클래스를 생성한다. 기본적인 protoc 사용법은 다음과 같다.
-```
+```bash
 $ protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/addressbook.proto
 ```
 - `$SRC_DIR` .proto 파일 위치
@@ -112,7 +112,7 @@ $ protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/addressbook.proto
 Java 프로젝트를 생성하고 resource/protos 디렉토리에 위 .proto 파일을 위치 시킨후 컴파일 해보자. protoc는 resource/protos 즉 .proto 파일이 저장된 디렉토리에서 실행했다
 
 실행한 명령어
-```
+```bash
 $ protoc -I=. --java_out=../../java ./addressbook.proto
 ```
 결과
@@ -124,7 +124,7 @@ person.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBo
 ### 라이브러리
 
 위까지 실행하면 컴파일에러를 잔뜩 안고 있는 AddressBookMessage 클래스를 얻을 수 있다. 다른 IDL처럼 protobuf 역시 라이브러리가 필요하다. pom.xml 파일에 다음 의존성을 추가.
-```
+```xml
 <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 <dependency>
     <groupId>com.google.protobuf</groupId>
@@ -137,70 +137,104 @@ person.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBo
 
 백문이 불여일견. 코더는 코드로 말한다.
 
+- `writeMessage()` rock, kai 두 Person이 포함되어 있는 AddressBook 메세지를 파일에 저장
+- `readMessage()` 파일에 저장된 AddressBook을 읽어서 화면에 출력. 기본제공되는 toString() 사용
+- `loopAddressBook()` 실제 AddressBook 메세지를 사용하는 예제
+
+
+```java
+private static final String SERIALIZED_ADDRESS_BOOK = "addressbook.message";
+@Test
+public void writeMessage() {
+    // AddressBook with Two person
+    Person rock = Person.newBuilder().setName("rock").setId(32).setEmail("rock@nroll.com")
+            .addPhones(PhoneNumber.newBuilder().setNumber("010-1024-2048").setType(PhoneType.MOBILE).build())
+            .addPhones(PhoneNumber.newBuilder().setNumber("02-3273-8783")).build();
+    Person kai = Person.newBuilder().setName("kai").setId(33).setEmail("kai@database.org")
+            .addPhones(PhoneNumber.newBuilder().setNumber("010-1677-7216").setType(PhoneType.MOBILE).build())
+            .build();
+    AddressBook addressBook = AddressBook.newBuilder().addPeople(rock).addPeople(kai).build();
+    // Write to file
+    try (OutputStream outputStream = new FileOutputStream(SERIALIZED_ADDRESS_BOOK)) {
+        addressBook.writeTo(outputStream);
+    } catch (IOException ignore) {
+    }
+}    
 ```
-public class ProtocolBuffers {
-    private static final String SERIALIZED_ADDRESS_BOOK = "addressbook.message";
+위 코드를 실행하면 serialize된 데이터가 다음과 같이 addressbook.message 파일에 저장된다. 파일 용량은 107바이트로 같은 데이터 저장시 674바이트가 필요한 json보다 훨씬 작다.
 
-    @Test
-    public void writeMessage() {
-        // Two persons
-        Person rock = Person.newBuilder().setName("rock").setId(32).setEmail("rock@nroll.com")
-                .addPhones(PhoneNumber.newBuilder().setNumber("010-1024-2048").setType(PhoneType.MOBILE).build())
-                .addPhones(PhoneNumber.newBuilder().setNumber("02-3273-8783")).build();
-        Person kai = Person.newBuilder().setName("kai").setId(33).setEmail("kai@database.org")
-                .addPhones(PhoneNumber.newBuilder().setNumber("010-1677-7216").setType(PhoneType.MOBILE).build())
-                .build();
+![](resources/grpc/serialized_addressbook.png)
 
-        // Addressbook
-        AddressBook addressBook = AddressBook.newBuilder().addPeople(rock).addPeople(kai).build();
-
-        // Write to file
-        try (OutputStream outputStream = new FileOutputStream(SERIALIZED_ADDRESS_BOOK)) {
-            addressBook.writeTo(outputStream);
-        } catch (IOException ignore) {
-        }
-    }
-
-    @Test
-    public void readMessage() {
-        try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
-            AddressBook addressBook = AddressBook.parseFrom(inputStream);
-            System.out.println(addressBook.toString());
-        } catch (IOException ignore) {
-        }
-    }
-
-    @Test
-    public void loopAddressBook() {
-        try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
-            AddressBook addressBook = AddressBook.parseFrom(inputStream);
-            for (Person person : addressBook.getPeopleList()) {
-                System.out.println("Person ID: " + person.getId());
-                System.out.println("  Name: " + person.getName());
-                if (person.hasEmail()) {
-                    System.out.println("  E-mail address: " + person.getEmail());
-                }
-
-                for (Person.PhoneNumber phoneNumber : person.getPhonesList()) {
-                    switch (phoneNumber.getType()) {
-                        case MOBILE:
-                            System.out.print("  Mobile phone #: ");
-                            break;
-                        case HOME:
-                            System.out.print("  Home phone #: ");
-                            break;
-                        case WORK:
-                            System.out.print("  Work phone #: ");
-                            break;
-                    }
-                    System.out.println(phoneNumber.getNumber());
-                }
-            }
-        } catch (IOException ignore) {
-        }
+```java
+@Test
+public void readMessage() {
+    try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
+        AddressBook addressBook = AddressBook.parseFrom(inputStream);
+        System.out.println(addressBook.toString());
+    } catch (IOException ignore) {
     }
 }
 ```
+출력 결과
+
+```json
+people {
+  name: "rock"
+  id: 32
+  email: "rock@nroll.com"
+  phones {
+    number: "010-1024-2048"
+    type: MOBILE
+  }
+  phones {
+    number: "02-3273-8783"
+  }
+}
+people {
+  name: "kai"
+  id: 33
+  email: "kai@database.org"
+  phones {
+    number: "010-1677-7216"
+    type: MOBILE
+  }
+}
+```
+
+```java
+@Test
+public void loopAddressBook() {
+    try (InputStream inputStream = new FileInputStream(SERIALIZED_ADDRESS_BOOK)) {
+        AddressBook addressBook = AddressBook.parseFrom(inputStream);
+        for (Person person : addressBook.getPeopleList()) {
+            System.out.println("Person ID: " + person.getId());
+            System.out.println("  Name: " + person.getName());
+            if (person.hasEmail()) {
+                System.out.println("  E-mail address: " + person.getEmail());
+            }
+            for (Person.PhoneNumber phoneNumber : person.getPhonesList()) {
+                switch (phoneNumber.getType()) {
+                    case MOBILE:
+                        System.out.print("  Mobile phone #: ");
+                        break;
+                    case HOME:
+                        System.out.print("  Home phone #: ");
+                        break;
+                    case WORK:
+                        System.out.print("  Work phone #: ");
+                        break;
+                }
+                System.out.println(phoneNumber.getNumber());
+            }
+        }
+    } catch (IOException ignore) {
+    }
+}
+
+```
+
+
+
 
 ## 좀 더 편하게 사용 (Maven Plugin)
 
