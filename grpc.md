@@ -1,4 +1,4 @@
-# 개요
+# GRPC
 
 이 문서는 다음 내용을 다룬다.
 
@@ -12,6 +12,8 @@ GRPC가 RPC의 일종이긴 하지만 이글에서는 기존의 RPC와 비교하
 
 뭐 그냥 그렇다고... 구글하고 내가 소스리뷰하는 관계는 아니니까. 
 
+![](resources/grpc/grpc-usage.png)
+https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 # 배경지식
 

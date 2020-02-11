@@ -1,31 +1,51 @@
 # Protocol Buffers
 
-프로토콜 버퍼가 뭐냐? 이 자료는 구글에서 베끼자
+Protocol Buffers (이하 protobuf)는 구글에서 만든 Interface Description Language 이다. 현재 버전3까지 나왔으며 버전2도 계속 사용되고 있다. 같은 부류의 IDL로는 대표적으로 avro와 thrift이 있으며 사용하는 패턴은 셋 모두 동일하다. 데이터의 생산자와 소비자 관점에서 사용방법은 다음과 갈다.
 
-# 해보자
+- 생산자 소비자 공통
+  1. IDL 고유 언어로 데이터(메세지)를 정의
+- 생산자
+  1. 데이터 정의를 기반으로 사용 언어의 타입(클래스) 생성
+  2. 타입을 기반으로 데이터를 생성
+  3. 데이터를 바이너리 데이터로 serialize 하여 소비자에게 전달
+- 소비자
+  1. 데이터 정의를 기반으로 사용 언어의 타입(클래스) 생성
+  2. 바이너리 데이터를 deserialize 하여 언어 타입의 데이터 생성
+  3. 데이터 사용
 
-Java 에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 좀 더 실생활에 쓸만하게 만들었다.
+구글은 항상 json/xml과 protobuf를 비교하여 strict한 데이터 타입 정의, 파싱의 불필요, 작은 메세지 사이즈 등의 장점을 내세운다. 하지만 이는 protobuf의 장점이라기보다는 avro, thrift로 대표되는 바이너리 기반 IDL의 장점이며 이 분야에서 가장 큰 공헌을 한 것은 당연히 thrift이다.
+
+다음 그림은 모질라에서 북마크를 처리하는 과정을 보여주고 있다. Rust와 kotlin이라는 다른 언어로 작성된 프로그램이 데이터를 교환하는 방법을 보여준다. Rust 쪽이 생산자 kotlin 쪽이 소비자이다.
+
+![](resources/grpc/protobuf_mozilla_bookmark.png)
+
+이미지 출처:https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/files/2019/03/Protobufs.png
+
+# 한번 해보자
+
+Java에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 옮긴 것이며, 실생활에 사용할 수 있도록 maven과 관련된 내용을 추가했다. 덤으로 구글이 잘난체하는 것 갈아서 좀 까기도 했다.
 
 여담인데 protobuf가 돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서를 한글화해주지 않는다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2이다.
 
 ## 준비작업
 
 ### protoc 설치
-protoc는 .proto 파일을 언어별 클래스를 생성하는 컴파일러이다.
 
-[Github protobuffers release](https://github.com/protocolbuffers/protobuf/releases)에 접속하면 필요한 컴파일러를 다운받을 수 있다. 컴파일러는 압축 파일의 이름에 따라서 다음과 같이 분류되며 필요한 버전을 받아서 압축을 풀자.
-- `protobuf-언어-*` 컴파일러의 언어별 빌드 소스
+Protobuf 사용을 위해서는 가장 먼저 protobuf 컴파일러를 설치해야 한다. Protobuf의 데이터정의는 .proto 확장자로 저장되는데 protoc는 이 .proto 파일을 기반으로 언어별 클래스를 생성하는 역할을 한다.
+
+[Github protobuffers release](https://github.com/protocolbuffers/protobuf/releases)에 접속하면 필요한 컴파일러를 다운받을 수 있다. 컴파일러는 압축 파일의 이름에 따라서 다음과 같이 분류되니 필요한 버전을 받아서 압축을 풀자.
+- `protobuf-언어-*` 컴파일러의 언어별 소스코드 (빌드 필요)
 - `protoc-버전-플랫폼-아키텍쳐-*` 플랫폼과 아키텍처 별 prebuild된 컴파일러 바이너리
 
-기본적으로 protobuf 컴파일러는 c++ 로 개발되어 있으며 소스코드 버전은 configure와 make 기반으로 빌드가 필요하다. 이 글에서는 prebuild된 컴파일러 기준으로 설명한다. (압축을 푼 디렉토리는 $PROTO_HOME으로 가정)
+기본적으로 protobuf 컴파일러는 c++ 로 개발되어 있으며 소스코드 버전은 configure와 make 기반으로 빌드한다. 이 글에서는 prebuild된 컴파일러 기준으로 설명한다. 다운받아서 압축을 풀면 protoc.exe 파일이 있다.
 
 ## 스키마(타입) 정의 및 Java 클래스 변환 (컴파일)
 
-....
+앞서 설명했듯이 .proto로 스키마를 정의하고 컴파일하여 java 클래스를 생성하는 과정이 먼저 필요하다.
 
 ### .proto 작성
 
-다음은 전화부(AddressBook)의 스키마(데이터 타입)를 정의하는 .proto 파일이다. Github 마크다운은 protobuf 문법도 지원한다!
+다음은 전화부(AddressBook)의 스키마(데이터 타입)를 정의하는 .proto 파일이며 구글 튜토리얼에 나온 내용이다. Github 마크다운은 protobuf syntax highlighting도 지원한다!
 
 ```protobuf
 // code came from https://developers.google.com/protocol-buffers/docs/javatutorial
@@ -108,22 +128,19 @@ $ protoc -I=$SRC_DIR --java_out=$DST_DIR filetocomple.proto
 - `$DST_DIR` 자바 소스 디렉토리
 - `filetocomple.proto` 컴파일할 .proto 정의 파일
 
-실행 예)
-Java 프로젝트를 생성하고 src/main/proto 디렉토리에 위 .proto 파일을 저장한후 컴파일 해보자. 명령어 실행위치는 프로젝트 홈디렉토리 즉 ${project.basedir} 이다.
-
-실행한 명령어
+실행 예) Java 프로젝트를 생성하고 src/main/proto 디렉토리에 위 .proto 파일을 저장한후 컴파일 해보자. 명령어 실행위치는 프로젝트 홈디렉토리 즉 ${project.basedir} 이다.
 ```bash
 $ protoc -I=src/main/proto --java_out=src/main/java addressbook.proto
 ```
-결과
+실행결과
 
 ![](resources/grpc/compiled_protobuf_class.png)
 
-person.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBookMessage 클래스가 생성된 것을 볼 수 있다. 
+adressbook.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBookMessage 클래스가 생성된 것을 볼 수 있다. 
 
 ### 라이브러리
 
-위까지 실행하면 컴파일에러를 잔뜩 안고 있는 AddressBookMessage 클래스를 얻을 수 있다. 다른 IDL처럼 protobuf 역시 라이브러리가 필요하다. pom.xml 파일에 다음 의존성을 추가.
+protoc 명령어를 실행하고나면 컴파일에러를 잔뜩 안고 있는 AddressBookMessage 클래스를 얻을수 있다. pom.xml 파일에 다음 의존성을 추가.
 ```xml
 <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 <dependency>
@@ -167,7 +184,7 @@ public void writeMessage() {
 ![](resources/grpc/serialized_addressbook.png)
 
 ### 메세지 읽기
-파일에서 읽은 후 deserialize (parseFrom)을 거쳐서 제공되는 toString() 메소드로 화면에 출력하는 코드이다. AddressBook 객체를 생성해내는 것은 한줄이면 된다. (물론 exception 처리코드는 추가되야 한다.)
+파일에서 읽은 후 deserialize (parseFrom)을 거쳐서 제공되는 toString() 메소드로 화면에 출력하는 코드이다. AddressBook 객체를 생성해내는 것은 한줄이면 된다. (물론 parseFrom이 뱉는 exception 처리는 추가되야겠지)
 
 ```java
 @Test
@@ -205,6 +222,7 @@ people {
   }
 }
 ```
+입력한 데이터대로 출력된 것을 볼 수 있다. 
 </details>
 
 ### 실제 AddressBook을 navigate하는 코드
@@ -255,7 +273,7 @@ Person ID: 33
 ```
 </details>
 
-toString으로 출력했을때와의 차이가 보이는가? 메세지 작성시 02-3273-8783의 경우 전화번호 타입(MOBILE, HOME, WORK)를 선택하지 않았고 toString() 출력했을때는 타입이 보이지 않았다.
+toString으로 출력했을때와의 차이가 보이는가? 메세지 작성시 rock의 전화번호인 02-3273-8783에는 전화번호 타입(MOBILE, HOME, WORK)를 선택하지 않았고 toString() 출력했을때는 타입이 보이지 않았다.
 ```
 phones {
   number: "02-3273-8783"
@@ -312,20 +330,31 @@ IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.
 
 # 타 IDL과의 비교
 
-## JSON / XML
+## JSON (and XML)
+
+![](resources/grpc/json_OTL.png)
+
+이미지 출처: https://codeclimate.com/blog/choose-protocol-buffers/
 
 Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다.
 
 | | Json | ProtoBuf |
 |-|-|-|
 | 스키마정의 | 없음 | 있음 |
-| 포맷 | 문자열 | 바이너리|
-| 파싱 | Json 파싱 | serialize/deserialize |
-| 범용성 | 매우 높음 | 낮음 |
 | 데이터타입 | 모호함 | 명확함 |
+| 저장포맷 | 문자열 | 바이너리|
+| 파싱 | Json 파싱 | serialize/deserialize |
+| 범용성 | 매우높음 | 낮음 |
 
+Protobuf와 json 의 가장큰 차이는 protobuf가 schema를 가진다는 것이며 대부분의 장점들은 여기서 출발한다. 사전에 스키마를 공유해야만 한다는 문제가 있지만 이는 json 역시 마찬가지인 것이 "파싱하는 코드"가 곧 스키마이기 때문이다. ObjectMapping 방법을 사용할때는 말할 것도 없고.
 
-항목별로 설명을 더해보자.
+반면 json이 protobuf에 비해 가지는 장점은 압도적인 범용성과 거의 대부분의 분야에서 사용되고 있다는 것이다. 솔직히 말해서 protobuf의 저장 포맷이 human readable하지 않다는 단점 역시 protobuf가 널리 사용된다며 부각되지 않을 것이다. 스키마를 주입하면 매우 간편하게 readable하게 해주는 툴이 나올 수도 있고 아니면 그냥 사람이 protobuf readable하게 될 수도 있다. 사람은 적응의 동물이지 않은가.
+
+<details> <summary>당신도 packet-readable 해질 수 있다.</summary>
+
+![](resources/grpc/ws-main.png)
+
+</details>
 
 ## Avro
 
