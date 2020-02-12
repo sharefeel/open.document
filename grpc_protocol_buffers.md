@@ -19,7 +19,7 @@ Protocol Buffers (이하 protobuf)는 구글에서 만든 Interface Description 
 
 ![](resources/grpc/protobuf_mozilla_bookmark.png)
 
-이미지 출처:https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/files/2019/03/Protobufs.png
+이미지 출처: [Crossing the Rust FFI frontier with Protocol Buffers - Aprin 2, 2019](https://hacks.mozilla.org/2019/04/crossing-the-rust-ffi-frontier-with-protocol-buffers/)
 
 # 한번 해보자
 
@@ -334,7 +334,7 @@ IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.
 
 ![](resources/grpc/json_OTL.png)
 
-이미지 출처: https://codeclimate.com/blog/choose-protocol-buffers/
+이미지 출처: [5 Reasons to Use Protocol buffers Instead of JSON for Your Next Service - June 5, 2014](https://codeclimate.com/blog/choose-protocol-buffers/)
 
 Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 
 
@@ -395,13 +395,17 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 ## Thrift
 
-Facebook이 개발하고 현재 apache에 호스팅되고 있다. 매우 많은 언어(액션스크립트, C, C++, C#, 카푸치노, 코코아, 델파이, 얼랭, Go, 하스켈, 자바, Node.js, 오브젝티브-C, OCaml, 펄, PHP, 파이썬, 루비, 스몰토크, ..)를 지원하며 그만큼 사용되는 곳 역시 굉장히 많다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
+Facebook이 개발하고 현재 apache에 호스팅되고 있다. 매우 많은 언어(액션스크립트, C, C++, C#, 카푸치노, 코코아, 델파이, 얼랭, Go, 하스켈, 자바, Node.js, 오브젝티브-C, OCaml, 펄, PHP, 파이썬, 루비, 스몰토크, ..)를 지원하며 그만큼 만은 곳에 사용되고 있다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
+
+![](resources/grpc/ThriftArchitecture.png)
+
+그림출처: [A Guided Tour Through Thrift - August 23, 2016](https://sookocheff.com/post/thrift/a-tour-through-thrift/)
 
 # 참고
 
 Protocol Buffers 공홈: https://developers.google.com/protocol-buffers
 
-Java 프로그램 가이드: https://developers.google.com/protocol-buffers/docs/javatutorial
+Protobuf Java 튜토리얼: https://developers.google.com/protocol-buffers/docs/javatutorial
 
 프로토콜 버퍼 컴파일러: https://github.com/protocolbuffers/protobuf/releases/tag/v3.11.3
 
