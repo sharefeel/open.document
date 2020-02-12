@@ -23,13 +23,13 @@ Protocol Buffers (이하 protobuf)는 구글에서 만든 Interface Description 
 
 # 한번 해보자
 
-Java에서 해보자. 기본적으로는 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 옮긴 것이며, 실생활에 사용할 수 있도록 maven과 관련된 내용을 추가했다. 덤으로 구글이 잘난체하는 것 갈아서 좀 까기도 했다.
+Java에서 해보자. 이 문서는 기본적으로 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 옮긴 것이며, 실생활에 사용할 수 있도록 약간의 내용을 추가했다. 덤으로 구글이 잘난체하는 것 갈아서 좀 까기도 했다. 본문의 소스코드는 https://github.com/sharefeel/gist/ 에 가면 받을 수 있다.
 
-여담인데 protobuf가 돈되는 product가 아니라 그런지 (2020년기준) 나온지 11년이 지나도록 문서를 한글화해주지 않는다. 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2이다.
+여담인데 (2020년기준) 나온지 11년이 지나도록 문서가 한글화되지 않았고 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2를 다루고 있다.
 
 ## 준비작업
 
-### protoc 설치
+### Protobuf 컴파일러 protoc 설치
 
 Protobuf 사용을 위해서는 가장 먼저 protobuf 컴파일러를 설치해야 한다. Protobuf의 데이터정의는 .proto 확장자로 저장되는데 protoc는 이 .proto 파일을 기반으로 언어별 클래스를 생성하는 역할을 한다.
 
@@ -45,7 +45,7 @@ Protobuf 사용을 위해서는 가장 먼저 protobuf 컴파일러를 설치해
 
 ### .proto 작성
 
-다음은 전화부(AddressBook)의 스키마(데이터 타입)를 정의하는 .proto 파일이며 구글 튜토리얼에 나온 내용이다. Github 마크다운은 protobuf syntax highlighting도 지원한다!
+다음은 전화부(AddressBook)의 스키마를 정의하는 .proto 파일이며 구글 튜토리얼에 나온 내용이다. Github 마크다운은 protobuf syntax highlighting도 지원한다!
 
 ```protobuf
 // code came from https://developers.google.com/protocol-buffers/docs/javatutorial
@@ -79,11 +79,11 @@ message AddressBook {
     repeated Person people = 1;
 }
 ```
-서두에 언급했듯이 이 .proto 정의 version 2 이다. 언어별 매뉴얼은 아래 링크 참고.
+서두에 언급했듯이 이 .proto 정의는 버전2 문법으로 작성되었다. 버전별 언어 가이드는 아래 링크 참고.
 - `language guide v2` https://developers.google.com/protocol-buffers/docs/proto
 - `language guide v3` https://developers.google.com/protocol-buffers/docs/proto3
 
-위 protobuf 파일을 기반으로 json 샘플을 작성하면 대충 이런 식을 것이다.
+위 .proto 파일에 정의된 스키마에 따라서 json 샘플 데이터를 작성하면 대충 이런 식을 것이다. Addressbook 내에 rock, kai 두 Person이 등록된 예제이다.
 
 ```json
 {
@@ -120,7 +120,7 @@ message AddressBook {
 
 ### .proto 파일 컴파일
 
-설치했던 protobuf 컴포일러로 .proto 파일을 컴파일하여 언어의 클래스를 생성한다. 기본적인 protoc 사용법은 다음과 같다.
+설치했던 protobuf 컴파일러로 .proto 파일을 컴파일하여 언어의 클래스를 생성해야 한다. 기본적인 protoc 사용법은 다음과 같다.
 ```bash
 $ protoc -I=$SRC_DIR --java_out=$DST_DIR filetocomple.proto
 ```
@@ -336,7 +336,7 @@ IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.
 
 이미지 출처: https://codeclimate.com/blog/choose-protocol-buffers/
 
-Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 사실 이바닥에서 장점이라는 것 자체가 원래 이론적이거나 특정 분야에 한정하여 강점을 가지는 경우가 많다는 것 정도는 다들 알고 있으니 이글에서도 그냥 장점 위주로 적겠다.
+Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 
 
 | | Json | ProtoBuf |
 |-|-|-|
@@ -346,11 +346,33 @@ Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protob
 | 파싱 | Json 파싱 | serialize/deserialize |
 | 범용성 | 매우높음 | 낮음 |
 
-Protobuf와 json 의 가장큰 차이는 protobuf가 schema를 가진다는 것이며 대부분의 장점들은 여기서 출발한다. 사전에 스키마를 공유해야만 한다는 문제가 있지만 이는 json 역시 마찬가지인 것이 "파싱하는 코드"가 곧 스키마이기 때문이다. ObjectMapping 방법을 사용할때는 말할 것도 없고.
+Protobuf와 json 의 가장큰 차이는 protobuf가 schema를 가진다는 것이며 그로 인해 모호성이 사전에 차단된다. 따라서 사용자는 데이터의 syntax에 대해서는 신경쓰지 않고 데이터를 사용하는데만 집중할 수 있다. 다음 json 관련 코드를 보자
+``` Java
+// 처리해야 하는 에러코드가 너무 많다.
+// 원하는 컬럼이 있는지? 없으면 getAs타입() 호출시에 NPE가 발생한다.
+// default값이 있는 컬럼이면 null일때 default값 입력
+// 프로그램이 원하는 형태로 타입 변환
+// 받은 데이터가 그 포맷이 맞는지도 테스트 필요
+try {
+    JsonObject object = jsonParser.parse(jsonString);
+    JsonElement longElement = object.get("LongColumn");
+    long longData = 0; // default value
+    if (Object.nonNull(longElement)) {
+        try {
+        longData = longElement.getAsLong();
+        } catch (NumberFormatException e) {
+            // 니가 숫자인지까지 내가 체크해야되냐?
+        }
+    }
+} catch (JsonParseException) {
+    // 익셉션 역시 처리할 필요가 없다.
+}
+```
+Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 검증과 예외처리 코드가 너무길다. 게다가 그 작업들은 문자열 파싱, 예외처리와 같이 CPU를 많이 소모한다. 예외처리 비용을 줄이기 위해서 object mapping과 annotation 기반의 validation 기법들이 사용되지만 object mapping 방식은 사실상 mapping되는 클래스가 스키마역할을 하는 것이다. 즉 protobuf로 개발하는 것과 다를게 없다는 거다. Protobuf 비해 장점은 스키마가 언어의 native code라는 정도? 
 
-반면 json이 protobuf에 비해 가지는 장점은 압도적인 범용성과 거의 대부분의 분야에서 사용되고 있다는 것이다. 솔직히 말해서 protobuf의 저장 포맷이 human readable하지 않다는 단점 역시 protobuf가 널리 사용된다며 부각되지 않을 것이다. 스키마를 주입하면 매우 간편하게 readable하게 해주는 툴이 나올 수도 있고 아니면 그냥 사람이 protobuf readable하게 될 수도 있다. 사람은 적응의 동물이지 않은가.
+반면 json이 protobuf에 비해 가지는 장점은 압도적인 범용성과 거의 대부분의 분야에서 사용되고 있다는 것이다. 아무리 protobuf가 발전한다고 해도 "데이터의 교환"이라는 분야에서 json을 뛰어 넘는 것음 힘들 것이다. 솔직히 말해서 protobuf가 json만큼 사용된다면 저장 포맷이 human readable하지 않다는 것도 아주 minor한 단점이 될 수 있다. 매우 간편하게 serialize된 데이터를 readable하게 해주는 툴이 나올 수도 있고 아니면 그냥 human이 protobuf readable하게 될 수도 있다. 사람은 적응의 동물이지 않은가.
 
-<details> <summary>당신도 packet-readable 해질 수 있다.</summary>
+<details> <summary>그런데 그것이 실제로 있어나고 있습니다.</summary>
 
 ![](resources/grpc/ws-main.png)
 
@@ -369,11 +391,11 @@ Protobuf와 json 의 가장큰 차이는 protobuf가 schema를 가진다는 것�
 
 참고문서: http://sjava.net/2012/12/%EB%B2%88%EC%97%AD-%EC%97%90%EC%9D%B4%EB%B8%8C%EB%A1%9Cavro-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%EB%B2%84%ED%8D%BCprotocol-buffers-%EC%93%B0%EB%A6%AC%ED%94%84%ED%8A%B8thrift%EC%9D%98-%EC%8A%A4/
 
-이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. __`하지만 이미 하둡쪽은 avro 세상이니 protobuf와 avro둘중 하나만 익히겠다고 하면 avro를 권한다.`__ 구글이 하는 것이니만큼 avro보다 더 발전했을 수 있으나 적용된데가 없으면 무쓸모 아니겠는가.
+이 문서는 2012년에 작성된 것이기 때문에 protobuf가 더 발전했는지는 모르겠다. 특히 버전3에서 어떻게 변했는지는 알아볼 필요는 있겠다. __`하지만 이미 하둡쪽은 avro 세상이니 빅데이터를 하려면 avro에 관심을 가지는게 낫다`__ 구글이 하는 것이니만큼 avro보다 기술적으로 더 발전할 수 있지만 적용된데가 없으면 무쓸모 아니겠는가. Json보다 낫지만 대체하지 못하는 것과 같다.
 
 ## Thrift
 
-역사가 긴 IDL로써 그만큼 사용되는 곳이 매우 많다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
+Facebook이 개발하고 현재 apache에 호스팅되고 있다. 매우 많은 언어(액션스크립트, C, C++, C#, 카푸치노, 코코아, 델파이, 얼랭, Go, 하스켈, 자바, Node.js, 오브젝티브-C, OCaml, 펄, PHP, 파이썬, 루비, 스몰토크, ..)를 지원하며 그만큼 사용되는 곳 역시 굉장히 많다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
 
 # 참고
 
