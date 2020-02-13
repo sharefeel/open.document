@@ -12,7 +12,9 @@ GRPC가 RPC의 일종이긴 하지만 이글에서는 기존의 RPC와 비교하
 
 뭐 그냥 그렇다고... 구글하고 내가 소스리뷰하는 관계는 아니니까. 
 
+
 ![](resources/grpc/grpc-usage.png)
+
 https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 # 배경지식
@@ -25,6 +27,10 @@ RPC는 매우 오래된 개념으로 여러 종류의 rpc 구현체가 있다.
 - XML-RPC
 
 RPC에 대해서는 자세히 살펴보지는 않는다.
+
+https://redcoder.tistory.com/126
+
+https://www.geeksforgeeks.org/remote-procedure-call-rpc-in-operating-system/
 
 ## Google Protocol Buffers
 
@@ -58,6 +64,13 @@ schema-less
 ### GRPC가 이것을 해결한다. 
 GRPC가 이 문제들을 해결한다.
 굳
+
+### MSA
+
+https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d
+
+https://levelup.gitconnected.com/grpc-in-microservices-5887caef195
+
 
 
 ## GRPC 단점
