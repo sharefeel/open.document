@@ -13,9 +13,10 @@ GRPC가 RPC의 일종이긴 하지만 이글에서는 기존의 RPC와 비교하
 뭐 그냥 그렇다고... 구글하고 내가 소스리뷰하는 관계는 아니니까. 
 
 
-![](resources/grpc/grpc-usage.png)
 
-https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
+# 기본 개념
+
+
 
 # 배경지식
 
@@ -50,6 +51,12 @@ HTTP 1.1 / ... 표 형태로
 RESTful API는 둘 모두 사용가능하다.
 HTTP라는 범용적인 프로토콜을 사용하고 있고 json 라이브러리는 웹에 사용되는 모든 언어에 존재한다. 없다면 그 언어는 쓰지마라. 웹용이 아니다.
 
+### GRPC Load balancing
+
+https://grpc.io/blog/loadbalancing/
+
+https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
+
 ## 서버 사이드
 
 ### 서버 통신에서 restful의 단점
@@ -71,6 +78,9 @@ https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d
 
 https://levelup.gitconnected.com/grpc-in-microservices-5887caef195
 
+![](resources/grpc/grpc-usage.png)
+
+https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 
 ## GRPC 단점
