@@ -147,11 +147,7 @@ ELB 기능 비교: https://aws.amazon.com/ko/elasticloadbalancing/features/
 
 Load balancing 부분에서 설명했듯이 A1의 리퀘스트가 B1으로 몰리는 상황이 발생할 수 있다. (좌) GRPC를 이해하는 software L7 load-balancer는 리퀘스트를 여러 backend 서버로 분산할 수 있다.
 
-<figure>
-  <img src=".resources/grpc/linkerd_why.png" width="200" title="balancing problem"/>
-  <img src=".resources/grpc/linkerd_does.png" width="300" title="balancing problem"/>
-</figure>
-
+![](.resources/grpc/linkerd.png)
 
 **`Linkerd`** Linkerd는 open-source service mesh 로써 l7 load-balancing 기능을 포함하고 있다. 참고로 container 용이다. 사실 위 그림은 linkerd 소개자료에서 가져온 것이다. [gRPC Load Balancing on Kubernetes without Tears](https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/) 
 
