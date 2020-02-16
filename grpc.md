@@ -72,11 +72,12 @@ GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술
   <figcaption><b>하나만 쓸수 있다면?</b></figcaption>
 </figure>
 
-GRPC의 장점들은 알아봤으니 trade-off에 감안하게 되는 단점들에 대해서 알아보자.
+Trade-off로 감안할 수 밖에 없는 불가능한 단점은 GRPC의 기반기술에서 온다.
 
-- `RPC`
-- `Protobuf`
-
+### RPC 의 한계
+### Protobuf를 사용으로 인한 단점 
+### HTTP 2.0을 사용한다는 단점
+Http 2.0은 1.1 대비 많은 장점을 제공한다. 하지만 connection oriented 프로토콜이라는 점에서 몇몇 단점이 존재하며 이는 
 
 # 적용
 
