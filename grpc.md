@@ -30,7 +30,7 @@ RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래�
 RPC의 실제 내부동작을 들여다보면 아래와 같다. Sun rpc, xmlrpc, grpc, thrift 등 여러종류의 rpc가 있지만 이 구조는 동일하다고 보면 된다.
 
 <figure align="middle">
-  <img src="resources/grpc/rpc_working.png" width="300" title="Remote procedure call working"/>
+  <img src="resources/grpc/rpc_working.png" width="500" title="Remote procedure call working"/>
 </figure>
 
 ## Google Protocol Buffers (Protobuf)
@@ -102,6 +102,7 @@ GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술
   <img src="resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
   <figcaption><b>하나만 쓸수 있다면?</b></figcaption>
 </figure>
+<p>
 
 Trade-off로 감안할 수 밖에 없는 불가능한 한계점은 GRPC의 기반기술에서 온다. Protobuf를 사용함으로써 데이터가 human readable하지 않기 때문에  connection oriented 프로토콜인 HTTP 2.0을 사용함으로 인해 기존 인프라와는 다른 방식으로 운영해야 한다.
 
