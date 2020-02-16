@@ -30,7 +30,7 @@ RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래�
 RPC의 실제 내부동작을 들여다보면 아래와 같다. Sun rpc, xmlrpc, grpc, thrift 등 여러종류의 rpc가 있지만 이 구조는 동일하다고 보면 된다.
 
 <figure align="middle">
-  <img src="resources/grpc/rpc_working.png" width="500" title="Remote procedure call working"/>
+  <img src="resources/grpc/rpc_working.png" width="300" title="Remote procedure call working"/>
 </figure>
 
 ## Google Protocol Buffers (Protobuf)
