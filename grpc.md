@@ -21,7 +21,7 @@ GRPC는 Remote Procedure Call(이하 RPC)의 하나로써 payload로 Google Prot
 RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래밍 모델이다. 다음은 caller와 caller 관점에서 도식화한 RPC를 도식화한 그림이다.
 
 <figure align="middle">
-  <img src="resources/grpc/rpc_overview.png" width="600" title="Remote procedure call model"/>
+  <img src=".resources/grpc/rpc_overview.png" width="600" title="Remote procedure call model"/>
 </figure>
 
 
@@ -33,7 +33,7 @@ RPC의 실제 내부동작을 들여다보면 아래와 같다. Sun rpc, xmlrpc,
 - 다른 플랫폼과 아키텍처 간의 호환성
 
 <figure align="middle">
-  <img src="resources/grpc/rpc_working.png" width="500" title="Remote procedure call working"/>
+  <img src=".resources/grpc/rpc_working.png" width="500" title="Remote procedure call working"/>
 </figure>
 
 ## Google Protocol Buffers (Protobuf)
@@ -89,7 +89,7 @@ https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술이다. 이런 기술들은 이미 **문제점**은 거의 없어진 상태이며 최종적으로는 기술이 주는 장점을 취하기 위해 심각하지 않은 수준의 **해결 불가능한 한계점**을 용인하면서 사용한다. 한계점을 완화하든 회피하든 그런식으로 말이다.
 
 <figure align="middle">
-  <img src="resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
+  <img src=".resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
   <figcaption><b>하나만 쓸수 있다면?</b></figcaption>
 </figure>
 <p>
@@ -127,11 +127,11 @@ HTTP 2.0의 경우 한번 connection이 맺어진 후에는 리퀘스트는 항�
 최초 callee를 일괄 시작할 시 connection은 정상적으로 분배된다. 하지만 connection이 다시 연결되는 상황이 반복되면 연결은 불균할 수 밖에 없다.
 
 <figure align="middle">
-  <img src="resources/grpc/balancing_even.png" title="Evenly balanced"/>
+  <img src=".resources/grpc/balancing_even.png" title="Evenly balanced"/>
   <figcaption><b>Evenly balanced</b></figcaption>
 </figure>
 <figure align="middle">
-  <img src="resources/grpc/balancing_ugly.png" title="4 was reconnected"/>
+  <img src=".resources/grpc/balancing_ugly.png" title="4 was reconnected"/>
   <figcaption><b>4 was reconnected</b></figcaption>
 </figure>
 
@@ -147,7 +147,7 @@ Round robin 대신 least connection을 사용함으로써 부하 분산에 더 �
 아래그림은 look-aside load balancer를 설명하고 있다. 기존 load balancer가 클라이언트가 전송한 패킷이 load balancer를 거쳐서 보내진다면, look-aside load balancer는 서버 정보제공 기능 역할만 하고 어느 서버를 선택할지는 클라이언트에 의해 결정된다. 결국 전체적인 복잡도가 높아지고 클라이언트의 책임이 증가한다.
 
 <figure align="middle">
-  <img src="resources/grpc/lookaside_lb.png" title="4 was reconnected"/>
+  <img src=".resources/grpc/lookaside_lb.png" title="4 was reconnected"/>
   <figcaption><b>Look-aside load balancer</b></figcaption>
 </figure>
 
