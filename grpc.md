@@ -60,22 +60,9 @@ GRPC가 가지는 대부분의 장점은 장점, 한계는 위의 두 차이에 
   - 스키마 정합성
   - Binary serialization: 네트웍 트래픽 감소, 서버 리소스 사용 감소
 
-## 서버 사이드
+## 서버 사이드에 어울린다
 
-### 서버 통신에서 restful의 단점
-HTTP의 단점
-모든 커넥션
-
-JSON의 단점
-큰 프로토콜 사이즈
-schema-less
-구문 오류
-
-### GRPC가 이것을 해결한다. 
-GRPC가 이 문제들을 해결한다.
-굳
-
-
+위에 언급한 장점들로 인해서 server to server 에서 GRPC가 RESTful API에 비해 기술적으로 우위에 있다(고 생각한다). Web(browser) 상에서도 grpc가 사용가능하며 관련 프로젝트도 있지만 메인스트림은 아닌 것으로 보인다. 당장 HTTP 2.0이 있음에도 1.1이 널리 사용되는 것을 보면 1.1만 가지고 있는 (즉 grpc에는 없는) 치명적인 매력이 있는게 아닐까?
 
 # 적용
 
@@ -98,7 +85,7 @@ https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술이다. 이런 기술들은 이미 **문제점**은 거의 없어진 상태이며 최종적으로는 기술이 주는 장점을 취하기 위해 심각하지 않은 수준의 **해결 불가능한 한계점**을 용인하면서 사용한다. 한계점을 완화하든 회피하든 그런식으로 말이다.
 
-<figure align="center">
+<figure align="middle">
   <img src="resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
   <figcaption><b>하나만 쓸수 있다면?</b></figcaption>
 </figure>
@@ -147,9 +134,22 @@ HTTP 2.0의 경우 한번 connection이 맺어진 후에는 리퀘스트는 항�
 
 #### Least connection은?
 
-Round robin 대신 least connection을 사용하는 것이 한가지 답이 될 수 있다. 하지만 이 역시 완벽한 답을 될 수 없다. Least connection은 각 connection에 의해 생성되는 부하가 동일할 경우 효과가 극대화되는 방식이기 때문에, 만약 caller간 call 수의 편차가 크다면 부하는 각 callee들에 균등하게 분배되지 않는다.
+Least connection rule은 load balancer가 backend 서버중 connection이 가장 적은 서버를 타겟으로 선택하는 정책이다.
+Round robin 대신 least connection을 사용함으로써 부하 분산에 더 도움을 받을 수 있다. 하지만 이 역시 완벽한 답을 될 수 없다. Least connection은 각 connection에 의해 생성되는 부하가 동일할 경우 효과가 극대화되는 방식이기 때문에 만약 caller간 call 수의 편차가 크다면 부하는 각 callee들에 균등하게 분배되지 않는다.
 
-https://grpc.io/blog/loadbalancing/
+#### Look-aside loadbalancer 
+
+발췌자료: [GRPC Load balancing](https://grpc.io/blog/loadbalancing/)
+
+아래그림은 look-aside load balancer를 설명하고 있다. 기존 load balancer가 클라이언트가 전송한 패킷이 load balancer를 거쳐서 보내진다면, look-aside load balancer는 서버 정보제공 기능 역할만 하고 어느 서버를 선택할지는 클라이언트에 의해 결정된다. 결국 전체적인 복잡도가 높아지고 클라이언트의 책임이 증가한다.
+
+<figure align="middle">
+  <img src="resources/grpc/lookaside_lb.png" title="4 was reconnected"/>
+  <figcaption><b>Look-aside load balancer</b></figcaption>
+</figure>
+
+
+
 
 
 ### Rolling update
@@ -175,15 +175,15 @@ for (i = 0; i < 서버수; i++>) {
 
 ### Load balancing (linkerd)
 
-Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 존재한다. 이 항목은 아래 문서를 발취한 내용이다.
+발췌자료: [gRPC Load Balancing on Kubernetes without Tears](https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/)
 
-https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
+Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 존재한다. Load balancing 부분에서 설명했듯이 A1의 리퀘스트가 B1으로 몰리 상황이 발생할 수 있다.
 
-![](resource/grpc/linkerd_why.png)
+![](resources/grpc/linkerd_why.png)
 
-![](resource/grpc/linkerd_does.png)
+이 상황을 linkerd가 해결할 수 있다고 한다. 
 
-
+![](resources/grpc/linkerd_does.png)
 
 # 결론
 
