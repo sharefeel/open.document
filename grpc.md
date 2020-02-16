@@ -192,3 +192,5 @@ Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 �
 
 1. 서버2서버에서 RESTful API를 대체하는데는 매우 좋다.
 2. HTTP 1.1 운영방식과 인프라역시 변경이 필요하다.
+
+<div w3-include-html="_includes/disqus.html"></div>
