@@ -98,7 +98,10 @@ https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술이다. 이런 기술들은 이미 **문제점**은 거의 없어진 상태이며 최종적으로는 기술이 주는 장점을 취하기 위해 심각하지 않은 수준의 **해결 불가능한 한계점**을 용인하면서 사용한다. 한계점을 완화하든 회피하든 그런식으로 말이다.
 
-  <img src="resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?" align="middle"/>
+<figure align="center">
+  <img src="resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
+  <figcaption><b>하나만 쓸수 있다면?</b></figcaption>
+</figure>
 <p>
 
 Trade-off로 감안할 수 밖에 없는 불가능한 한계점은 GRPC의 기반기술에서 온다. Protobuf를 사용함으로써 데이터가 human readable하지 않기 때문에  connection oriented 프로토콜인 HTTP 2.0을 사용함으로 인해 기존 인프라와는 다른 방식으로 운영해야 한다.
