@@ -16,7 +16,7 @@
 현재 대부분의 저장소에 사용되고 있는 스피닝 디스크(HDD)는 SSD비해 random access의 latency가 매우길다. 반면 SSD는 random access에 좋은 성능을 보이지만 용량 대비 매우 비싸다. 아래 그림은 서버용 HDD와 SSD를 비교한 것이다. 따라서 우리는 HDD를 쓸수밖에 없고, SSD를 쓰는 것보다 그리고 SW적으로 HDD의 단점을 보완하여 사용하는 것이 어렵지만 더 보편적인 선택이다.
 
 __SSD vs. HDD__ 비싸다.
-![](resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
+![](.resources/how_storages_care_large_data/ssd_vs_sata.png "SSD 비싸다")
 
 돈이 넉넉히 있어서 HDD 대신 SSD를 살 수 있다고 그것을 실천하는 것은 현명하지 않을 수 있다. 
 1. __`가격`__ 일단 비싸다.
@@ -34,15 +34,15 @@ __SSD vs. HDD__ 비싸다.
 
 __`비교: HDD vs SDD vs RAM`__ 아래 그림은 왜 sequential 하게 배치하는지를 보여준다.
 
-<img src="resources/how_storages_care_large_data/ssd_hdd_seq_write.png" width="400">
-<img src="resources/how_storages_care_large_data/ssd_hdd_random_write.png" width="400">
+<img src=.resources/how_storages_care_large_data/ssd_hdd_seq_write.png" width="400">
+<img src=.resources/how_storages_care_large_data/ssd_hdd_random_write.png" width="400">
 
 HDD는 random access에 매우 취약하다. 물론 이는 단순 벤치마크이며 application이 동작할때의 퍼포먼스의 격차는 적다. [자료출처: 테크스팟](https://www.techspot.com/review/1956-storage-performance/)
 
 __마음에 안정이 좀 되시나요?__
 실제 우리는 OS가 해주는 것 이상으로 파일시스템을 sequential 하게 관리하려고 노력하다.
 
-![SpeedDisk](resources/how_storages_care_large_data/speeddisk.png)
+![SpeedDisk](.resources/how_storages_care_large_data/speeddisk.png)
 
 ## CAP 이론
 
@@ -51,7 +51,7 @@ __마음에 안정이 좀 되시나요?__
 * Consistency 
 * Partition Tolerance
 
-![](resources/how_storages_care_large_data/cap.png)
+![](.resources/how_storages_care_large_data/cap.png)
 
 __`ACID 와 CAP의 consistency 차이`__ ACID의 consistency는 write성공하면 이후 read는 같은 데이터가 보장되는 strong consistency이다. 반면 CAP의 경우 weak consistency로써 eventual consistency가 그 예이다. 즉 eventual consistency는 write하면 언젠가는 각 분산노드가 같은 데이터를 가지게 되는 것을 의미한다. 즉 최종적으로는 데이터가 반영되지 않고 유실되거나 각기 다른 두 write의 결과가 섞이는 일은 없다.
 
@@ -61,7 +61,7 @@ __`Eventual Consistency의 선택`__ 사실상 분산 storage에서 eventual con
 
 RDBMS 데이터 모델링의 덕목중 하나로 정규화가 있다. 공통된 데이터를 별도 테이블로 분리하도록 설계하고, 분리된 두 테이블을 join 함으로써 하나의 데이터가 완성한다.
 
-![](resources/how_storages_care_large_data/rdb_nosql_model.png)
+![](.resources/how_storages_care_large_data/rdb_nosql_model.png)
 
 정규화를 통할 경우 다음과 같은 장점을 얻을 수 있다.
 * 공통된 데이터에 대한 update
@@ -84,7 +84,7 @@ RDBMS 데이터 모델링의 덕목중 하나로 정규화가 있다. 공통된 
 
 저장소는 데이터를 파일에 할때 파티셔닝과 파티션내 정렬을 통해서 성능의 저하를 감소시킨다. 파티션, 클러스터링, predicated pushdown 등 이름은 다양하더라도 결국 추구하는 바는 __스캔범위의 감소__ 이다. 그러니 적극적으로 __잘__ 써야한다.
 
-![](resources/how_storages_care_large_data/cassandra_partition_clustering.png)
+![](.resources/how_storages_care_large_data/cassandra_partition_clustering.png)
 
 (자료출처: https://www.instaclustr.com/cassandra-data-partitioning/)
 
@@ -114,7 +114,7 @@ RDBMS는 막강한 기능을 가지고 있지만 대량 데이터처리에 있�
 
 단순하지만 확장성, latency, throughput 면에서 최고의 저장소
 
-<img src="resources/how_storages_care_large_data/kafka-topic-partition-layout.png" width=500>
+<img src=.resources/how_storages_care_large_data/kafka-topic-partition-layout.png" width=500>
 
 (이미지출처: http://cloudurable.com/blog/kafka-architecture-topics/index.html)
 
@@ -175,7 +175,7 @@ __`Cassandra HDFS 비교`__ HDFS가 마스터 슬레이브인 것과 달리 카�
 
 __`Namenode + Datanode + Client library`__ 클라이언트가 하둡 데이터에 접근하는 flow
 
-![](resources/how_storages_care_large_data/hdfs_simple_picture.png)
+![](.resources/how_storages_care_large_data/hdfs_simple_picture.png)
 
 * 토폴로지
   * Namenode + Datanode

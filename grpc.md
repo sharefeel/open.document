@@ -75,7 +75,7 @@ https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d
 
 https://levelup.gitconnected.com/grpc-in-microservices-5887caef195
 
-![](resources/grpc/grpc-usage.png)
+![](.resources/grpc/grpc-usage.png)
 
 https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
@@ -182,11 +182,11 @@ for (i = 0; i < 서버수; i++>) {
 
 Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 존재한다. Load balancing 부분에서 설명했듯이 A1의 리퀘스트가 B1으로 몰리 상황이 발생할 수 있다.
 
-![](resources/grpc/linkerd_why.png)
+![](.resources/grpc/linkerd_why.png)
 
 이 상황을 linkerd가 해결할 수 있다고 한다. 
 
-![](resources/grpc/linkerd_does.png)
+![](.resources/grpc/linkerd_does.png)
 
 # 결론
 

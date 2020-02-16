@@ -17,7 +17,7 @@ Protocol Buffers (이하 protobuf)는 구글에서 만든 Interface Description 
 
 다음 그림은 모질라에서 북마크를 처리하는 과정을 보여주고 있다. Rust와 kotlin이라는 다른 언어로 작성된 프로그램이 데이터를 교환하는 방법을 보여준다. Rust 쪽이 생산자 kotlin 쪽이 소비자이다.
 
-![](resources/grpc/protobuf_mozilla_bookmark.png)
+![](.resources/grpc/protobuf_mozilla_bookmark.png)
 
 이미지 출처: [Crossing the Rust FFI frontier with Protocol Buffers - Aprin 2, 2019](https://hacks.mozilla.org/2019/04/crossing-the-rust-ffi-frontier-with-protocol-buffers/)
 
@@ -134,7 +134,7 @@ $ protoc -I=src/main/proto --java_out=src/main/java addressbook.proto
 ```
 실행결과
 
-![](resources/grpc/compiled_protobuf_class.png)
+![](.resources/grpc/compiled_protobuf_class.png)
 
 adressbook.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBookMessage 클래스가 생성된 것을 볼 수 있다. 
 
@@ -181,7 +181,7 @@ public void writeMessage() {
 ```
 위 코드를 실행하면 serialize된 데이터가 다음과 같이 addressbook.message 파일에 저장된다. (Builder 기반으로 코드를 작성하긴 했는데 더 간결한 방법이 있는지는 모르겠다) 생성된 파일의 용량은 107바이트로써 같은 데이터 저장시 674바이트가 필요한 json보다 훨씬 작다.
 
-![](resources/grpc/serialized_addressbook.png)
+![](.resources/grpc/serialized_addressbook.png)
 
 ### 메세지 읽기
 파일에서 읽은 후 deserialize (parseFrom)을 거쳐서 제공되는 toString() 메소드로 화면에 출력하는 코드이다. AddressBook 객체를 생성해내는 것은 한줄이면 된다. (물론 parseFrom이 뱉는 exception 처리는 추가되야겠지)
@@ -322,11 +322,11 @@ protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 
 ### IDE 플러그인
 IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자. Syntax validation, syntax highlighting, code formatting 등의 개발 편의기능을 제공한다. 아래는 실제 적용한 예이며 formatting도 플러그인의 도움을 받았다.
 
-![](resources/grpc/protobuf_plugin_screenshot.png)
+![](.resources/grpc/protobuf_plugin_screenshot.png)
 
 또한 compile 후 생성된 클래스를 지울때 safe-delete 기능도 제공한다. 아래는 java_outer_classname에 클래스이름이 지정되어 있어서 지울수 없는 예시인데 사실 이 기능은 오히려 귀찮다. "Search in comments and strings"를 해제하면 삭제 가능하다.
 
-![](resources/grpc/safe_delete_class.png)
+![](.resources/grpc/safe_delete_class.png)
 
 ### 프로젝트간 .proto 공유
 
@@ -346,7 +346,7 @@ Protobuf로 통신하려면 각 프로젝트간 .proto 공유가 되야한다.
 
 ## JSON (and XML)
 
-![](resources/grpc/json_OTL.png)
+![](.resources/grpc/json_OTL.png)
 
 이미지 출처: [5 Reasons to Use Protocol buffers Instead of JSON for Your Next Service - June 5, 2014](https://codeclimate.com/blog/choose-protocol-buffers/)
 
@@ -388,7 +388,7 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 <details> <summary>그런데 그것이 실제로 있어나고 있습니다.</summary>
 
-![](resources/grpc/ws-main.png)
+![](.resources/grpc/ws-main.png)
 
 </details>
 
@@ -411,7 +411,7 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 Facebook이 개발하고 현재 apache에 호스팅되고 있다. 매우 많은 언어(액션스크립트, C, C++, C#, 카푸치노, 코코아, 델파이, 얼랭, Go, 하스켈, 자바, Node.js, 오브젝티브-C, OCaml, 펄, PHP, 파이썬, 루비, 스몰토크, ..)를 지원하며 그만큼 만은 곳에 사용되고 있다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
 
-![](resources/grpc/ThriftArchitecture.png)
+![](.resources/grpc/ThriftArchitecture.png)
 
 그림출처: [A Guided Tour Through Thrift - August 23, 2016](https://sookocheff.com/post/thrift/a-tour-through-thrift/)
 
