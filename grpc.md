@@ -44,9 +44,12 @@ GRPC는protobuf로 serialize된 데이터를 메세지의 payload에 사용한�
 
 # GRPC란?
 
+![](.resources/grpc/grpc.png)
 
+Payload가 protobuf데이터인 RPC이다. - 설명끝 -
 
 ## RESTful과 GRPC의 통신 방식 비교
+
 
 GRPC와 RESTful API 차이는 결국 두가지이다.
 - HTTP 2.0
@@ -59,34 +62,42 @@ GRPC가 가지는 대부분의 장점은 장점, 한계는 위의 두 차이에 
   - 낮은 네트웍 부하: Connection oriented, header compression, protobuf 
   - 빠른 응답
   - Server push
+  - 브라우저 지원 없음 ()
 - **`Protobuf`**
   - 스키마 정합성
-  - Binary serialization: 네트웍 트래픽 감소, 서버 리소스 사용 감소
+  - Binary serialization: 네트웍 트래픽 감소, 서버 리소스 사용 감소, 사람이 읽을 수 없음
 
-## 서버 사이드에 어울린다
+## 서버 사이드 API 호출에
 
 위에 언급한 장점들로 인해서 server to server 에서 GRPC가 RESTful API에 비해 기술적으로 우위에 있다(고 생각한다). Web(browser) 상에서도 grpc가 사용가능하며 관련 프로젝트도 있지만 메인스트림은 아닌 것으로 보인다. 당장 HTTP 2.0이 있음에도 1.1이 널리 사용되는 것을 보면 1.1만 가지고 있는 (즉 grpc에는 없는) 치명적인 매력이 있는게 아닐까?
+
+## 코드를 한번 볼까?
+
+다른 사람이 이해하기 쉽게 작성한 것을 첨부한다.
+
+[GRPC java 서버/클라이언트 예제 - 정아마추어 코딩블로그](https://jeong-pro.tistory.com/192)
 
 # 적용
 
 ## Micro Service Architecture 에서의 사용
 
-https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d
 
 https://levelup.gitconnected.com/grpc-in-microservices-5887caef195
 
+아래는 microsoft grpc 자료중 일부이다. Web 보다는 microservice to microservice에 쓰인다라고 적혀 있다. 서버2서버에 쓰인다는게 나만의 생각이 아니란걸 MS의 권위를 빌려서 보여준달까. [狐假虎威](https://namu.wiki/w/%ED%98%B8%EA%B0%80%ED%98%B8%EC%9C%84)
+
+At the time of writing of this book, most browsers have limited support for gRPC. gRPC heavily uses HTTP/2 features and no browser provides the level of control required over web requests to support a gRPC client. gRPC is typically used for internal microservice to microservice communication. Figure 4-22 shows a simple, but common usage pattern.
+
 ![](.resources/grpc/grpc-usage.png)
 
-https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
-
-
+본문: https://docs.microsoft.com/en-us/dotnet/architecture/cloud-native/rest-grpc
 
 
 # 운영 지식
 
 ## GRPC 단점
 
-GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술이다. 이런 기술들은 이미 **문제점**은 거의 없어진 상태이며 최종적으로는 기술이 주는 장점을 취하기 위해 심각하지 않은 수준의 **해결 불가능한 한계점**을 용인하면서 사용한다. 한계점을 완화하든 회피하든 그런식으로 말이다.
+GRPC는 훌륭하고 완성도 높은 (한편으론 특별할 것 없는) 기술이다. 이런 기술들은 이미 **문제점**은 거의 없어진 상태이며 최종적으로는 기술이 주는 장점을 취하기 위해 심각하지 않은 수준의 **해결 불가능한 한계점**을 용인하면서 사용한다. 한계점을 완화하든 회피하든 그런식으로 말이다. 
 
 <figure align="middle">
   <img src=".resources/grpc/fork_spoon.png" title="하나만 쓸수 있다면?"/>
@@ -151,10 +162,6 @@ Round robin 대신 least connection을 사용함으로써 부하 분산에 더 �
   <figcaption><b>Look-aside load balancer</b></figcaption>
 </figure>
 
-
-
-
-
 ### Rolling update
 
 가용성을 유지한채로 서버를 업데이트하기 위해 rolling restart를 하게 된다. HTTP 1.1 방식에서는 다음 스텝으로 간단하게 수행가능하다. (편의상 1대씩 업데이트한다고 가정)
@@ -188,9 +195,17 @@ Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 �
 
 ![](.resources/grpc/linkerd_does.png)
 
+# 지난가는 이야기
+
+## GRPC를 웹에서 쓰면 안되나?
+
+응 안되. 사실 지원하지만 읽어보니 지원한다고 할 수 없는 것 같다.
+
+https://grpc.io/blog/state-of-grpc-web/
+
 # 결론
 
-1. 서버2서버에서 RESTful API를 대체하는데는 매우 좋다.
-2. HTTP 1.1 운영방식과 인프라역시 변경이 필요하다.
+1. 서버2서버에서 RESTful API를 대체하는데는 매우 좋고 microservice와 어울린다.
+2. HTTP 1.1 기반 서비스에서 GRPC로 drop-in-place 교체는 불가능하다. 운영방식과 인프라 변경이 수반되어야 한다.
 
 <div w3-include-html="_includes/disqus.html"></div>
