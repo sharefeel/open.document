@@ -175,13 +175,13 @@ for (i = 0; i < 서버수; i++>) {
 
 ### Load balancing (linkerd)
 
-Kubernetes linkerd 관련 설명
+Kubernetes에서 load balancing 문제를 해결하기 위해 linkerd라는게 존재한다. 이 항목은 아래 문서를 발취한 내용이다.
 
-아래 문서를 발취한 내용이다.
+https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
 
 ![](resource/grpc/linkerd_why.png)
 
-https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
+![](resource/grpc/linkerd_does.png)
 
 
 
