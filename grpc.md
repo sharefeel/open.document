@@ -151,12 +151,6 @@ Round robin 대신 least connection을 사용하는 것이 한가지 답이 될 
 
 https://grpc.io/blog/loadbalancing/
 
-### Load balancing (linkerd)
-
-Kubernetes linked 관련 설명
-
-https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
-
 
 ### Rolling update
 
@@ -173,7 +167,23 @@ for (i = 0; i < 서버수; i++>) {
 
 반면 HTTP 2.0(을 포함한 connection oriented 프로토콜) 서버에서는 두 스텝에서 시나리오가 성립하지 않는다. 문제가 발생하는 스텝을 살펴보자.
 - Step 1. Connection oriented 서비스의 스위치에서 서버를 제외하더라도 경우 커넥션이 사라지지 않기 때문에 기존방식으로 graceful shutdown이 불가능하다. 클라이언트의 reconnect & 재전송이나 서버에서 서비스 종료 push를 보내는 등의 추가 작업이 필요하다.
-- Step 4. 서버i가 다운되면 클라이언트는 다른 서버에 연결한다. 이때 서버i를 다시 기동하더라도 서버i로 들어오는 커넥션은 없다.
+- Step 4. 서버i가 다운되면 클라이언트는 다른 서버에 연결한다. 이때 서버i를 다시 기동하더라도 커넥션이 있는 다른 서버가 다운되기 전까지는 서버i로 들어오는 커넥션은 없다. 만약 least connection을 사용중이라면 될 수 있다.
+
+### Scale-in/out
+
+요즘같은 클라우드 시대에 RESTful API를 대체가능하려면 elastic한 scale-in/out에 쉽게 대응가능해야 한다. 하지만 rolling update와 마찬가지 이유에서 scale-in/out 역시 어렵다. (사실상 rolling update가 scale-in과 scale-out의 조합이다)
+
+### Load balancing (linkerd)
+
+Kubernetes linkerd 관련 설명
+
+아래 문서를 발취한 내용이다.
+
+![](resource/grpc/linkerd_why.png)
+
+https://kubernetes.io/blog/2018/11/07/grpc-load-balancing-on-kubernetes-without-tears/
+
+
 
 # 결론
 
