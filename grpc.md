@@ -27,7 +27,10 @@ RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래�
 
 그림출처: https://www.geeksforgeeks.org/remote-procedure-call-rpc-in-operating-system/
 
-RPC의 실제 내부동작을 들여다보면 아래와 같다. Sun rpc, xmlrpc, grpc, thrift 등 여러종류의 rpc가 있지만 이 구조는 동일하다고 보면 된다.
+RPC의 실제 내부동작을 들여다보면 아래와 같다. Sun rpc, xmlrpc, grpc, thrift 등 여러종류의 rpc가 있지만 이 구조는 동일하다고 보면 된다. 또한 major RPC framework은 여러 편의기능을 제공하기 때문에 사용자는 비지니스 로직에 집중할 수 있다.
+- 네트워크 에러 처리
+- 다양한 언어 지원
+- 다른 플랫폼과 아키텍처 간의 호환성
 
 <figure align="middle">
   <img src="resources/grpc/rpc_working.png" width="500" title="Remote procedure call working"/>
@@ -41,7 +44,7 @@ GRPC는protobuf로 serialize된 데이터를 메세지의 payload에 사용한�
 
 # GRPC란?
 
-설명
+
 
 ## RESTful과 GRPC의 통신 방식 비교
 

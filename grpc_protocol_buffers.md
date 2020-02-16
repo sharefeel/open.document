@@ -98,7 +98,7 @@ message AddressBook {
                     "type": "MOBILE"
                 },
                 {
-                    "number": "02-3273-8783",
+                    "number": "02-3273-8783"
                 }
             ]
         },
