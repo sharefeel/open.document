@@ -148,8 +148,8 @@ ELB 기능 비교: https://aws.amazon.com/ko/elasticloadbalancing/features/
 Load balancing 부분에서 설명했듯이 A1의 리퀘스트가 B1으로 몰리는 상황이 발생할 수 있다. (좌) GRPC를 이해하는 software L7 load-balancer는 리퀘스트를 여러 backend 서버로 분산할 수 있다.
 
 <figure>
-  <img src=".resources/grpc/linkerd_why.png" width="290" title="balancing problem"/>
-  <img src=".resources/grpc/linkerd_does.png" width="430" title="balancing problem"/>
+  <img src=".resources/grpc/linkerd_why.png" width="200" title="balancing problem"/>
+  <img src=".resources/grpc/linkerd_does.png" width="300" title="balancing problem"/>
 </figure>
 
 
