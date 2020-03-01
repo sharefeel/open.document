@@ -26,12 +26,16 @@ $ pip install
 
 github 에서 1.10.9 소스 코드를 다운 받아서 설치한다.
 ```bash
+# github에서 clone
 $ git clone https://github.com/apache/airflow.git
 Cloning into 'airflow'...
 $ cd airflow
+# 1.10.9 태그 checkout
+$ git checkout tags/1.10.9
+# Install
 $ python setup.py install
 :
-Finished processing dependencies for apache-airflow==2.0.0.dev0
+Finished processing dependencies for apache-airflow==1.10.9
 ```
 
 
@@ -48,9 +52,9 @@ $AIRFLOW_HOME/airflow.cfg 파일이 위치해야 한다. 설치된 파일중 템
 
 ```bash
 # MacOS의 경우 python3 site-packages 하위에 airflow 파일들이 설치된다.
-ls /usr/local/lib/python3.7/site-packages/apache_airflow-2.0.0.dev0-py3.7.egg
+ls /usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg
 # 위 경로에서 설정 템플릿 파일을 복사하자
-cp /usr/local/lib/python3.7/site-packages/apache_airflow-2.0.0.dev0-py3.7.egg/airflow/config_templates/default_airflow.cfg $AIRFLOW_HOME/
+cp /usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg/airflow/config_templates/default_airflow.cfg $AIRFLOW_HOME/
 cd $AIRFLOW_HOME
 mv default_airflow.cfg airflow.cfg
 ```
@@ -60,7 +64,7 @@ mv default_airflow.cfg airflow.cfg
 - `db` sqlite, 파일위치는 $AIRFLOW_HOME/airflow.db
 - `dag 경로` $AIRFLOW_HOME/dags
 
-기본적인 설정 수정은 다음 정도일 것이다.
+운영환경에서의 기본적인 설정 수정은 다음 정도일 것이다.
 ```bash
 # Airflow 가 DAG을 읽어들일 경로이다. 즉 사용자는 DAG을 작성하여 이 경로에 복사하면 되다.
 # 절대경로여야 한다.
@@ -76,7 +80,13 @@ base_url = http://localhost:8080
 web_server_host = 0.0.0.0
 web_server_port = 8080
 
-# LDAP 지원이 추가되었는데 해보지 않았다. 관심있으면 try 해보길..
+# 스케줄러 튜닝들. Concurrency 옵션은 중요한데 이건 실 운영환경에 따라 차이가 난다.
+executor
+parallelism
+dag_concurrency
+max_active_runs_per_dag
+
+# 그외 주요 설정으로는 LDAP 지원이 추가되었는데 해보지 않았다. 관심있으면 try 해보길..
 [ldap]
 uri = 
 user_filter = ..
@@ -114,7 +124,8 @@ Airflow 를 쓴다는 것은 airflow를 운영하는 것과 dag을 작성하여 
 Airflow의 시간은 기본적으로 UTC 기반으로 동작하는데 이게 한국에 사는 우리 입장에선 매우 짜증난다. 표면적으로 시간으로 짜증나는 경우는 세가지이다.
 1. Dashboard UI의 표기 시간
 2. UI에 표기되는 DAG실행 시간
-2. DAG 코딩시에 시간 파라미터
+1. 스케줄 지정 시간
+2. Task 실행시에 airflow가 전달해주는 시간
 
 ## SPOF
 Airflow는 일반적으로 시스템 내에서 매우 중요한 위치를 차지하지만 문제는 그 중요도에 비해서 가용성 부분에서 취약하다. 
