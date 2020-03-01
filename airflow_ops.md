@@ -46,9 +46,16 @@ airflow.cfg 이야기
 
 ## 실행
 
-### 실행
+### DB 초기화 및 필요한 프로세스 실행
 
-initdb, webserver, scheduler
+```bash
+# 데이터베이스 초기화 작업이 필요하다. 이 작업은 한번만 해야 한다.
+$ airflow initdb
+# Front-end 역할을 하는 웹서버 실행. Foreground로 실행된다. Daemon으로 실행하는 것은 각자 알아서.
+$ airflow webserver
+# 실제 dag을 실행하는 스케줄러 프로세스를 실행
+$ airflow scheduler
+````
 
 ### 짠~ UI 가 떴습니다.
 
