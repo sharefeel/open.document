@@ -34,15 +34,55 @@ $ python setup.py install
 Finished processing dependencies for apache-airflow==2.0.0.dev0
 ```
 
+
+
 ## 설정
 
 ### AIRFLOW_HOME
 
 일단 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. AIRFLOW_HOME 하위에는 
 
-### 설정 파일 편집
+### 설정파일: airflow.cfg
 
-airflow.cfg 이야기
+$AIRFLOW_HOME/airflow.cfg 파일이 위치해야 한다. 설치된 파일중 템플릿 설정 파일을 복사한 후 수정하면 된다.
+
+```bash
+# MacOS의 경우 python3 site-packages 하위에 airflow 파일들이 설치된다.
+ls /usr/local/lib/python3.7/site-packages/apache_airflow-2.0.0.dev0-py3.7.egg
+# 위 경로에서 설정 템플릿 파일을 복사하자
+cp /usr/local/lib/python3.7/site-packages/apache_airflow-2.0.0.dev0-py3.7.egg/airflow/config_templates/default_airflow.cfg $AIRFLOW_HOME/
+cd $AIRFLOW_HOME
+mv default_airflow.cfg airflow.cfg
+```
+
+사실상 아무런 설정도 하지 않고 그대로 사용할 수 있다. 그러면 다음 설정으로 동작하게 된다.
+- `webserver`0.0.0.0:8080
+- `db` sqlite, 파일위치는 $AIRFLOW_HOME/airflow.db
+- `dag 경로` $AIRFLOW_HOME/dags
+
+기본적인 설정 수정은 다음 정도일 것이다.
+```bash
+# Airflow 가 DAG을 읽어들일 경로이다. 즉 사용자는 DAG을 작성하여 이 경로에 복사하면 되다.
+# 절대경로여야 한다.
+dags_folder = {AIRFLOW_HOME}/dags
+
+# 데이터를 저장한 데이터베이스로 아래는 sqlite 의 기본 설정
+sql_alchemy_conn = sqlite:///{AIRFLOW_HOME}/airflow.db
+# mysql, postgreql 등의 DBMS도 지원하며 관리차원에서는 DBMS를 선택하는 것이 낫다. 아래는 mysql 예시
+sql_alchemy_conn = mysql:///user:password@mysqlhost:3306/airflow.db
+
+# webserver uri는 아래 세 설정을 사용하면 돈다.
+base_url = http://localhost:8080
+web_server_host = 0.0.0.0
+web_server_port = 8080
+
+# LDAP 지원이 추가되었는데 해보지 않았다. 관심있으면 try 해보길..
+[ldap]
+uri = 
+user_filter = ..
+:
+
+```
 
 ## 실행
 
@@ -59,6 +99,8 @@ $ airflow scheduler
 
 ### 짠~ UI 가 떴습니다.
 
+
+
 예제 DAG 들이 있습니다.
 
 # DAG 작성
@@ -67,6 +109,12 @@ Airflow 를 쓴다는 것은 airflow를 운영하는 것과 dag을 작성하여 
 
 
 # 기타 운영 이슈
+
+## 타임존
+Airflow의 시간은 기본적으로 UTC 기반으로 동작하는데 이게 한국에 사는 우리 입장에선 매우 짜증난다. 표면적으로 시간으로 짜증나는 경우는 세가지이다.
+1. Dashboard UI의 표기 시간
+2. UI에 표기되는 DAG실행 시간
+2. DAG 코딩시에 시간 파라미터
 
 ## SPOF
 Airflow는 일반적으로 시스템 내에서 매우 중요한 위치를 차지하지만 문제는 그 중요도에 비해서 가용성 부분에서 취약하다. 
