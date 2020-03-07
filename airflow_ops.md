@@ -1,19 +1,20 @@
 # 개요
+
 이 문서에서는 apache airflow를 설치하고 운영하는 방법을 다룬다. 사실 airflow 운영은 
-
-# Install & run
-
-이 문서는 맥북 프로 2016, macOS Mojave, python3, Airflow 1.10.9 기준으로 작성되었다. Airflow 는 PIP와 소스설치 두가지 방법으로 설치가능하다.
 
 ## Install
 
+이 문서는 맥북 프로 2016, macOS Mojave, python3, Airflow 1.10.9 기준으로 작성되었다. Airflow 는 PIP와 소스설치 두가지 방법으로 설치가능하다.
+
 ### 준비
 
-아래 내용은 알아서들 설치하시고. Airflow는 python3로 구동되며 DAG 역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없다. 설치하면 기본적으로 example DAG이 있기 때문에 수정을 해서 사용하면 된다. 만약 자신만의 operator를 작성하려면 airflow 내부 동작과 python의 클래스와 상속 방법은 알고 있어야 한다. Operator는 이후 다시 설명한다.
+아래 것들을 설치하자. python3만 필수이고 나머지 둘은 선택이다.
 
 - `python3`
 - `pip` pip로 설치할 경우에만 필요
 - `DB` 데이터 저장용 DB로 mysql 추천. 별도 설치하지 않으면 sqlite가 사용됨.
+
+Airflow는 python3로 구동되며 DAG 역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없으며 일반적인 작업에 사용할 operator는 이미 제공이 된다. 설치하면 example DAG이 등록되어 있기 때문에 수정을 해서 사용하면 된다. 만약 자신만의 operator를 작성하려면 airflow 내부 동작과 python의 클래스와 상속 방법은 알고 있어야 한다. DAG 작성은 아래에서 다시 설명한다.
 
 ### PIP Install
 
