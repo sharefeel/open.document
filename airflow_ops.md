@@ -20,6 +20,9 @@ DAG은 airflow에서 매우 중요하고 일상적인 용어이지만 사실 Dir
 </figure>
 
 ### Task
+<figure align="middle">
+  <img src=".resources/airflow/simple_dag_image.png" width="250" title="Simple DAG"/>
+</figure>
 
 Task는 DAG을 구성하는 하나의 단위이다. 위 이미지에서는 하나의 박스에 해당함
 
@@ -172,6 +175,22 @@ DAG 상세 페이지로 들어가보자.
 #### 시간 선택
 
 ![Time Select](.resources/airflow/time_select.png)
+
+#### 실행 내역의 gantt chart
+
+![Gantt Chart](.resources/airflow/gantt_chart.png)
+
+### Task 실행 제어
+
+각 task의 박스를 클릭하면 다음과 같이 task를 제어할 수 있는 메뉴가 팝업된다. 아래는 2020-03-06 00:00 (UTC) 실행된 DAG의 run_after_loop을 클릭했을때 뜨는 팝업이다.
+
+<figure align="middle">
+  <img src=".resources/airflow/task_control_popup.png" width="500" title="Gantt Chart"/>
+</figure>
+
+주요한 몇가지만 살펴보자.
+
+
 
 ## DAG 작성
 
