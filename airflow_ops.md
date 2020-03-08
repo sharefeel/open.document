@@ -8,10 +8,11 @@ Airbnb에서 만들었다. Workflow Management System 의 일종인데 각 작�
 
 ### DAG 이란?
 
-DAG은 airflow 에서 많이 사용되지만 사실 Directed Acyclic Graph의 줄임말이다. 즉 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph) 같은 페이지를 보면 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다. 하지만 airflow에서는 그렇게까지 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있다. (실제 python 언어로 작성한다) DAG의 간단한 예를 보자.
+DAG은 airflow 에서 많이 사용되지만 사실 Directed Acyclic Graph의 줄임말이다. 즉 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph) 같은 페이지를 보면 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다. 하지만 airflow에서는 그렇게까지 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있다. DAG의 간단한 예를 보자.
 
-![](.resources/airflow/dag_example.png)
-
+<figure align="middle">
+  <img src=".resources/airflow/dag_example.png" width="500" title="Simple DAG"/>
+</figure>
 
 ## Install
 
