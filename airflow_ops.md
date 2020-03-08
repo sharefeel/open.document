@@ -184,7 +184,9 @@ DAG 상세 페이지로 들어가보자.
 
 #### Tree view
 
-Tree view 메뉴에서는 DAG내의 각 task에 대해서 각 스케줄마다 성공 실패 여부를 여러 스케줄에 대해서 한번에 확인 가능하다. 각 스케줄 별로 확인할필요 없이 스케줄 간격이 짧거나 과거 history 파악이 필요할때 유용하다. 다만 graph view에 비해서 task간 관계 파악은 덜 직과적이다. (나만 그런가?)
+Tree view 메뉴에서는 DAG내의 각 task에 대해서 각 스케줄마다 성공 실패 여부를 여러 스케줄에 대해서 한번에 확인 가능하다. 각 스케줄 별로 확인할필요 없이 스케줄 간격이 짧거나 과거 history 파악이 필요할때 유용하다. 다만 graph view에 비해서 task간 관계 파악은 덜 직관적이다. (나만 그런가?)
+
+![Tree View](.resources/airflow/tree_view.png)
 
 ### Task 실행 제어
 
@@ -246,14 +248,11 @@ Bash operator는 명령의 exit code가 0인 경우 성공으로 판단하기 �
 #### Mark Success
 
 run_after_loop 태스크는 항상 실패하게 되므로 뒤이은 run_this_last는 실행될 수 없다. 이때 강제로 run_after_loop을 성공으로 마킹함으로써 뒤이은 run_this_last가 실행되도록 할 수 있다.
+
 1. run_after_loop 팝업에서 mark success 클릭하여 강제로 성공처리
 2. UI 상에서 success가 된 것을 확인
 3. run_this_last 태스크 팝업에서 clear를 클릭하여 다시 실행
 4. 기다리면 실행된다.
-
-## DAG 작성
-
-Airflow 를 쓴다는 것은 airflow를 운영하는 것과 dag을 작성하여 workflow를 관리하는 것으로 나눠집니다. DAG 작성은 
 
 ## 기타 운영 이슈
 
