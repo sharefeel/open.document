@@ -31,17 +31,18 @@ Task는 DAG을 구성하는 하나의 단위로써 실제 어떤 "작업"을 수
 
 ### Operator
 
-Airflow DAG은 파이썬으로 작성된다. Operator는 각 task가 수행할 수 있는 작업이며 파이썬 클래스 형태로 제공된다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며, 그 외에 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
+Airflow DAG은 파이썬으로 작성된다. Operator는 각 task가 수행할 수 있는 작업이며 파이썬 클래스 형태로 제공된다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
 
 - bash_operator
 - dummy_operator
 - http_operator
+- python_operator
 
 각 operator는 내부적으로 BaseOperator를 상속받아서 만들어져 있는데 필요하다면 사용자가 operator를 추가로 구현할 수 있다. 예를 들어 SSH로 원격 명령어를 실행하려면 bash_operator로 ssh command를 실행해도 되겠지만, ssh_operator 자체를 구현하는 것도 하나의 방법이다.
 
 ### DAG 소스
 
-됐고 그냥 DAG 소스를 하나 보자.
+됐고 그냥 DAG 소스를 하나 보자. 위에 예시로 든 DAG의 소스코드이다. 자세한 설명은 생략한다. (이 글은 DAG 작성 설명이 아니다)
 
 <details>
 <summary> DAG 소스 </summary>
@@ -97,7 +98,7 @@ cond >> [dummy_task_1, dummy_task_2]
 
 </details>
 
-## Install
+## Airflow Install
 
 이 문서는 맥북 프로 2016, macOS Mojave, python3, Airflow 1.10.9 기준으로 작성되었다. Airflow 는 PIP와 소스설치 두가지 방법으로 설치가능하다.
 
@@ -107,9 +108,9 @@ cond >> [dummy_task_1, dummy_task_2]
 
 - `python3`
 - `pip` pip로 설치할 경우에만 필요
-- `DB` 데이터 저장용 DB로 mysql 추천. 별도 설치하지 않으면 sqlite가 사용됨.
+- `DBMS` Airflow는 상태를 db에 관리한다. 다만 sqlite 역시 지원하기 때문에 필수는 아니다.
 
-Airflow는 python3로 구동되며 DAG 역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없으며 일반적인 작업에 사용할 operator는 이미 제공이 된다. 설치하면 example DAG이 등록되어 있기 때문에 수정을 해서 사용하면 된다. 만약 자신만의 operator를 작성하려면 airflow 내부 동작과 python의 OOP 문법에 대해서 익숙해야 한다. DAG 작성은 아래에서 다시 설명한다.
+Airflow는 python3로 구동되며 DAG 역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없으며 일반적인 작업에 사용할 operator는 이미 제공이 된다. 설치하면 example DAG이 등록되어 있기 때문에 수정을 해서 사용하면 된다. 만약 자신만의 operator를 작성하려면 airflow 내부 동작과 python의 OOP 문법에 대해서 익숙해야 한다.
 
 ### PIP Install
 
@@ -142,7 +143,12 @@ Finished processing dependencies for apache-airflow==1.10.9
 
 #### AIRFLOW_HOME
 
-일단 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. (기본 설정대로 운영한다면) AIRFLOW_HOME 하위에 db, dags, airflow.cfg 파일 등이 위치한다.
+*_HOME 환경변수는 익숙할 것이다. 공홈 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. AIRFLOW_HOME 하위에 다음 파일들이 위치한다. 기본설정으로 운영하는 것을 가정한 것이며 airflow.cfg를 빼고는 설정으로 모두 변경 가능하다.
+
+- `airflow.cfg` airflow 설정파일
+- `dags` dag 파이썬 파일이 위치하는 디렉토리
+- `airflow.db` sqlite를 사용할경우 생성되는 db 파일
+- `logs` airflow와 dag의 실행로그파일이 저장되는 디렉토리
 
 #### 설정파일: airflow.cfg
 
@@ -199,9 +205,9 @@ user_filter = ..
 ### DB 초기화 및 필요한 프로세스 실행
 
 ```bash
-# 데이터베이스 초기화 작업이 필요하다. 이 작업은 한번만 해야 한다.
+# 데이터베이스 초기화. 이 작업은 한번만 해야 한다
 $ airflow initdb
-# Front-end 역할을 하는 웹서버 실행. Foreground로 실행된다. Daemon으로 실행하는 것은 각자 알아서.
+# Front-end 역할을 하는 웹서버 실행
 $ airflow webserver
 # 실제 dag을 실행하는 스케줄러 프로세스를 실행
 $ airflow scheduler
@@ -210,7 +216,7 @@ $ airflow scheduler
 ## UI 사용
 
 UI를 설명한다.
-사용한 DAG 소스 [basic_tutorial.py](.resources/airflow/basic_tutorial.py)
+사용한 DAG 소스 [basic_tutorial.py](.resources/airflow/basic_tutorial.py), [basic_tutorial_fail.py](.resources/airflow/basic_tutorial_fail.py)
 
 ### Dashboard
 
