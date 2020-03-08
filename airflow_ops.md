@@ -17,25 +17,32 @@ Airflow를 사용한다는 것은 다음 두가지로 나눠볼 수 있다.
 
 DAG은 airflow에서 매우 중요하고 통용되는 용어이지만 사실 Directed Acyclic Graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph)을 보면 지루하지 않게 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다.
 
-하지만 airflow에서는 DAG의 상세 내용에 대해서 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있다. 다음 그림은 실제 airflow의 DAG으로써 총 세개의 task (condition, dummy_task_1, dummy_task_2)와 그 의존성을 보여준다.
+하지만 airflow의 이해를 위해서 DAG이란 자료구조를 자세히 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있으며 실제 작성은 python으로 한다. 다음 그림은 실제 airflow의 DAG의 예제이다.
 
 <figure align="middle">
   <img src=".resources/airflow/simple_dag_image.png" width="250" title="Simple DAG"/>
 </figure>
 
+DAG에는 세개의 task (condition, dummy_task_1, dummy_task_2)가 있다. 이 DAG이 airflow에 의해서 실행되면, condition task가 먼저 실행된 후 dummy_task_1과 dummy_task_2가 수행된다.
+
 ### Task
 
-Task는 DAG을 구성하는 하나의 단위이다. 위 이미지에서는 하나의 박스에 해당함
+Task는 DAG을 구성하는 하나의 단위로써 실제 어떤 "작업"을 수행한다.
 
 ### Operator
 
-Airflow DAG과 그 task는 파이썬으로 기술된다. 이때 각 task가 수행할 수 있는 작업이며, 파이썬 클래스 형태로 제공된다. 자세한 것은 실제 DAG 작성하는 부분에서 살펴보도록 한다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며, 그 외에 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
+Airflow DAG은 파이썬으로 작성된다. Operator는 각 task가 수행할 수 있는 작업이며 파이썬 클래스 형태로 제공된다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며, 그 외에 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
 
 - bash_operator
 - dummy_operator
 - http_operator
 
 각 operator는 내부적으로 BaseOperator를 상속받아서 만들어져 있는데 필요하다면 사용자가 operator를 추가로 구현할 수 있다. 예를 들어 SSH로 원격 명령어를 실행하려면 bash_operator로 ssh command를 실행해도 되겠지만, ssh_operator 자체를 구현하는 것도 하나의 방법이다.
+
+### DAG 소스
+
+됐고 그냥 DAG 소스를 하나 보자.
+
 
 ## Install
 
