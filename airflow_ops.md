@@ -155,7 +155,7 @@ UI를 설명한다.
 
 ![Airflow dashboard](.resources/airflow/dashboard.png)
 
-상단의 DAGs 메뉴 선택하면 보면 현재 등록된 DAG의 리스트와 요약된 상태의 대시보드가 나오며, airflow에 등록된 DAG의 운영상태를 한눈에 알 수 있다. 특이한 점은 오른쪽위의 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-07 23:47 KST이기 때문에 9시간의 차이가 나는데 이게 운영하다보면 은근히 헷갈린다.
+상단의 DAGs 메뉴 선택하면 보면 현재 등록된 DAG의 리스트와 요약된 상태의 대시보드가 나오며, airflow에 등록된 DAG의 운영상태를 한눈에 알 수 있다. 특이한 점은 오른쪽위의 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-08 16:23 KST이기 때문에 9시간의 차이가 나는데 이게 운영하다보면 은근히 헷갈린다.
 
 - `i` DAG의 on 스위치
 - `DAG` 등록된 dag 이름. 클릭하면 DAG 상세 페이지로 이동한다.
@@ -182,15 +182,54 @@ DAG 상세 페이지로 들어가보자.
 
 ### Task 실행 제어
 
-각 task의 박스를 클릭하면 다음과 같이 task를 제어할 수 있는 메뉴가 팝업된다. 아래는 2020-03-06 00:00 (UTC) 실행된 DAG의 run_after_loop을 클릭했을때 뜨는 팝업이다.
+각 task의 박스를 클릭하면 다음과 같이 task를 제어할 수 있는 메뉴가 팝업된다. 아래는 2020-03-06 01:00 (UTC) 실행된 DAG의 run_after_loop을 클릭했을때 뜨는 팝업이다.
 
 <figure align="middle">
   <img src=".resources/airflow/task_control_popup.png" width="500" title="Gantt Chart"/>
 </figure>
 
-주요한 몇가지만 살펴보자.
+기능이 많으니 주요한 몇가지만 살펴보자.
 
+#### Log
 
+Graph view에서 볼 수 있듯이 run_after_loop 태스크는 실행이 실패했다. 원인 분석을 위해서 view log를 클릭해보자.
+
+<details><summary>실행로그 </summary>
+
+```java
+*** Reading local file: /Users/youngrokko/airflow/logs/basic_tutorial_fail/run_after_loop/2020-03-06T01:00:00+00:00/1.log
+[2020-03-08 16:42:15,294] {taskinstance.py:655} INFO - Dependencies all met for <TaskInstance: basic_tutorial_fail.run_after_loop 2020-03-06T01:00:00+00:00 [queued]>
+[2020-03-08 16:42:15,304] {taskinstance.py:655} INFO - Dependencies all met for <TaskInstance: basic_tutorial_fail.run_after_loop 2020-03-06T01:00:00+00:00 [queued]>
+[2020-03-08 16:42:15,305] {taskinstance.py:866} INFO - 
+--------------------------------------------------------------------------------
+[2020-03-08 16:42:15,305] {taskinstance.py:867} INFO - Starting attempt 1 of 1
+[2020-03-08 16:42:15,305] {taskinstance.py:868} INFO - 
+--------------------------------------------------------------------------------
+[2020-03-08 16:42:15,312] {taskinstance.py:887} INFO - Executing <Task(BashOperator): run_after_loop> on 2020-03-06T01:00:00+00:00
+[2020-03-08 16:42:15,314] {standard_task_runner.py:53} INFO - Started process 13490 to run task
+[2020-03-08 16:42:15,368] {logging_mixin.py:112} INFO - Running %s on host %s <TaskInstance: basic_tutorial_fail.run_after_loop 2020-03-06T01:00:00+00:00 [running]> Youngrokui-MacBookPro.local
+[2020-03-08 16:42:15,385] {bash_operator.py:82} INFO - Tmp dir root location: 
+ /tmp
+[2020-03-08 16:42:15,386] {bash_operator.py:105} INFO - Temporary script location: /tmp/airflowtmp5d0zozkw/run_after_loopt40s_5r5
+[2020-03-08 16:42:15,387] {bash_operator.py:115} INFO - Running command: echo 1; sleep 5; exit 1
+[2020-03-08 16:42:15,392] {bash_operator.py:122} INFO - Output:
+[2020-03-08 16:42:15,395] {bash_operator.py:126} INFO - 1
+[2020-03-08 16:42:20,403] {bash_operator.py:130} INFO - Command exited with return code 1
+[2020-03-08 16:42:20,412] {taskinstance.py:1128} ERROR - Bash command failed
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg/airflow/models/taskinstance.py", line 966, in _run_raw_task
+    result = task_copy.execute(context=context)
+  File "/usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg/airflow/operators/bash_operator.py", line 134, in execute
+    raise AirflowException("Bash command failed")
+airflow.exceptions.AirflowException: Bash command failed
+[2020-03-08 16:42:20,415] {taskinstance.py:1185} INFO - Marking task as FAILED.dag_id=basic_tutorial_fail, task_id=run_after_loop, execution_date=20200306T010000, start_date=20200308T074215, end_date=20200308T074220
+[2020-03-08 16:42:25,289] {logging_mixin.py:112} INFO - [2020-03-08 16:42:25,287] {local_task_job.py:103} INFO - Task exited with return code 1
+
+```
+
+ERROR
+
+</details>
 
 ## DAG 작성
 
