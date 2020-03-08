@@ -1,18 +1,37 @@
 # 개요
 
 이 문서에서는 apache airflow를 설치하고 운영하는 방법을 다룬다. 사실 airflow 운영은 
-
-## Airflow 란
-
 Airbnb에서 만들었다. Workflow Management System 의 일종인데 각 작업(task)를 DAG으로 만들어 실행한다. 비슷한 것으로는 ㅇㅇㅇㅇㅇ 등이 있다.
 
-### DAG 이란?
+Airflow를 사용한다는 것은 DAG을 작성하는 작업과 이 DAG을 실행하는 작업으로 나눠진다. 이 글은 실행하는 것 위주로 살펴볼 예이며, DAG을 작성하는 것은 별도 주제로 다룬다.
 
-DAG은 airflow 에서 많이 사용되지만 사실 Directed Acyclic Graph의 줄임말이다. 즉 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph) 같은 페이지를 보면 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다. 하지만 airflow에서는 그렇게까지 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있다. DAG의 간단한 예를 보자.
+## Terms
+
+용어를 우선 알고 들어가자.
+
+### DAG
+
+DAG은 airflow에서 매우 중요하고 일상적인 용어이지만 사실 Directed Acyclic Graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph)을 보면 지루하지 않게 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다.
+
+하지만 airflow에서는 DAG의 상세 내용에 대해서 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있다. 다음 그림은 실제 airflow의 DAG으로써 총 세개의 task (condition, dummy_task_1, dummy_task_2)와 그 의존성을 보여준다.
 
 <figure align="middle">
-  <img src=".resources/airflow/dag_example.png" width="500" title="Simple DAG"/>
+  <img src=".resources/airflow/simple_dag_image.png" width="250" title="Simple DAG"/>
 </figure>
+
+### Task
+
+Task는 DAG을 구성하는 하나의 단위이다. 위 이미지에서는 하나의 박스에 해당함
+
+### Operator
+
+Airflow DAG과 그 task는 파이썬으로 기술된다. 이때 각 task가 수행할 수 있는 작업이며, 파이썬 클래스 형태로 제공된다. 자세한 것은 실제 DAG 작성하는 부분에서 살펴보도록 한다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며, 그 외에 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
+
+- bash_operator
+- dummy_operator
+- http_operator
+
+각 operator는 내부적으로 BaseOperator를 상속받아서 만들어져 있는데 필요하다면 사용자가 operator를 추가로 구현할 수 있다. 예를 들어 SSH로 원격 명령어를 실행하려면 bash_operator로 ssh command를 실행해도 되겠지만, ssh_operator 자체를 구현하는 것도 하나의 방법이다.
 
 ## Install
 
@@ -124,15 +143,20 @@ $ airflow webserver
 $ airflow scheduler
 ```
 
+## UI 사용
+
+UI를 설명한다.
+사용한 DAG 소스 [basic_tutorial.py](.resources/airflow/basic_tutorial.py)
+
 ### Dashboard
 
 ![Airflow dashboard](.resources/airflow/dashboard.png)
 
-상단의 DAGs 메뉴를 보면 현재 등록된 DAG의 리스트와 요약된 상태가 보여진다. 오른쪽 를 보면 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-07 23:47 KST 이다. DAG 목록 테이블을 컬럼별로 설명하며 다음과 같다.
+상단의 DAGs 메뉴 선택하면 보면 현재 등록된 DAG의 리스트와 요약된 상태의 대시보드가 나오며, airflow에 등록된 DAG의 운영상태를 한눈에 알 수 있다. 특이한 점은 오른쪽위의 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-07 23:47 KST이기 때문에 9시간의 차이가 나는데 이게 운영하다보면 은근히 헷갈린다.
 
 - `i` DAG의 on 스위치
 - `DAG` 등록된 dag 이름. 클릭하면 DAG 상세 페이지로 이동한다.
-- `Schedule` DAG에서 지정한 스케줄링 방식을 보여준다. cron 포맷, 안함, 즉시실행 등이 있다.
+- `Schedule` DAG에서 지정한 스케줄링 방식을 보여준다. cron 포맷, 안함, 즉시실행 등이 있다. 주의할 것은 이 시간 역시 UTC 기준이다.
 - `Owner` 중요하지 않음
 - `Recent Tasks` 최근 동작한 task 정보
 - `Last Run` 마지막 동작 시간. 설치 직후이므로 기록된 것이 없다.
@@ -140,6 +164,14 @@ $ airflow scheduler
 - `Links` DAG의 상세 페이지의 direct link
 
 DAG 상세 페이지로 들어가보자.
+
+#### Graph View 
+
+![Graph View](.resources/airflow/graph_view.png)
+
+#### 시간 선택
+
+![Time Select](.resources/airflow/time_select.png)
 
 ## DAG 작성
 
