@@ -27,7 +27,7 @@ $ pip install
 
 ### 소스 기반 설치
 
-github 에서 1.10.9 소스 코드를 다운 받아서 설치한다.
+github 에서 소스코드를 다운로드 받아서 설치한다. 현재는 1.10.9 tag가 가장 최신다.
 
 ```bash
 # github에서 clone
@@ -110,11 +110,11 @@ $ airflow initdb
 $ airflow webserver
 # 실제 dag을 실행하는 스케줄러 프로세스를 실행
 $ airflow scheduler
-````
+```
 
-### 짠~ UI 가 떴습니다
+### Dashboard
 
-예제 DAG 들이 있습니다.
+![Airflow dashboard](.resources/airflow/dashboard.png)
 
 ## DAG 작성
 
