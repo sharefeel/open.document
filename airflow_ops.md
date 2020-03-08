@@ -168,6 +168,8 @@ UI를 설명한다.
 
 DAG 상세 페이지로 들어가보자.
 
+#### DAG 상세 페이지
+
 #### Graph View 
 
 ![Graph View](.resources/airflow/graph_view.png)
@@ -179,6 +181,10 @@ DAG 상세 페이지로 들어가보자.
 #### 실행 내역의 gantt chart
 
 ![Gantt Chart](.resources/airflow/gantt_chart.png)
+
+#### Tree view
+
+Tree view 메뉴에서는 DAG내의 각 task에 대해서 각 스케줄마다 성공 실패 여부를 여러 스케줄에 대해서 한번에 확인 가능하다. 각 스케줄 별로 확인할필요 없이 스케줄 간격이 짧거나 과거 history 파악이 필요할때 유용하다. 다만 graph view에 비해서 task간 관계 파악은 덜 직과적이다. (나만 그런가?)
 
 ### Task 실행 제어
 
@@ -227,9 +233,23 @@ airflow.exceptions.AirflowException: Bash command failed
 
 ```
 
-ERROR
+로그는 airflow 자체 로그와 오퍼레이터에 의해서 실행된 출력결과가 하나의 파일에 저장되어 있다. ERROR - Bash command failed 바로 윗부분을 보면 에러의 원인을 알 수 있다. "Command exited with return code 1"이 바로 그 원인다. run_after_loop는 bash operator인데 다음 명령어를 실행하고 있다. (실행된 명령어는 Rendered Tempalate에서 확인할 수 있다.)
+
+```bash
+echo 1; sleep 5; exit 1
+```
+
+Bash operator는 명령의 exit code가 0인 경우 성공으로 판단하기 때문에 위 코드는 항상 실패하게 된다.
 
 </details>
+
+#### Mark Success
+
+run_after_loop 태스크는 항상 실패하게 되므로 뒤이은 run_this_last는 실행될 수 없다. 이때 강제로 run_after_loop을 성공으로 마킹함으로써 뒤이은 run_this_last가 실행되도록 할 수 있다.
+1. run_after_loop 팝업에서 mark success 클릭하여 강제로 성공처리
+2. UI 상에서 success가 된 것을 확인
+3. run_this_last 태스크 팝업에서 clear를 클릭하여 다시 실행
+4. 기다리면 실행된다.
 
 ## DAG 작성
 
