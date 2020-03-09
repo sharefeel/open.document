@@ -33,7 +33,7 @@ args = {
 dag = DAG(
     dag_id='basic_tutorial',
     default_args=args,
-    schedule_interval='0 * * * *',
+    schedule_interval='*/5 * * * *',
     dagrun_timeout=timedelta(minutes=10),
     tags=['example']
 )
