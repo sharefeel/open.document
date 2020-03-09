@@ -1,29 +1,25 @@
 # 개요
 
-이 문서에서는 apache airflow를 설치과 간단한 사용법에 대해서 다룬다. Airflow는 Airbnb에서 만든 Workflow Management System 의 일종으로 쉽게는 스케줄러이다. 비슷한 시스템으로는 spotify의 luigi가 있고, hadoop 에코시스템에서는 oozie와 azkaban 등이 있다.
+이 문서에서는 apache airflow를 설치과 간단한 사용법에 대해서 다룬다. Airflow는 Airbnb에서 만든 Workflow Management System 중 하나로써 비슷한 시스템으로는 spotify의 luigi가 있고, hadoop 에코시스템에서는 oozie와 azkaban 등이 있다. Airflow를 사용한다는 것은 다음 두가지로 나눠볼 수 있다.
 
-Airflow를 사용한다는 것은 다음 두가지로 나눠볼 수 있다.
+1. 실행할 dag을 작성
+2. dag의 실행 
 
-1. 실행할 airflow DAG을 작성
-2. Airflow를 운영함으로써 dag의 스케줄링
-
-아래에 다시 설명하겠지만 DAG은 workflow 라고 이해하면 된다. 이글은 DAG의 개발보다는 airflow 운영과 사용(의 일부)에 대해서 다룬다. 물론 현업에선 DAG 작성부터 해야겠지만, 사실 airflow가 뭔지는 알아야 dag을 만들겠다는 결심을 할 것 아닌가.
+아래에 다시 설명하겠지만 dag은 workflow 라고 이해하면 된다. 이글은 dag의 개발보다는 airflow 운영과 dag을 스케줄링하는 방법 대해서 다룬다.
 
 ## Terms
 
-용어를 우선 알고 들어가자.
+### DAG (Directed Acyclic Graph)
 
-### DAG
+Dag은 airflow에서 workflow라는 의미로 통용되지만 사실 directed acyclic graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프인데 tree 역시 dag의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph)을 보면 지루하지 않게 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다. 저정도로는 직성이 안풀린다면 [wikipedia](https://en.wikipedia.org/wiki/Directed_acyclic_graph)를 읽어보면 어떨까?
 
-DAG은 airflow에서 매우 중요하고 통용되는 용어이지만 사실 Directed Acyclic Graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프로써 tree 역시 DAG의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph)을 보면 지루하지 않게 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다.
-
-하지만 airflow의 이해를 위해서 DAG이란 자료구조를 자세히 알 필요는 없다. Airflow에서 DAG은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있으며 실제 작성은 python으로 한다. 다음 그림은 실제 airflow의 DAG의 예제이다.
+하지만 airflow의 이해를 위해서 dag이란 자료구조를 알 필요는 없으며 순환구조가 없는 즉 시작과 끝이 있는 작업의 흐름이라고 이해하면 된다. Airflow에서 dag은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있으며 실제 작성은 python으로 한다. 다음 그림은 실제 airflow의 간단한 dag의 예제이다.
 
 <figure align="middle">
   <img src=".resources/airflow/simple_dag_image.png" width="250" title="Simple DAG"/>
 </figure>
 
-DAG에는 세개의 task (condition, dummy_task_1, dummy_task_2)가 있다. 이 DAG이 airflow에 의해서 실행되면, condition task가 먼저 실행된 후 dummy_task_1과 dummy_task_2가 수행된다.
+Dag에는 세개의 task (condition, dummy_task_1, dummy_task_2)가 있다. 이 dag이 airflow에 의해서 실행되면, condition task가 먼저 실행된 후 dummy_task_1과 dummy_task_2가 수행된다. Dummy_task_1이 실행될지 혹은 dummy_task_2가 실행될지 혹은 둘다 실행될지는 dag 파이썬 코드에서 결정한다.
 
 ### Task
 
