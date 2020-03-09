@@ -23,22 +23,22 @@ Dag에는 세개의 task (condition, dummy_task_1, dummy_task_2)가 있다. 이 
 
 ### Task
 
-Task는 DAG을 구성하는 하나의 단위로써 실제 어떤 "작업"을 수행한다.
+Task는 dag을 구성하는 하나의 실행 단위이다. Dag은 task의 관계를 기술하는 역할을 하며 *task가 인스턴스화되어 실행됨으로써 실제 작업이 실행*된다.
 
 ### Operator
 
-Airflow DAG은 파이썬으로 작성된다. Operator는 각 task가 수행할 수 있는 작업이며 파이썬 클래스 형태로 제공된다. Airflow 에서 기본으로 지원하는 DAG은 다음과 같으며 사용법은 [공홈](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. 흔히 사용되는 것으로 다음과 같은 것들이 있으며 각 스토리지 (hive, mysql, mssql, ..) 등에 접근하는 operator도 있다.
+Airflow dag은 파이썬으로 작성되는데 operator는 각 task가 수행할 수 있는 작업의 정의이며 파이썬 클래스로 정의된다. Airflow 에서 많은 수의 operator를 기본 제공하고 있으며 전체 목록은 [공식홈페이지](http://airflow.apache.org/docs/stable/_api/airflow/operators/index.html)에서 확인가능하다. Airflow를 적용할 시스템에 따라 다르겠지만 다음 operator는 범용적으로 사용된다.
 
-- bash_operator
-- dummy_operator
-- http_operator
-- python_operator
+- `bash_operator` Bash 명령어를 실행하는 operator
+- `python_operator` Python 함수 호출하는 operator. 코드를 삽입할 수 있다는 것 뿐만 아니라 dag의 환경변수 활용이 용이하다는 면에서 유용하다. 다만 task간의 관계도로 풀어야할 것을 코드에 구현하는 것은 지양하는 것이 좋다.
+- `http_operator` Http 호출을 하는 operator
+- `dummy_operator` 실제 수행하는 작업은 없는 이름 그대로 dummy operator. Task간의 관계를 논리적으로 설명하기 위한 목적으로 사용가능
 
-각 operator는 내부적으로 BaseOperator를 상속받아서 만들어져 있는데 필요하다면 사용자가 operator를 추가로 구현할 수 있다. 예를 들어 SSH로 원격 명령어를 실행하려면 bash_operator로 ssh command를 실행해도 되겠지만, ssh_operator 자체를 구현하는 것도 하나의 방법이다.
+각 operator는 내부적으로 BaseOperator를 상속받아서 만들어져 있는데 필요하다면 사용자가 operator를 추가로 구현할 수 있다. 예를 들어 SSH로 원격 명령어를 실행하는 task가 필요한 경우, bash_operator로 ssh command를 실행할 수 있지만 더 **`멋지게`** ssh_operator를 구현해서 처리하는 방법도 있다. 
 
-### DAG 소스
+### DAG 예제 소스 코드
 
-됐고 그냥 DAG 소스를 하나 보자. 위에 예시로 든 DAG의 소스코드이다. 자세한 설명은 생략한다. (이 글은 DAG 작성 설명이 아니다)
+됐고 그냥 dag 소스를 하나 보자. 위의 task 세개로 이루어진 dag의 소스코드이다. 파이썬 문법을 모르더라도 대충 감이 올 것이다.
 
 <details>
 <summary> DAG 소스 </summary>
@@ -96,7 +96,7 @@ cond >> [dummy_task_1, dummy_task_2]
 
 ## Airflow Install
 
-이 문서는 맥북 프로 2016, macOS Mojave, python3, Airflow 1.10.9 기준으로 작성되었다. Airflow 는 PIP와 소스설치 두가지 방법으로 설치가능하다.
+설치해보자. 이 문서는 맥북 프로 2016, macOS Mojave, python3, Airflow 1.10.9 기준으로 작성되었다. Airflow 는 PIP와 소스설치 두가지 방법으로 설치가능하다.
 
 ### 준비
 
@@ -104,16 +104,16 @@ cond >> [dummy_task_1, dummy_task_2]
 
 - `python3`
 - `pip` pip로 설치할 경우에만 필요
-- `DBMS` Airflow는 상태를 db에 관리한다. 다만 sqlite 역시 지원하기 때문에 필수는 아니다.
+- `DBMS` Airflow는 상태를 저장할 데이터베이스. Sqlite를 기본지원하지만 sqlite를 사용하면 동시에 여러개의 task가 실행되지 못한다. 이는 sqlite의 concurrent write가 제한적이기 때문이다. 참고: [Sqlite / Begin Concurrent](https://www.sqlite.org/cgi/src/doc/begin-concurrent/doc/begin_concurrent.md)
 
-Airflow는 python3로 구동되며 DAG 역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없으며 일반적인 작업에 사용할 operator는 이미 제공이 된다. 설치하면 example DAG이 등록되어 있기 때문에 수정을 해서 사용하면 된다. 만약 자신만의 operator를 작성하려면 airflow 내부 동작과 python의 OOP 문법에 대해서 익숙해야 한다.
+Airflow는 python3로 구동되며 dag역시 python으로 작성한다. 하지만 기존에 python을 사용해보지 않았다고 해도 DAG을 작성하는 것은 문제가 없으며 일반적인 작업에 사용할 operator는 이미 제공이 된다. 설치하면 example DAG이 등록되어 있기 때문에 수정을 해서 사용하면 된다. (Operator를 추가구현 하겠다면 얘기는 달라진다)
 
 ### PIP Install
 
-pip 기반 설치는 매우 쉽다. pip만 제대로 설치되어 있다면 말이다.
+pip 기반 설치는 매우 쉽다. pip만 제대로 설치되어 있으면 한줄이면 끝난다. 
 
 ```bash
-$ pip install
+$ pip install apache-airflow
 :
 ```
 
@@ -139,7 +139,7 @@ Finished processing dependencies for apache-airflow==1.10.9
 
 #### AIRFLOW_HOME
 
-*_HOME 환경변수는 익숙할 것이다. 공홈 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. AIRFLOW_HOME 하위에 다음 파일들이 위치한다. 기본설정으로 운영하는 것을 가정한 것이며 airflow.cfg를 빼고는 설정으로 모두 변경 가능하다.
+*_HOME 환경변수는 익숙할 것이다. 공홈 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. 기본설정에서 변경하지 않고 사용할 경우 AIRFLOW_HOME 하위에 다음 파일들이 위치한다. (궂이 변경해서 사용할 필요는 없을 것 같다)
 
 - `airflow.cfg` airflow 설정파일
 - `dags` dag 파이썬 파일이 위치하는 디렉토리
@@ -154,16 +154,14 @@ $AIRFLOW_HOME/airflow.cfg 파일이 위치해야 한다. 설치된 파일중 템
 # MacOS의 경우 python3 site-packages 하위에 airflow 파일들이 설치된다.
 ls /usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg
 # 위 경로에서 설정 템플릿 파일을 복사하자
-cp /usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg/airflow/config_templates/default_airflow.cfg $AIRFLOW_HOME/
-cd $AIRFLOW_HOME
-mv default_airflow.cfg airflow.cfg
+cp /usr/local/lib/python3.7/site-packages/apache_airflow-1.10.9-py3.7.egg/airflow/config_templates/default_airflow.cfg $AIRFLOW_HOME/airflow.cfg
 ```
 
 사실상 아무런 설정도 하지 않고 그대로 사용할 수 있다. 그러면 다음 설정으로 동작하게 된다.
 
-- `webserver`0.0.0.0:8080
-- `db` sqlite, 파일위치는 $AIRFLOW_HOME/airflow.db
-- `dag 경로` $AIRFLOW_HOME/dags
+- `webserver 주소` 0.0.0.0:8080
+- `데이터베이스` sqlite, 파일위치는 $AIRFLOW_HOME/airflow.db
+- `dag 파일 경로` $AIRFLOW_HOME/dags
 
 운영환경에서의 기본적인 설정 수정은 다음 정도일 것이다.
 
@@ -173,9 +171,9 @@ mv default_airflow.cfg airflow.cfg
 dags_folder = {AIRFLOW_HOME}/dags
 
 # 데이터를 저장한 데이터베이스로 아래는 sqlite 의 기본 설정
-sql_alchemy_conn = sqlite:///{AIRFLOW_HOME}/airflow.db
+sql_alchemy_conn = sqlite:////{AIRFLOW_HOME}/airflow.db
 # mysql, postgreql 등의 DBMS도 지원하며 관리차원에서는 DBMS를 선택하는 것이 낫다. 아래는 mysql 예시
-sql_alchemy_conn = mysql:///user:password@mysqlhost:3306/airflow.db
+sql_alchemy_conn = mysql://user:password@mysqlhost:3306/airflow.db
 
 # webserver uri는 아래 세 설정을 사용하면 돈다.
 base_url = http://localhost:8080
@@ -209,31 +207,64 @@ $ airflow webserver
 $ airflow scheduler
 ```
 
+참고. webserver와 scheduler는 foreground로 실행된다.
+
 ## UI 사용
 
-UI를 설명한다.
-사용한 DAG 소스 [basic_tutorial.py](.resources/airflow/basic_tutorial.py), [basic_tutorial_fail.py](.resources/airflow/basic_tutorial_fail.py)
+Airflow webser의 UI를 살펴보자. 설명을 위해 두개의 dag을 추가했다.
+
+- [basic_tutorial.py](.resources/airflow/basic_tutorial.py)
+- [basic_tutorial_fail.py](.resources/airflow/basic_tutorial_fail.py)
 
 ### Dashboard
 
+설정한 URL로 접속하면 airflow에 등록된 dag의 운영상태를 한눈에 알 수 있는 dashboard가 나타난다.
+
 ![Airflow dashboard](.resources/airflow/dashboard.png)
 
-상단의 DAGs 메뉴 선택하면 보면 현재 등록된 DAG의 리스트와 요약된 상태의 대시보드가 나오며, airflow에 등록된 DAG의 운영상태를 한눈에 알 수 있다. 특이한 점은 오른쪽위의 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-08 16:23 KST이기 때문에 9시간의 차이가 나는데 이게 운영하다보면 은근히 헷갈린다.
+특이한 점은 오른쪽위의 시간이 UTC로 표시되는 것을 볼 수 있다. 스크린샷을 찍은 시점은 2020-03-08 16:23 KST이기 때문에 9시간의 차이가 나는데 이게 운영하다보면 은근히 헷갈린다.
 
 - `i` 스케줄 on/off 스위치
-- `DAG` 등록된 dag 이름. 클릭하면 DAG 상세 페이지로 이동한다.
-- `Schedule` DAG에서 지정한 스케줄링 방식을 보여준다. cron 포맷, 안함, 즉시실행 등이 있다. 주의할 것은 이 시간 역시 UTC 기준이다.
+- `DAG` 등록된 dag 이름. 클릭하면 dag 상세 페이지로 이동한다.
+- `Schedule` Dag에서 지정한 스케줄링 방식을 보여준다. 주의할 것은 이 시간 역시 UTC 기준이다.
 - `Owner` 중요하지 않음
-- `Recent Tasks` 최근 동작한 task 정보
-- `Last Run` 마지막 스케줄 시각. UTC
-- `DAG Runs` 동작중인 task
-- `Links` DAG의 상세 페이지의 direct link
+- `Recent Tasks` 최근 동작한 task 정보를 상태별로 보여준다.
+- `Last Run` 마지막 스케줄 시각. 역시 UTC
+- `DAG Runs` Dag 동작 상태
+- `Links` DAG의 상세 페이지의 direct link / 스샷이 짤려서 안보이는구만.. 아무튼 있다.
 
-### 여기서 잠깐. 시간개념에 대해서
+### 여기서 잠깐! schedule 시간에 대해서
 
-Airflow는 스케줄러이기 때문에 "현재시간"이 아니라 "실행시간"에 대해서 이해해야 한다. 예를들어 DAG의 스케줄 설정이 다음처럼 되어 있다고 하자.
+Airflow는 스케줄러이기 때문에 "현재시간"이 아니라 "실행시간"에 대해서 이해해야 한다. 일단위 배치작업이 다음처럼 스케줄 될 필요가 있다고 하자.
+
 - 스케줄 시작 시간: 2020-01-01T05:00:00
-- 스케줄 정책: 매일 0시 (0 0 )
+- 스케줄 정책: 매일 0시 (0 0 * * *)
+
+만약 현재가 2020-01-05T05:00:00 인 경우 이 작업의 스케줄을 실행하면 총 네번 실행되는데 그 "실행시간"은 다음과 같다. 
+
+1. 2020-01-02T00:00:00
+2. 2020-01-03T00:00:00
+3. 2020-01-04T00:00:00
+4. 2020-01-05T00:00:00
+
+Airflow는 dag 코드 내에서 사용할 수 있는 미리 정의된 변수를 제공하는데 그중 실행 시간 관련 변수가 있다. 위의 처리할 일자를 파라미터로 받는 배치 프로그램을 batch operator로 실행한다면 dag은 대충 다음과 같은 모양일 것이다.
+
+```python
+args = {
+  `start_date`: datetime(2020, 1, 1, 5)
+}
+
+dag = DAG{
+  schedule_interval=`0 0 * * *`
+}
+
+batch_task = BashOperator{
+  bash_command=`batch_command {{ ds }}`
+  dag=dag
+}
+```
+
+돌려보진 않았기 때문에 틀렸을 수 있다. 하지만 중요한 것은 start_time, schedule_interval, {{ ds }} 라는 미리 정의된 변수를 통해서 일단위 스케줄을 할 수 있다는 것이다.
 
 ### DAG 상세 페이지
 
