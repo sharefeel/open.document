@@ -266,43 +266,49 @@ batch_task = BashOperator{
 
 돌려보진 않았기 때문에 틀렸을 수 있다. 하지만 중요한 것은 start_time, schedule_interval, {{ ds }} 라는 미리 정의된 변수를 통해서 일단위 스케줄을 할 수 있다는 것이다.
 
+참고. [Airflow Default Variables](https://airflow.apache.org/docs/stable/macros.html#default-variables)
+
 ### DAG 상세 페이지
 
 basic_tutorial dag의 상세 페이지로 들어가보자.
 
 #### Graph View 
 
-그래프뷰에서는 dag의 의존성 그래프와 현재 실행상태를 보여준다. 
+그래프뷰에서는 dag의 의존성 그래프와 현재 실행상태를 보여준다.
 
 ![Graph View](.resources/airflow/graph_view.png)
 
 #### 시간 선택
 
+Dag이 스케줄된 시간을 선택하여 정보를 볼 수 있다. 기본은 가장 최근 스케줄 시간이다.
+
 ![Time Select](.resources/airflow/time_select.png)
 
 #### 실행 내역의 gantt chart
+
+각 task의 실행 시간을 알 수 있다.
 
 ![Gantt Chart](.resources/airflow/gantt_chart.png)
 
 #### Tree view
 
-Tree view 메뉴에서는 DAG내의 각 task에 대해서 각 스케줄마다 성공 실패 여부를 여러 스케줄에 대해서 한번에 확인 가능하다. 각 스케줄 별로 확인할필요 없이 스케줄 간격이 짧거나 과거 history 파악이 필요할때 유용하다. 다만 graph view에 비해서 task간 관계 파악은 덜 직관적이다. (나만 그런가?)
+Tree view 메뉴에서는 DAG내의 각 task에 대해서 각 스케줄마다 성공 실패 여부를 여러 스케줄에 대해서 한번에 확인 가능하다. 각 스케줄 별로 확인하지 않더라도 과거 history 파악이 필요할때 유용하다. 다만 graph view에 비해서 task간 관계 파악은 덜 직관적이다. (나만 그런가?)
 
 ![Tree View](.resources/airflow/tree_view.png)
 
 ### Task 실행 제어
 
-각 task의 박스를 클릭하면 다음과 같이 task를 제어할 수 있는 메뉴가 팝업된다. 아래는 2020-03-06 01:00 (UTC) 실행된 DAG의 run_after_loop을 클릭했을때 뜨는 팝업이다.
+각 task의 박스를 클릭하면 다음과 같이 task를 제어할 수 있는 메뉴가 팝업된다. 아래는 2020-03-06 01:00 (UTC) 실행된 basic_tutorial_fail dag의 run_after_loop을 클릭했을때 뜨는 팝업이다.
 
 <figure align="middle">
   <img src=".resources/airflow/task_control_popup.png" width="500" title="Gantt Chart"/>
 </figure>
 
-기능이 많으니 주요한 몇가지만 살펴보자.
+기능이 많으니 중요한 몇가지만 살펴보자.
 
 #### Log
 
-Graph view에서 볼 수 있듯이 run_after_loop 태스크는 실행이 실패했다. 원인 분석을 위해서 view log를 클릭해보자.
+Graph view에서 볼 수 있듯이 run_after_loop 태스크는 실패했다. 원인 분석을 위해서 view log를 클릭해보자.
 
 <details><summary>실행로그 </summary>
 
@@ -337,6 +343,8 @@ airflow.exceptions.AirflowException: Bash command failed
 
 ```
 
+</details>
+
 로그는 airflow 자체 로그와 오퍼레이터에 의해서 실행된 출력결과가 하나의 파일에 저장되어 있다. ERROR - Bash command failed 바로 윗부분을 보면 에러의 원인을 알 수 있다. "Command exited with return code 1"이 바로 그 원인다. run_after_loop는 bash operator인데 다음 명령어를 실행하고 있다. (실행된 명령어는 Rendered Tempalate에서 확인할 수 있다.)
 
 ```bash
@@ -344,8 +352,6 @@ echo 1; sleep 5; exit 1
 ```
 
 Bash operator는 명령의 exit code가 0인 경우 성공으로 판단하기 때문에 위 코드는 항상 실패하게 된다.
-
-</details>
 
 #### Mark Success
 
@@ -356,23 +362,23 @@ run_after_loop 태스크는 항상 실패하게 되므로 뒤이은 run_this_las
 3. run_this_last 태스크 팝업에서 clear를 클릭하여 다시 실행
 4. 기다리면 실행된다.
 
-## 기타 운영 이슈
+## 운영 이슈
 
 ### 타임존
 
-Airflow의 시간은 기본적으로 UTC 기반으로 동작하는데 이게 한국에 사는 우리 입장에선 매우 짜증난다. 표면적으로 시간으로 짜증나는 경우는 세가지이다.
+Airflow의 시간은 기본적으로 UTC 기반으로 동작하는데 이게 KST에 사는 우리 입장에선 헷갈리게 만든다. 스케줄러인데 이 dag이 언제 실행될지 헷갈린다는 것은 치명적이다. 다음이 그 케이스.
 
-1. Dashboard UI의 표기 시간
-2. UI에 표기되는 DAG실행 시간
-3. 스케줄 지정 시간
-4. Task 실행시에 airflow가 전달해주는 시간
+1. UI에 표기되는 스케줄 관련 시간
+2. Dag 파이썬 코드에서 시간 관련 변수
+
+airflow.cfg 에 보면 default_timezone 설정이 있는데 도대체 어디에 써먹는 건지 모르겠다. Asia/seoul로 설정해도 UI 상에 시간이 kst가 되는 것도 아니며 dag 내에서 시간 변수도 여전히 utc이다. 스케줄 시간은 utc만 지원한다는 것이 airflow의 입장이다.
 
 ### SPOF
 
-Airflow는 일반적으로 시스템 내에서 매우 중요한 위치를 차지하지만 문제는 그 중요도에 비해서 가용성 부분에서 취약하다.
+Airflow는 일반적으로 시스템 내에서 매우 중요한 위치를 차지하지만 그 중요도에 비해서 가용성 부분은 취약하다.
 
-`webserver` DAG 코드는 파이썬 파일로저장되며 동작중인 상태는 데이터베이스에 저장되며 웹서버는 stateless 하고 동작하는 front-end이다. 따라서 프로세스가 다운되더라도 단순히 재실행하기만 하면 된다.
-`scheduler` 실제 dag과 task의 실행을 담당하고 상태와 결과를 DB에 저장한다. 따라서 scheduler 프로세스가 죽는 것은 매우 심각한 상황이다.
+- `webserver` Front-end인 webserver는 문제가 생길경우 재실행하면 된다. DAG 코드는 파이썬 파일로저장되며 동작중인 상태는 데이터베이스에 저장되므로 webserver는 stateless라고 할 수 있다.
+- `scheduler` Scheduler 프로세스가 다운되는 것은 매우 심각한 상황이다. 실제 dag과 task의 실행을 담당하고 상태와 결과를 DB에 저장하는 역할을 하기 때문에, 프로세스가 다운되면 실행정보가 유실될 뿐만 아니라 더이상 task가 실행되지도 않는다. 복구 또한 까다롭다.
 
 ### 자원 점유
 
@@ -383,10 +389,10 @@ Airflow 운영중 가장 큰 문제는 airflow의 자원 점유이다.
 
 Airflow 자원점유의 특징은 DAG이나 task의 총량이 아니라 `동시에 동작 중인 태스크 수`에 선형적으로 비례한다는 점이다. 이로 인해 발생하는 가장 심각한 문제는 **메모리가 부족한 경우 airflow 프로세스가 사라진다**는 점이다.
 
-### 로그의 누적
-
 ### UI 반응성
 
-Airflow front-end의 경우 많은 양의 정보를 보여준다. 특히 graph-view
+출력할 정보가 많은 경우 속도가 매우 느리다. Task가 많은 경우 graph view를 보는 데는 인내심이 필요하다.
 
-### ;aldjfdsj
+### 초기 기동시간
+
+Airflow scheduler가 죽는 경우 재실행해야하는데 초기 기동시에 dag과 task 정보를 로딩한다. 운영을 위해서는 기동시간에 대한 감이 있어야 한다.
