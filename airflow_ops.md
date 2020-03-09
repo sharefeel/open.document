@@ -11,7 +11,7 @@
 
 ### DAG (Directed Acyclic Graph)
 
-Dag은 airflow에서 workflow라는 의미로 통용되지만 사실 directed acyclic graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프인데 tree 역시 dag의 일종이다. [DAG 알고리즘(국문)](https://steemit.com/dag/@cryptodreamers/dag-dag-directed-acyclic-graph)을 보면 지루하지 않게 dag의 정의와 알고리즘으로써 역할 그리고 bit coin 등에 활용되는 것을 볼 수 있다. 저정도로는 직성이 안풀린다면 [wikipedia](https://en.wikipedia.org/wiki/Directed_acyclic_graph)를 읽어보면 어떨까?
+Dag은 airflow에서 workflow라는 의미로 통용되지만 사실 directed acyclic graph라는 자료구조의 줄임말이다. 직역하면 방향성이 있고 순환구조가 없는 그래프인데 tree 역시 dag의 일종이다. 이글을 보면 이해가 쉬울것이다. [방향 비순환 그래프](https://jackpot53.tistory.com/84) 저 정도로는 직성이 안풀린다면 [wikipedia](https://en.wikipedia.org/wiki/Directed_acyclic_graph)를 읽어보면 어떨까?
 
 하지만 airflow의 이해를 위해서 dag이란 자료구조를 알 필요는 없으며 순환구조가 없는 즉 시작과 끝이 있는 작업의 흐름이라고 이해하면 된다. Airflow에서 dag은 task의 실행순서와 의존성을 기술하는 언어라고 할 수 있으며 실제 작성은 python으로 한다. 다음 그림은 실제 airflow의 간단한 dag의 예제이다.
 
