@@ -92,6 +92,8 @@ dummy_task_2 = DummyOperator(task_id='dummy_task_2', dag=dag)
 cond >> [dummy_task_1, dummy_task_2]
 ```
 
+그나저나 어떻게 bitwise 연산자가 task간 dependency를 기술하는지 궁금했는데 찾아보니까 파이썬도 연산자 오버로딩이 있다.
+
 </details>
 
 ## Airflow Install
@@ -126,9 +128,11 @@ github 에서 소스코드를 다운로드 받아서 설치한다. 현재는 1.1
 $ git clone https://github.com/apache/airflow.git
 Cloning into 'airflow'...
 $ cd airflow
+
 # 1.10.9 태그 checkout
 $ git tags -l
 $ git checkout tags/1.10.9
+
 # Install
 $ python setup.py install
 :
