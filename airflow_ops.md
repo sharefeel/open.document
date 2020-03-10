@@ -384,8 +384,8 @@ Airflow는 일반적으로 시스템 내에서 매우 중요한 위치를 차지
 
 Airflow 운영중 가장 큰 문제는 airflow의 자원 점유이다.
 
-`Thread 점유` Airflow 각 task는 thread로 동작한다.
-`메모리 부족` Airflow는 동시에 실행되고 있는 task의 수만큼 메모리를 필요로 한다.
+- `Thread 점유` Airflow 각 task는 thread로 동작한다.
+- `메모리 부족` Airflow는 동시에 실행되고 있는 task의 수만큼 메모리를 필요로 한다.
 
 Airflow 자원점유의 특징은 DAG이나 task의 총량이 아니라 `동시에 동작 중인 태스크 수`에 선형적으로 비례한다는 점이다. 이로 인해 발생하는 가장 심각한 문제는 **메모리가 부족한 경우 airflow 프로세스가 사라진다**는 점이다.
 
