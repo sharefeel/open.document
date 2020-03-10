@@ -92,7 +92,16 @@ dummy_task_2 = DummyOperator(task_id='dummy_task_2', dag=dag)
 cond >> [dummy_task_1, dummy_task_2]
 ```
 
-그나저나 어떻게 bitwise 연산자가 task간 dependency를 기술하는지 궁금했는데 찾아보니까 파이썬도 연산자 오버로딩이 있다.
+그나저나 어떻게 bitwise 연산자가 task간 dependency를 기술하는지 궁금했는데 찾아보니까 파이썬도 연산자 오버로딩이 있다. (요약하면) >> 는 다음처럼 오버로딩되어 있다.
+
+
+```python
+def __rshift__(self, other):
+    self.set_downstream(other)
+    return other
+```
+
+원래대로라면 dag 작성글에서 다룰 내용이지만 궁금해서 찾아봤다.
 
 </details>
 
