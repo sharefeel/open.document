@@ -139,7 +139,7 @@ Finished processing dependencies for apache-airflow==1.10.9
 
 #### AIRFLOW_HOME
 
-*_HOME 환경변수는 익숙할 것이다. 공홈 메뉴얼에서는 AIRFLOW_HOME을 ~/airflow 로 가이드하고 있다. 기본설정에서 변경하지 않고 사용할 경우 AIRFLOW_HOME 하위에 다음 파일들이 위치한다. (궂이 변경해서 사용할 필요는 없을 것 같다)
+*_HOME 환경변수는 익숙할 것이다. 설정하지 않으면 ~/airflow가 기본값으로 사용되며 AIRFLOW_HOME 하위에 다음 파일들이 위치한다. (설정파일인 airflow.cfg에서 설정변경이 가능하다. 하지만 궂이 변경해서 사용할 필요는 없을 것 같다)
 
 - `airflow.cfg` airflow 설정파일
 - `dags` dag 파이썬 파일이 위치하는 디렉토리
