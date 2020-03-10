@@ -92,7 +92,7 @@ dummy_task_2 = DummyOperator(task_id='dummy_task_2', dag=dag)
 cond >> [dummy_task_1, dummy_task_2]
 ```
 
-그나저나 어떻게 bitwise 연산자가 task간 dependency를 기술하는지 궁금했는데 찾아보니까 파이썬도 연산자 오버로딩이 있다. (요약하면) >> 는 다음처럼 오버로딩되어 있다.
+그나저나 어떻게 bitwise 연산자가 task간 dependency를 기술하는지 궁금했는데 찾아보니까 파이썬도 연산자 오버로딩이 있다. 간단하게 요약해보면 >> 는 다음처럼 현재 task의 다음 task를 지정하도록 오버로딩되어 있다.
 
 
 ```python
