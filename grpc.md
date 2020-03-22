@@ -16,7 +16,7 @@ GRPC는 이름 그대로 구글에서 만든 remote procedure call famework(이�
 
 ## Remote Procedure Call (RPC)
 
-RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래밍 모델이며, 일반적으로 전송 레이어를 포함한 framework를 지칭하기도 한다. (RPC framework도 RPC로 부른다는 소리) 다음은 caller와 caller 관점에서 RPC를 도식화한 그림이다.
+RPC란 이름 그대로 원격지의 프로시저를 호출하는 프로그래밍 모델이며, 일반적으로 전송 레이어를 포함한 framework를 지칭하기도 한다. (RPC framework도 RPC로 부른다는 소리) 다음은 caller와 callee 관점에서 RPC를 도식화한 그림이다.
 
 <figure align="middle">
   <img src=".resources/grpc/rpc_overview.png" width="600" title="Remote procedure call model"/>
