@@ -140,7 +140,7 @@ Round robin 대신 least connection을 사용함으로써 부하 분산에 더 �
 
 ### AWS ALB (Application Load balancer) vs NLB (Network Load balancer)
 
-결론부터 말하자면 ALB는 GRPC를 지원하지 않기 때문에 NLB를 사용해야한다. L7에서 동작하는 ALB와 달리 L4에서 동작하는 NLB는 HTTP를 이해하지 못하기 때문에 ALB의 모든 기능을 제공하지 못한다. 401 을 발생시키는 caller와 리소스를 찾을 수 있고 인증서도 LB에서 관리할 수 있으면 좋지 않겠는가? NLB로는 그런 것이 힘들다.
+결론부터 말하자면 ALB는 GRPC를 지원하지 않기 때문에 NLB를 사용해야한다. L7에서 동작하는 ALB와 달리 L4에서 동작하는 NLB는 HTTP를 이해하지 못하기 때문에 ALB와는 기능차이가 있다. 401 을 발생시키는 caller와 리소스를 찾을 수 있고 인증서도 LB에서 관리할 수 있으면 좋지 않겠는가? NLB로는 그런 것이 힘들다.
 
 ELB 기능 비교: https://aws.amazon.com/ko/elasticloadbalancing/features/
 
