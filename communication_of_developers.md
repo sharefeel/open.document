@@ -52,9 +52,103 @@ Swagger, Lombok, JPA 로 알아본다.
 
 ### Swagger
 
+API Document 에서 소비자들은 어떤 것을 기대할까?
 
+![API Document에 가장 중요하게 생각하는 것](.resources/communication_of_developers/most-important-documentation-chart.png)
+
+참고.
+
+[10 Ways to create easy-to-use compelling API Documeent - swagger.io](https://swagger.io/blog/api-documentation/create-compelling-easy-to-use-api-documentation/)
+
+[The State of API 2019 Report - smartbear.com](https://smartbear.com/resources/ebooks/the-state-of-api-2019-report/?utm_medium=content-text&utm_source=swagger-blog&utm_campaign=10-ways-api-documentation)
+
+그렇다면 swagger가 만들어낸 문서를 보자.
+
+[Swagger 생성 UI](https://petstore.swagger.io/?_ga=2.24643192.370818538.1592102595-498966297.1592102595#/)
 
 ### Lombok
 
 ### JPA
 
+## 간단한 프로젝트
+
+다음 역할을 하는 springboot 기반 api 를 개발한다.
+
+0. 로그 수신해서 mysql 데이터베이스에 저장하는 api
+1. 데이터베이스에 저장된 로그의 수를 리턴하는 api
+
+사용하는 database 환경
+
+- dbms: mysql
+- endpoint: localhost:3306
+- database: mydb
+
+### API 사용법
+
+![API 목록](.resources/communication_of_developers/swagger_apilist.png)
+
+![모델](.resources/communication_of_developers/swagger_models.png)
+
+![로그 전송 API](.resources/communication_of_developers/swagger_newlog.png)
+
+다음 세 로그를 전송
+
+```json
+{
+  "aaid": "AAID-1",
+  "eventLog": "This is android event 1",
+  "eventTimeEpoch": 100000,
+  "market": "playstore",
+  "user": "somebody"
+}
+
+{
+  "aaid": "AAID-1",
+  "eventLog": "This is android event 2",
+  "eventTimeEpoch": 200000,
+  "market": "playstore",
+  "user": "somebody"
+}
+
+{
+  "eventLog": "This is iphone event",
+  "eventTimeEpoch": 300000,
+  "idfa": "IDFA-1",
+  "market": "appstore",
+  "user": "nobody"
+}
+```
+
+안드로이드 로그수를 조회해보자
+
+![android log count](.resources/communication_of_developers/swagger_countandroid.png)
+
+### Step.2 lombok을 통한 코드 가독성 향상
+
+### Step.3 Database에서 데이터는 어떻게 가져가나?
+
+프로젝트 개요
+
+프로젝트는 다음 두가지 API를 제공한다.
+
+
+로그는 json 으로 받는다.
+
+```json
+{
+  "user": "이벤트를 발생한 사용자",
+  "market": "appstore 또는 playstore",
+  "idfa": "apple 광고 ID. market이 appstore인 경우 저장",
+  "aaid": "google 광고 ID. market이 playstore인 경우 저장",
+  "eventLog": "이벤트",
+  "eventTimeEpoch": "이벤트 발생 시간의 epoch time. 초단위"
+}
+```
+
+![생성된 applog 테이블](.resources/communication_of_developers/applog_table.png)
+
+![데이터베이스 select 결과](.resources/communication_of_developers/database_select.png)
+
+## Tags
+
+`#Lombok` `#Swagger` `#Jpa` `#Swagger`
