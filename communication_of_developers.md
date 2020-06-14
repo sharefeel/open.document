@@ -79,9 +79,11 @@ API Document 에서 소비자들은 어떤 것을 기대할까?
 
 사용하는 database 환경
 
-- dbms: mysql
+- dbms: mysql 5.7
 - endpoint: localhost:3306
 - database: mydb
+
+### 프로젝트 소스코드
 
 ![Project tree](.resources/communication_of_developers/project_tree.png)
 
@@ -323,6 +325,58 @@ public interface AppLogRepository extends JpaRepository<AppLogEntity, Long> {
 
 </details>
 
+### 실행
+
+다음과 같이 시작 로그가 올라간다. `jpa.hibernate.ddl-auto: create`로 설정했기 때문에 Hibernate에 의해 create table 쿼리가 실행되는 것을 볼 수 있다. 참고로 `jpa.show-sql: true` 설정에 의해서 실행되는 쿼리가 출력된다.
+
+<details><summary> 시작 로그 </summary>
+
+```log4j
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.2.8.RELEASE)
+
+2020-06-14 23:13:16.515  INFO 18168 --- [           main] net.youngrok.snippet.SnippetApplication  : Starting SnippetApplication on DESKTOP-AD0PBN1 with PID 18168 (C:\Users\YK\Desktop\dev\snippet\out\production\classes started by YK in C:\Users\YK\Desktop\dev\snippet)
+2020-06-14 23:13:16.528  INFO 18168 --- [           main] net.youngrok.snippet.SnippetApplication  : No active profile set, falling back to default profiles: default
+2020-06-14 23:13:17.599  INFO 18168 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2020-06-14 23:13:17.676  INFO 18168 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 66ms. Found 1 JPA repository interfaces.
+2020-06-14 23:13:18.681  INFO 18168 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2020-06-14 23:13:18.694  INFO 18168 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2020-06-14 23:13:18.694  INFO 18168 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.36]
+2020-06-14 23:13:18.860  INFO 18168 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2020-06-14 23:13:18.860  INFO 18168 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2272 ms
+2020-06-14 23:13:19.156  INFO 18168 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2020-06-14 23:13:19.234  INFO 18168 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.17.Final
+2020-06-14 23:13:19.420  INFO 18168 --- [           main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2020-06-14 23:13:19.555  INFO 18168 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2020-06-14 23:13:19.729  INFO 18168 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2020-06-14 23:13:19.752  INFO 18168 --- [           main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL57Dialect
+Hibernate: drop table if exists applog
+Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(40), eventlog varchar(3000) not null, eventtime datetime(6) not null, idfa varchar(40), market varchar(10) not null, user varchar(20) not null, primary key (id)) engine=InnoDB
+2020-06-14 23:13:20.603  INFO 18168 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2020-06-14 23:13:20.612  INFO 18168 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2020-06-14 23:13:21.278  WARN 18168 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2020-06-14 23:13:21.439  INFO 18168 --- [           main] pertySourcedRequestMappingHandlerMapping : Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2020-06-14 23:13:21.559  INFO 18168 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-06-14 23:13:21.743  INFO 18168 --- [           main] d.s.w.p.DocumentationPluginsBootstrapper : Context refreshed
+2020-06-14 23:13:21.772  INFO 18168 --- [           main] d.s.w.p.DocumentationPluginsBootstrapper : Found 1 custom documentation plugin(s)
+2020-06-14 23:13:21.810  INFO 18168 --- [           main] s.d.s.w.s.ApiListingReferenceScanner     : Scanning for api listing references
+2020-06-14 23:13:22.131  INFO 18168 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2020-06-14 23:13:22.133  INFO 18168 --- [           main] net.youngrok.snippet.SnippetApplication  : Started SnippetApplication in 6.192 seconds (JVM running for 6.865)
+```
+
+</details>
+
+실행하고 나면 mysql에 다음과 같이 테이블이 생성된 것을 확인할 수 있다.
+
+![생성된 applog 테이블](.resources/communication_of_developers/applog_table.png)
+
+
 ### API 사용법
 
 ![API 목록](.resources/communication_of_developers/swagger_apilist.png)
@@ -359,35 +413,22 @@ public interface AppLogRepository extends JpaRepository<AppLogEntity, Long> {
 }
 ```
 
-안드로이드 로그수를 조회해보자
+로그 전송이 끝났으면 mysql 테이블에 정상적으로 적재되었는지 확인해보자.
+
+![데이터베이스 select 결과](.resources/communication_of_developers/database_select.png)
+
+다시 swagger로 돌아와서 로그 수를 조회해보자. 검색조건은 market = playstore
 
 ![android log count](.resources/communication_of_developers/swagger_countandroid.png)
 
-### Step.2 lombok을 통한 코드 가독성 향상
-
-### Step.3 Database에서 데이터는 어떻게 가져가나?
-
-프로젝트 개요
-
-프로젝트는 다음 두가지 API를 제공한다.
-
-
-로그는 json 으로 받는다.
+200(OK)와 함께 전송했던 playstore 로그 건수가 리턴된다.
 
 ```json
 {
-  "user": "이벤트를 발생한 사용자",
-  "market": "appstore 또는 playstore",
-  "idfa": "apple 광고 ID. market이 appstore인 경우 저장",
-  "aaid": "google 광고 ID. market이 playstore인 경우 저장",
-  "eventLog": "이벤트",
-  "eventTimeEpoch": "이벤트 발생 시간의 epoch time. 초단위"
+  "market": "playstore",
+  "count": 2
 }
 ```
-
-![생성된 applog 테이블](.resources/communication_of_developers/applog_table.png)
-
-![데이터베이스 select 결과](.resources/communication_of_developers/database_select.png)
 
 ## Tags
 
