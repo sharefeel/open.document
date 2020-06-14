@@ -83,6 +83,246 @@ API Document 에서 소비자들은 어떤 것을 기대할까?
 - endpoint: localhost:3306
 - database: mydb
 
+![Project tree](.resources/communication_of_developers/project_tree.png)
+
+개별 소스 코드
+
+<details><summary>application.yaml</summary>
+
+```yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mydb?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+```
+
+</details>
+
+<details><summary>SnippetApplication.java</summary>
+
+```java
+package net.youngrok.snippet;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SnippetApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SnippetApplication.class, args);
+    }
+}
+
+```
+
+</details>
+
+<details><summary>SwaggerConfig.java</summary>
+
+```java
+package net.youngrok.snippet;
+
+import com.google.common.base.Predicates;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2).select()
+                .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+                .paths(PathSelectors.any()).build();
+    }
+}
+
+
+```
+
+</details>
+
+<details><summary>web.AppLog.java</summary>
+
+```java
+package net.youngrok.snippet.web;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AppLog {
+    private String user;
+    private String market;
+    private String aaid;
+    private String idfa;
+
+    private String eventLog;
+    private long eventTimeEpoch;
+}
+
+```
+
+</details>
+
+<details><summary>web.LogCount.java</summary>
+
+```java
+package net.youngrok.snippet.web;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+class LogCount {
+    private String market;
+    private long count;
+}
+
+```
+
+</details>
+
+<details><summary>web.ApplicationLogController.java</summary>
+
+```java
+package net.youngrok.snippet.web;
+
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
+import net.youngrok.snippet.database.AppLogEntity;
+import net.youngrok.snippet.database.AppLogRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1")
+public class AppLogController {
+    private final AppLogRepository repository;
+
+    @ApiOperation("Add new log API")
+    @PostMapping(value = "/applog", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> newLog(@RequestBody AppLog appLog) {
+        repository.saveAndFlush(AppLogEntity.newEntity(appLog));
+        return ResponseEntity.ok("OK");
+    }
+
+    @ApiOperation("Log count api")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "API-KEY", value = "api key", paramType = "header", required = true, example = "valid_api_key"),
+            @ApiImplicitParam(name = "market", value = "조회할 market", allowableValues = "all, appstore, playstore", required = true, example = "appstore")
+    })
+    @GetMapping(value = "/applog/count/{market}")
+    public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
+                                             @RequestHeader("API-KEY") String apiKey) {
+        if (!apiKey.equals("valid_api_key")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+        }
+
+        long count;
+        if (market.equalsIgnoreCase("all")) {
+            count = repository.count();
+        } else {
+            count = repository.countByMarket(market);
+        }
+        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+    }
+}
+
+```
+
+</details>
+
+<details><summary>database.AppLogEntity.java</summary>
+
+```java
+package net.youngrok.snippet.database;
+
+import lombok.Getter;
+import lombok.Setter;
+import net.youngrok.snippet.web.AppLog;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "applog")
+public class AppLogEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user", length = 20, nullable = false)
+    private String user;
+
+    @Column(name = "market", length = 10, nullable = false)
+    private String market;
+
+    @Column(name = "idfa", length = 40)
+    private String idfa;
+
+    @Column(name = "aaid", length = 40)
+    private String aaid;
+
+    @Column(name = "eventlog", length = 3000, nullable = false)
+    private String eventLog;
+
+    @Column(name = "eventtime", nullable = false)
+    private LocalDateTime eventTime;
+
+    public static AppLogEntity newEntity(AppLog appLog) {
+        return new AppLogEntity()
+                .setUser(appLog.getUser())
+                .setMarket(appLog.getMarket())
+                .setIdfa(appLog.getIdfa())
+                .setAaid(appLog.getAaid())
+                .setEventLog(appLog.getEventLog())
+                .setEventTime(LocalDateTime.ofEpochSecond(appLog.getEventTimeEpoch(), 0, ZoneOffset.UTC));
+    }
+}
+
+```
+
+</details>
+
+<details><summary>database.AppLogRepository.java</summary>
+
+```java
+package net.youngrok.snippet.database;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AppLogRepository extends JpaRepository<AppLogEntity, Long> {
+    long countByMarket(String market);
+}
+
+```
+
+</details>
+
 ### API 사용법
 
 ![API 목록](.resources/communication_of_developers/swagger_apilist.png)
