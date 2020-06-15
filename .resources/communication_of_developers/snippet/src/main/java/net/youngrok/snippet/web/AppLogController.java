@@ -33,7 +33,7 @@ public class AppLogController {
     public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
                                              @RequestHeader("API-KEY") String apiKey) {
         if (!apiKey.equals("valid_api_key")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().market(market).count(-1));
         }
 
         long count;
@@ -42,6 +42,6 @@ public class AppLogController {
         } else {
             count = repository.countByMarket(market);
         }
-        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+        return ResponseEntity.ok(new LogCount().market(market).count(count));
     }
 }

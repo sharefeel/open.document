@@ -116,7 +116,7 @@ public class AppLogController {
     public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
                                              @RequestHeader("API-KEY") String apiKey) {
         if (!apiKey.equals("valid_api_key")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().market(market).count(-1));
         }
         long count;
         if (market.equalsIgnoreCase("all")) {
@@ -124,7 +124,7 @@ public class AppLogController {
         } else {
             count = repository.countByMarket(market);
         }
-        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+        return ResponseEntity.ok(new LogCount().market(market).count(count));
     }
 }
 ```
@@ -181,7 +181,7 @@ public class AppLogController {
     public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
                                              @RequestHeader("API-KEY") String apiKey) {
         if (!apiKey.equals("valid_api_key")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().market(market).count(-1));
         }
 
         long count;
@@ -190,18 +190,27 @@ public class AppLogController {
         } else {
             count = repository.countByMarket(market);
         }
-        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+        return ResponseEntity.ok(new LogCount().market(market).count(count));
     }
 }
 ```
 
 </details>
 
-위 샘플 코드는 ..... github
-
 ### Lombok
 
-### JPA
+Lombok을 한단어로 줄이면 `소스 다이어트` 라고 할 수 있다. 장황하고 반복적인 관습 코드를 어노테이션으로 대체한다.
+
+다들 아는 것을 궂이 반복해서 할 필요는 없지 않은가?
+
+Setter()
+
+
+
+### 샘플 코드
+
+[샘플코드](https://github.com/sharefeel/open.document/tree/master/.resources/communication_of_developers/snippet)
+
 
 ## 간단한 프로젝트
 
