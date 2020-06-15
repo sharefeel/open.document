@@ -1,50 +1,79 @@
-# 개발자의 소통 도구 : Swagger, Lombok, JPA
+# 개발자의 소통 도구 : Swagger, Lombok
 
-블라블라
-개발자는 다른 개발자와 소통을 한다. 
+개발자는 다른 개발자와 소통을 한다. 소통이란 작성한 소스코드와 그 동작에 대해서 다른 사람을 이해시키기 위한 활동을 말한다. 소통의 도구를 얘기하기 전에 "왜" 소통을 하는지에 대해서 살펴볼 필요가 있다. 그 이유는
 
-용어정의
+```text
+소스코드보다 사람의 언어가 더 이해하기 쉽기 때문이다. 
+```
 
-- `생산자` 소통을 위한 컨텐츠를 작성하는 사람
-- `소비자` 작성된 컨텐츠를 받아 이해하는 사람
+살펴볼 소통의 도구는 swagger, lombok 두가지이며 각각의 목적은 다음과 같다.
+
+- `Swagger` 동작에 대한 설명
+- `Lombok` 소스코드 가독성 증가
 
 ## 개발자의 소통
 
-### 잘하는 소통
+### 개발자의 소통의 덕목
 
-소통에 있어서 개발자가 추구하는 항목들
+개발자는 소통에 임함에 있어 다음과 같은 덕목을 추구한다.
 
 - `스피드` 소통을 하는데 필요한 시간.
-- `명확함` 
-- `정확함`
-- `디테일` 자세함
-- `가독(시)성` 
-- `겉멋` 매우 중요하다. 개발자에게 있어서 매우 큰 동기부여가 된다.
+- `명확함` 내용이 정확하고 오해가 없어야 한다.
+- `디테일` 상세한 내용까지 전달한다.
+- `가시성` 읽기 좋아야 한다.
+- `체험` 실제 동작을 동작을 테스트해
+
+### 덕목의 우선순위
+
+소통을 잘한다는 것은 어떤 것일까? 어떤 덕목에 더 가중치를 두고 소통해야 하는가? (특히 월급 받고 있하는 개발자 관점에서)
+
+1. Essential
+   1. `명확함` - 필수이다. 나머지 모든 항목이 뛰어나더라도 명확함이 없다면 쓸모없는 소통이다.
+2. The better, The better
+   1. `스피드` 소통에 드는 시간은 짧을 수록 좋다.
+   2. `체험` 체험만큼 많은 것을 얻을 수 있는 것은 없다.
+3. Optional, Trade-off
+   1. `디테일` 물론 상세한 것은 좋다. 하지만 대게 디테일해질수록 투입 시간대비 문서의 가치는 낮아진다.
+   2. `가시성` 시간소모적인 일이며 필요한 곳에 한정해야 한다.
+
+스피드과 스피드 외 덕목들은 반비례 관계이다. 우리가 취해야 할 것은 투입시간 대비 가장 많은 것을 얻을 수 있는 "체험"이다. 이에 대해서는 swagger 부분에서 다시 살펴본다.
 
 ### 고전적인 소통
 
-소통을 하는 주된 이유중 하나는 바로 내가 작성한 소스코드의 동작을 다른 사람에게 이해시키기 위해서이다.
-고전적이 방법으로는 이해의 매개체로 "문서"를 사용하는 방법이 있다.
+고전적인 소통의 방법으로 매개체로 "문서"를 사용하는 방법이 있다.
 
-0. 소스코드 작성자가 문서를 작성
-1. 문서를 읽고 ...
+1. 소스코드 작성자가 문서를 작성
+2. 문서를 통해서 소스코드와 동작을 파악
 
-많은 사람들은 알고 있다. 이 작업은 시간이 많이 걸리고, 생성한 문서를 아무도 안볼수도 있으며, 문서 본다고 이해할거란 보장도 없다. 결국 문서화는 시간낭비라는 인식이 강화되고 문서로써의 요구사항만을 만족시키는 문서들이 양산된다.
+많은 사람들은 알고 있다. 이 작업은 시간이 많이 걸리고 생성한 문서를 아무도 보지 않을 수도 있으며 문서 본다고 이해할거란 보장도 없다. 결국 문서화는 시간낭비라는 인식이 강화되고 문서로써의 요구사항만을 만족시키는 문서들이 양산된다. 또한 문서의 특성상 "체험"과는 매우 거리가 있다.
+
+Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 독자가 한정적인 프로젝트에서 이런 문서를 생산해야하는지는 의문이다. 이 문서는 confluent이니까 하는 거다.
+
+![Fleet management](https://cdn.confluent.io/wp-content/uploads/fleet_management_monitoring-1536x707.png)
+
+출처: [Confluent Blog: Real-Time Fleet Management Using Confluent Cloud and MongoDB](https://www.confluent.io/blog/fleet-management-gps-tracking-with-confluent-cloud-mongodb)
 
 #### 여담. 망분리가 되어어 있다면
 
-만약 소통하는 곳 즉 문서를 작성하는 곳과 설명할 것의 위치가 다르다면 어떨까? 소스코드 또는 그 동작을 문서에 첨부또는 복사 불가능하거나 또는 매우 불편하고 어느 범위까지 복사가 허용되는지에 대한 가이드도 모호하다면? 후략.
+만약 소통하는 곳 즉 문서를 작성하는 곳과 설명할 것의 위치가 다르다면 어떨까? 자료를 문서에 첨부하는 것이 불가능하거나 매우 불편한경우 문서 작성에 투입되는 시간은 급증한다.
 
-#### 여담. 그림 to Code
+![망분리](.resources/communication_of_developers/network_separation.png)
 
-그렇다면 왜 문서를 작성할까? 그 본질은 소스코드자체보다는 문서가 더 이해하기 쉽다는데 있다. 설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 한때의 유행이었는지 여전히 연구중인지는 알 수 없으나 아직 그런 세상이 오지는 않았다. 소스코드가 선행한다. 
+### Code Generation
+
+설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 즉 사랑의 언어로 소통을 했더니 동작하는 소스코드가 탄생하는 것이다. 하지만 아직은 범용적인 방법은 아니다. 여전히 소스코드가 선행한다.
+
+![Code Generation](.resources/communication_of_developers/code_generation.png)
+
+출처: [Obeo.com: Code Generation](https://www.obeo.fr/en/services/code-generation-tools)
 
 ### Code as a Doument
 
-그렇다면 소스코드 자체로 소통하면 되지 않나? 이를 도와주는 툴들이 많이 있다. 오늘은 이 관점에서 swagger, lombok, jpa를 소개하려고 한다.
+그렇다면 소스코드 자체로 소통하면 되지 않나? 이를 도와주는 툴들이 많이 있다. 오늘은 이 관점에서 swagger, lombok 소개하려고 한다.
 
-또한 소스코드 그 자체로도 가독성이 있어야 한다. 이는  
+사실 우리는 이미 일상생활에서 사용중이다. 다음은 @Setter 어노테이션에 마우스오버하면 IntelliJ가 팝업으로 javadoc을 보여주는 화면이다.
 
+![Lombok Setter javadoc](.resources/communication_of_developers/setter_javadoc.png)
 
 ## 도구
 
@@ -64,7 +93,111 @@ API Document 에서 소비자들은 어떤 것을 기대할까?
 
 그렇다면 swagger가 만들어낸 문서를 보자.
 
-[Swagger 생성 UI](https://petstore.swagger.io/?_ga=2.24643192.370818538.1592102595-498966297.1592102595#/)
+[Swagger Live Demo](https://petstore.swagger.io/?_ga=2.24643192.370818538.1592102595-498966297.1592102595#/)
+
+실제 소스코드에서 swagger 가 사용되는 예를 보자. 아래 ApplicationLogController 클래스는 spring-boot 프로젝트에서 API가 두개인 controller 이다.
+
+<details><summary>ApplicationLogController.java (without swagger)</summary>
+
+```java
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1")
+public class AppLogController {
+    private final AppLogRepository repository;
+
+    @PostMapping(value = "/applog", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> newLog(@RequestBody AppLog appLog) {
+        repository.saveAndFlush(AppLogEntity.newEntity(appLog));
+        return ResponseEntity.ok("OK");
+    }
+
+    @GetMapping(value = "/applog/count/{market}")
+    public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
+                                             @RequestHeader("API-KEY") String apiKey) {
+        if (!apiKey.equals("valid_api_key")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+        }
+        long count;
+        if (market.equalsIgnoreCase("all")) {
+            count = repository.count();
+        } else {
+            count = repository.countByMarket(market);
+        }
+        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+    }
+}
+```
+
+</details>
+
+위 코드로 문서를 작성한다면 대충 다음과 같을 것이다.
+
+```text
+설명: 로그를 수신해서 DB에 저장하는 API
+URL: /api/v1/applog
+Method: Http, POST
+Parameter: Request body 에 AppLog 타입의 json
+Accept: "application/json
+Return: OK (200)
+```
+
+```text
+설명: market 별로 저장된 로그 수를 리턴하는 API
+URL: /api/v1/applog/count/{market}
+Method: Http, GET
+Parameter
+  - market: path, string, 가능값(all, playstore, appstore)
+  - API-KEY: header, string
+Return
+  - UNAUTHRIZED(401): API-KEY가 틀림
+  - OK(200): LogCount 타입의 json
+```
+
+반대로 이를 swagger 로 작성한려면 code에 swagger 관련 어노테이션을 추가해야 한다. @ApiOperation, @ApiImplicitParams 어노테이션 6줄이 추가되었다. 이를 통해서 사용자는 API의 문서를 볼 수 있을 뿐 아니라 실제로 로그를 전송해서 database에 저장하고 get api를 통해서 로그수를 조회할 수도 있다. 
+
+<details><summary>web.ApplicationLogController.java (with swagger)</summary>
+
+```java
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1")
+public class AppLogController {
+    private final AppLogRepository repository;
+
+    @ApiOperation("Add new log API")
+    @PostMapping(value = "/applog", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> newLog(@RequestBody AppLog appLog) {
+        repository.saveAndFlush(AppLogEntity.newEntity(appLog));
+        return ResponseEntity.ok("OK");
+    }
+
+    @ApiOperation("Log count api")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "API-KEY", value = "api key", paramType = "header", required = true, example = "valid_api_key"),
+            @ApiImplicitParam(name = "market", value = "조회할 market", allowableValues = "all, appstore, playstore", required = true, example = "appstore")
+    })
+    @GetMapping(value = "/applog/count/{market}")
+    public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
+                                             @RequestHeader("API-KEY") String apiKey) {
+        if (!apiKey.equals("valid_api_key")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
+        }
+
+        long count;
+        if (market.equalsIgnoreCase("all")) {
+            count = repository.count();
+        } else {
+            count = repository.countByMarket(market);
+        }
+        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
+    }
+}
+```
+
+</details>
+
+위 샘플 코드는 ..... github
 
 ### Lombok
 

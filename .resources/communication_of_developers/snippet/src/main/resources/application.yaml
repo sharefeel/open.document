@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mydb?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 1hate_Japan
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
