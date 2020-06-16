@@ -1,4 +1,4 @@
-package net.youngrok.snippet.lombok;
+package net.youngrok.snippet.withlombok;
 
 import lombok.*;
 
@@ -12,6 +12,6 @@ public class Person {
     private String address;
 
     public static Person newPerson() {
-        return new Person().name("IU").birth("1993.05.16").address("ASIA/SEOUL");
+        return new Person().setName("IU").setBirth("1993.05.16").setAddress("ASIA/SEOUL");
     }
 }

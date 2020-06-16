@@ -37,11 +37,11 @@ public class AppLogEntity {
 
     public static AppLogEntity newEntity(AppLog appLog) {
         return new AppLogEntity()
-                .user(appLog.user())
-                .market(appLog.market())
-                .idfa(appLog.idfa())
-                .aaid(appLog.aaid())
-                .eventLog(appLog.eventLog())
-                .eventTime(LocalDateTime.ofEpochSecond(appLog.eventTimeEpoch(), 0, ZoneOffset.UTC));
+                .setUser(appLog.getUser())
+                .setMarket(appLog.getMarket())
+                .setIdfa(appLog.getIdfa())
+                .setAaid(appLog.getAaid())
+                .setEventLog(appLog.getEventLog())
+                .setEventTime(LocalDateTime.ofEpochSecond(appLog.getEventTimeEpoch(), 0, ZoneOffset.UTC));
     }
 }

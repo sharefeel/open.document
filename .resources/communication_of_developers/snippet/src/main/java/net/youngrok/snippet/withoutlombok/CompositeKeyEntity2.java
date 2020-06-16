@@ -1,4 +1,4 @@
-package net.youngrok.snippet.lombok;
+package net.youngrok.snippet.withoutlombok;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "twokeytable2")
-@IdClass(CompositeKeyEntityWithoutLombok.Keys.class)
-public class CompositeKeyEntityWithoutLombok {
+@IdClass(CompositeKeyEntity2.Keys.class)
+public class CompositeKeyEntity2 {
     @Id
     private String brand;
 
@@ -44,10 +44,10 @@ public class CompositeKeyEntityWithoutLombok {
             if (!other.equals((Object) this)) {
                 return false;
             }
-            if (this.brand() == null ? other.brand() != null : !this.brand().equals(other.brand())) {
+            if (this.getBrand() == null ? other.getBrand() != null : !this.getBrand().equals(other.getBrand())) {
                 return false;
             }
-            if (this.item() == null ? other.item() != null : !this.item().equals(other.item())) {
+            if (this.getItem() == null ? other.getItem() != null : !this.getItem().equals(other.getItem())) {
                 return false;
             }
             return true;
@@ -57,8 +57,8 @@ public class CompositeKeyEntityWithoutLombok {
         public int hashCode() {
             final int PRIME = 59;
             int result = 1;
-            result = (result * PRIME) + (this.brand() == null ? 43 : this.brand().hashCode());
-            result = (result * PRIME) + (this.item() == null ? 43 : this.item().hashCode());
+            result = (result * PRIME) + (this.getBrand() == null ? 43 : this.getBrand().hashCode());
+            result = (result * PRIME) + (this.getItem() == null ? 43 : this.getItem().hashCode());
             return result;
         }
     }

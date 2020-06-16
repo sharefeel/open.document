@@ -1,4 +1,4 @@
-package net.youngrok.snippet.lombok;
+package net.youngrok.snippet.withlombok;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

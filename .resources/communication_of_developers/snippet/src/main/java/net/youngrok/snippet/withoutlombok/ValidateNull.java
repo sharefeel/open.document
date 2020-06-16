@@ -1,18 +1,13 @@
-package net.youngrok.snippet.lombok;
+package net.youngrok.snippet.withoutlombok;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
 @Slf4j
 @SuppressWarnings("unused")
-public class NonNullExample {
-    public void lombokMethod(@NonNull String firstName, @NonNull String lastName) {
-        logger.info("Name is {} {}", firstName, lastName);
-    }
-
-    public void oldMethod(String firstName, String lastName) {
+public class ValidateNull {
+    public void logName(String firstName, String lastName) {
         if (Objects.isNull(firstName)) {
             throw new NullPointerException("firstName is null");
         }
