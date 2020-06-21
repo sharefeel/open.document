@@ -25,7 +25,7 @@
 
 ### 덕목의 우선순위
 
-소통을 잘한다는 것은 어떤 것일까? 어떤 덕목에 더 가중치를 두고 소통해야 하는가? (특히 월급 받고 있하는 개발자 관점에서)
+소통을 잘한다는 것은 어떤 것일까? 어떤 덕목에 더 가중치를 두고 소통해야 하는가? (특히 월급 받고 일하는 개발자 관점에서)
 
 1. Essential
    1. `명확함` - 필수이다. 나머지 모든 항목이 뛰어나더라도 명확함이 없다면 쓸모없는 소통이다.
@@ -36,7 +36,7 @@
    1. `디테일` 물론 상세한 것은 좋다. 하지만 대게 디테일해질수록 투입 시간대비 문서의 가치는 낮아진다.
    2. `가시성` 시간소모적인 일이며 필요한 곳에 한정해야 한다.
 
-스피드과 스피드 외 덕목들은 반비례 관계이다. 우리가 취해야 할 것은 투입시간 대비 가장 많은 것을 얻을 수 있는 "체험"이다. 이에 대해서는 swagger 부분에서 다시 살펴본다.
+스피드와 스피드 외 덕목들은 반비례 관계라고 할 수 있으며 항목별로 그 정도의 차이가 있다.
 
 ### 고전적인 소통
 
@@ -47,7 +47,7 @@
 
 많은 사람들은 알고 있다. 이 작업은 시간이 많이 걸리고 생성한 문서를 아무도 보지 않을 수도 있으며 문서 본다고 이해할거란 보장도 없다. 결국 문서화는 시간낭비라는 인식이 강화되고 문서로써의 요구사항만을 만족시키는 문서들이 양산된다. 또한 문서의 특성상 "체험"과는 상극이다.
 
-Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 독자가 한정적인 프로젝트에서 이런 문서를 생산할 필요는 없다.
+Confluent에서 발췌한 그림이다. 이런 문서는 매우 훌륭하지만 사용자가 한정적인 프로젝트에서 이런 문서를 생산할 필요는 없다.
 
 ![Fleet management](https://cdn.confluent.io/wp-content/uploads/fleet_management_monitoring-1536x707.png)
 
@@ -61,7 +61,7 @@ Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 
 
 ### Code Generation
 
-설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 즉 사랑의 언어로 소통을 했더니 동작하는 소스코드가 탄생하는 것이다. 하지만 아직은 제한적인 분야에서만 활용되고 있다. 여전히 소스코드가 선행한다.
+설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 즉 사람의 언어로 소통을 했더니 동작하는 소스코드가 탄생하는 것이다. 하지만 아직은 제한적인 분야에서만 활용되고 있다. 여전히 소스코드가 선행한다.
 
 ![Code Generation](.resources/communication_of_developers/code_generation.png)
 
@@ -71,11 +71,11 @@ Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 
 
 그렇다면 소스코드 자체로 소통하면 되지 않나? 이를 도와주는 툴들이 많이 있다. 오늘은 이 관점에서 swagger, lombok 소개하려고 한다.
 
-사실 우리는 이미 일상생활에서 사용중이다. 다음은 @Setter 어노테이션에 마우스오버하면 IntelliJ가 팝업으로 javadoc을 보여주는 화면이다.
+사실 우리는 이미 일상생활에서 이 기법을 사용중이다. 다음은 @Setter 어노테이션에 마우스오버하면 IntelliJ가 팝업으로 javadoc을 보여주는 화면이다.
 
 ![Lombok Setter javadoc](.resources/communication_of_developers/setter_javadoc.png)
 
-Javadoc은 소스코드상에 주석을 작성하면 html 문서가 되는 방식이다. 사실 javadoc은 위치만 소스코드일 뿐 컨텐츠는 별도로 작성해야한다는 면에서 고전적인 문서작성과 같다고 할 수 있다. 그러나 자동화된 도구들이 작성시간을 줄이고 오류발생을 낮춰줌으로써 일반적인 문서대비 장점을 가진다. 또한 위 스크린샷처럼 IDE들이 html을 곧바로 렌더링해서 보여줄 수 있기 때문에 고전적인 문서대비 가시성이 매우 높다.
+Javadoc은 소스코드상에 주석을 작성하면 html 문서가 되는 방식이다. 사실 javadoc은 위치만 소스코드일 뿐 컨텐츠는 별도로 작성해야한다는 면에서 고전적인 문서작성과 같다고 할 수 있다. 그러나 자동화된 도구들이 작성시간을 줄이고 오류발생을 낮춰줌으로써 일반적인 문서대비 투입 리소스가 적다. 또한 위 스크린샷처럼 IDE들이 html을 곧바로 렌더링해서 보여줄 수 있기 때문에 고전적인 문서대비 가시성이 매우 높다.
 
 ## 도구
 
@@ -83,7 +83,7 @@ Swagger, Lombok에 대해서 알아보자
 
 ### Swagger
 
-API Document 에서 소비자들은 어떤 것을 기대할까?
+API Document 에는 어떤 내용이 주로 담겨야 할까? 다음은 그와 관련한 조사이다.
 
 ![API Document에 가장 중요하게 생각하는 것](.resources/communication_of_developers/most-important-documentation-chart.png)
 
@@ -93,9 +93,18 @@ API Document 에서 소비자들은 어떤 것을 기대할까?
 
 [The State of API 2019 Report - smartbear.com](https://smartbear.com/resources/ebooks/the-state-of-api-2019-report/?utm_medium=content-text&utm_source=swagger-blog&utm_campaign=10-ways-api-documentation)
 
-그렇다면 swagger가 만들어낸 문서를 보자.
+그렇다면 swagger가 만들어낸 문서를 보자. 다음은 swagger.io 에서 제공하는 데모 화면이다.
 
 [Swagger Live Demo](https://petstore.swagger.io/?_ga=2.24643192.370818538.1592102595-498966297.1592102595#/)
+
+Swagger와 고전적인 문서방식이 각각 어떤 항목에서 강점을 가지는지에 대한 내 의견이다. Demo를 실행해봤다면 내 의견에 공감하리라고 본다.
+
+- `swagger` examples, status and errors, authentication, error messages, http requests, parameter, sandbox environment
+- `고전적인 문서` getting started guide, code samples, tutorials, change logs, FAQs
+
+Swagger와 고전적인 문서 모두 고유의 장점을 가진다. 하지만 리스트에서 상위에 랭크된 항목은 전부 swagger의 승리이다. 물론 고전적인 문서로도 위 항목을 대부분 기술 가능하다. 하지만 도구의 선정은 "할수 있느냐"가 아니라 "얼마나 효율적으로 하느냐"의 관점에서 접근해야 한다.
+
+#### Swagger in 소스코드
 
 실제 소스코드에서 swagger 가 사용되는 예를 보자. 아래 ApplicationLogController 클래스는 spring-boot 프로젝트에서 API가 두개인 controller 이다.
 
@@ -224,11 +233,11 @@ Lombok을 한단어로 줄이면 `소스 다이어트` 라고 할 수 있다. �
 1. A 클래스는 getter와 setter로 캡슐화 되어 있다.
 2. A 클래스는 String getName(), void setName(String name)으로 name을 캡슐화하고, int getAge(), void setAge(int age)로 age를 캡슐화했으며 String getAddress(), void setAddress(String address)로 address를 캡슐화했다.
 
-많은 사람들이 1을 고를거라고 생각한다. 계속해서 lombok이 어떻게 소스의 가독성을 높이는지 살펴보자.
+많은 사람들이 1번을 선택할거라고 생각한다. 계속해서 lombok이 어떻게 소스의 가독성을 높이는지 살펴보자.
 
 #### lombok.config
 
-lombok.config에 다음 설정을 추가했다. 이 설정은 setter가 this를 리턴하게 함으로써 setter를 체인 형태로 사용할 수 있게 해준다.
+우선 lombok의 전역 설정인 lombok.config에 다음 설정을 추가했다. 이 설정은 setter가 this를 리턴하게 함으로써 setter를 체인 형태로 사용할 수 있게 해준다. 이건 그냥 내 코딩 스타일인데 Builder 부분에서 잠시 설명하겠다.
 
 ```bash
  lombok.accessors.chain=true
@@ -236,7 +245,7 @@ lombok.config에 다음 설정을 추가했다. 이 설정은 setter가 this를 
 
 #### @Getter / @Setter / @ToString
 
-lombok 의 기능중 가장 많이 사용되는 이 세가지가 아닐까? getter, setter는 필수이면서도 반복적이고 장황한 코드의 전형이다. ToString 역시 작성하기 굉장히 귀찮은 코드이다. 심지어 다른 클래스를 상속하고 있기라도 한다면 부모 클래스의 변수모두 포함해야 한다.
+lombok 의 기능중 가장 많이 사용되는 이 세가지가 아닐까? getter, setter는 필수이면서도 반복적이고 장황한 코드의 전형이다. ToString 역시 작성하기 굉장히 귀찮은 코드이다. 심지어 다른 클래스를 상속하고 있기라도 한다면 부모 클래스의 변수모두 toString에 기술해야 한다.
 
 <details><summary>With Lombok</summary>
 
@@ -329,7 +338,7 @@ public class PersonWithBuilder {
 
 #### @EqualsAndHashCode
 
-equals()와 hashCode() 생성을 간편화해준다. 사실 나는 아직 정확히 저 두 메소드를 어떻게 작성해야하는지 모르고 있고 그다지 알고 싶지도 않다. 그냥 EqualsAndHashCode를 쓰고 있다. JPA Entity 클래스에서 테이블에 privary key가 둘 이상인경우 equals, hashCode 메소드를 가지는 Id 정용 클래스를 작성해야 한다. 다음 예를 보면 왜 lombok이 축복인지 알 수 있다.
+equals()와 hashCode() 생성을 간편화해준다. 사실 나는 아직 정확히 저 두 메소드를 어떻게 작성해야하는지 모르고 있고 그다지 알고 싶지도 않다. 그냥 EqualsAndHashCode를 쓰고 있다. JPA Entity 클래스에서 테이블에 primary key가 둘 이상인경우 equals, hashCode 메소드를 가지는 Id만을 포함한 클래스를 작성해야 한다. 다음 예를 보면 왜 lombok이 축복인지 알 수 있다.
 
 <details><summary>With Lombok</summary>
 
@@ -422,9 +431,9 @@ public class CompositeKeyEntity2 {
 
 </details>
 
-#### @Val
+#### Val
 
-많은 컴파일 언어들은 변수 선언시에 타입을 함께 선언할 것을 강제한다. 하지만 대입되는 value에 의해서 타입추론이 가능한 경우는 타입을 생략할 수 있는 편의장치 역시 대부분의 언어들 역시 제공한다. C++ C# Kotlin Scala java10 등. 하지만 아직까지도 가장 많이 사용되는 java8 이라면 다음과 같이 간편화할 수 있다.
+컴파일 언어들은 기본적으로 변수 선언시에 타입을 명시할 것을 강제한다. 하지만 대입되는 value에 의해서 타입추론이 가능한 경우는 타입을 생략할 수 있는 편의장치 역시 대부분의 언어들이 제공한다. C++ 11 C# Kotlin Scala java10 등. 하지만 아직까지도 가장 많이 사용되는 java8 이라면 다음과 같이 간편화할 수 있다.
 
 <details><summary>With Lombok</summary>
 
@@ -472,7 +481,7 @@ public class FinalAuto {
 
 #### @NonNull
 
-메소드 바디에서 파라미터 null 검사는 매우 자주 필요하지만 매우 번거롭고 그 코드로 인해서 나머지 코드의 가독성을 해친다. 문을 열고 들어갔더니 정리안된 신발이 수북히 쌓여 있는 느낌이랄까? @NonNull을 사용하면 메소드 최상단에 null 검사 코드를 추가된다.
+메소드 바디에서 파라미터 null 검사는 매우 자주 필요하지만 번거롭고 그 코드로 인해서 나머지 코드의 가독성을 해친다. 문을 열고 들어갔더니 정리안된 신발이 수북히 쌓여 있는 느낌이랄까? @NonNull을 사용하면 메소드 최상단에 null 검사 코드를 추가된다.
 
 <details><summary>With Lombok</summary>
 
@@ -505,7 +514,6 @@ public class ValidateNull {
 ```
 
 </details>
-
 
 #### AccessLevel
 
@@ -549,11 +557,11 @@ public class Singleton {
 
 ## 간단한 프로젝트
 
-위 swagger와 
+Swagger 설명에서 들었던 API의 전체 소스코드이다.
 
 [샘플코드](https://github.com/sharefeel/open.document/tree/master/.resources/communication_of_developers/snippet)
 
-다음 역할을 하는 springboot 기반 api 를 개발한다.
+포함하는 API
 
 1. AppLog 타임의 로그를 수신해서 mysql 데이터베이스에 저장하는 api
 2. 데이터베이스에 저장된 로그의 수를 리턴하는 api
@@ -569,7 +577,7 @@ public class Singleton {
 다음과 같이 시작 로그가 올라간다. 참고로 다음 jpa(hibernate) 설정이 추가된 상태이다.
 
 ```bash
-# 프로그램 초기화 시 entity 에 맞는 테이블을 생성한다. drop table 후 create table 쿼리가 실행되는 것을 볼 수 있다.
+# 프로그램 초기화 시 entity 에 맞는 테이블을 생성한다. 로그에서 drop table 후 create table 쿼리가 실행되는 것을 볼 수 있다.
 jpa.hibernate.ddl-auto: create
 # JPA 에 의해 실행되는 쿼리가 화면에 출력된다.
 jpa.show-sql: true
@@ -622,7 +630,6 @@ Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(
 
 ![생성된 applog 테이블](.resources/communication_of_developers/applog_table.png)
 
-
 ### API 사용법
 
 ![API 목록](.resources/communication_of_developers/swagger_apilist.png)
@@ -631,7 +638,7 @@ Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(
 
 ![로그 전송 API](.resources/communication_of_developers/swagger_newlog.png)
 
-다음 세 로그를 전송
+테스트를 위해서 /api/v1/applog API로 다음 세 로그를 전송하자.
 
 ```json
 {
@@ -659,11 +666,11 @@ Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(
 }
 ```
 
-로그 전송이 끝났으면 mysql 테이블에 정상적으로 적재되었는지 확인해보자.
+Mysql 테이블에 정상적으로 적재된 것을 확인할 수 있다.
 
 ![데이터베이스 select 결과](.resources/communication_of_developers/database_select.png)
 
-다시 swagger로 돌아와서 로그 수를 조회해보자. 검색조건은 market = playstore
+다시 swagger로 돌아와서 로그 수를 조회. 검색조건은 market = playstore 이다.
 
 ![android log count](.resources/communication_of_developers/swagger_countandroid.png)
 
@@ -683,7 +690,7 @@ Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(
 - 소통의 효율 != sum(소통의 효과)
 - 소통의 효율 == sum(소통의 효과) / 투입된 시간
 
-이는 도구를 선택하고 사용할 때도 마찬가지이다. Swagger에 훨씬 많은 기능이 있지만 그것을 다 익혀서 swagger 장인이 될 필요는 없다.
+이는 도구를 사용할 때도 마찬가지이다. Swagger에 훨씬 많은 기능이 있지만 그것을 모두 익혀서 사용하는 것은 오히려 효율을 떨어트릴 수 있다. 목적은 효율적인 소통이지 swagger 장인이 되이 것은 아니다.
 
 ## Tags
 
