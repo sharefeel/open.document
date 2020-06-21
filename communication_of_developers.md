@@ -199,6 +199,22 @@ public class AppLogController {
 
 </details>
 
+여기까지 작업한 후에는 보통 나는 샘플 리턴데이터를 작성한다. 앞어서 얘기했지만 swagger를 사용하는 이유는 소통이다. 개발 초기에는 당연히 API 스펙만 존재하며 실제로 동작하지 않기 때문에 샘플 리턴 데이터를 작성한다. 사실 각 데이터 타입별로 샘플 데이터를 작성하는 것은 매우 번거롭지만, 작성에 투입한 시간 이상으로 소통에 큰 도움이 된다고 확신한다.
+
+```java
+@Getter
+@Setter
+class LogCount {
+    private String market;
+    private long count;
+
+    // 샘플 데이터. Controller는 개발 전까지 이 데이터를 리턴한다. 
+    public static LogCount getSample() {
+        return new LogCount().setMarket("appstore").setCount(10);
+    }
+}
+```
+
 ### Lombok
 
 Lombok을 한단어로 줄이면 `소스 다이어트` 라고 할 수 있다. 장황하고 반복적인 관습 코드를 어노테이션으로 대체한다. 이미 공감하고 있는 내용이라면 디테일하게 소통하는 것은 시간낭비이다.
