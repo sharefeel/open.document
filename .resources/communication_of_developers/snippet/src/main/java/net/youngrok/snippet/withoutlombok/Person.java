@@ -1,6 +1,6 @@
 package net.youngrok.snippet.withoutlombok;
 
-@SuppressWarnings("all")
+@SuppressWarnings("unused")
 public class Person {
     private String name;
     private String birth;
@@ -35,7 +35,7 @@ public class Person {
 
     @Override
     public String toString() {
-        return "PersionWithourLombok(name=" + name + ", birth=" + birth + ", address=" + address;
+        return "PersonWithoutLombok(name=" + name + ", birth=" + birth + ", address=" + address;
     }
 
     public static Person newPerson() {

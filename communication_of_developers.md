@@ -3,10 +3,10 @@
 개발자는 다른 개발자와 소통을 한다. 소통이란 작성한 소스코드와 그 동작에 대해서 다른 사람을 이해시키기 위한 활동을 말한다. 소통의 도구를 얘기하기 전에 "왜" 소통을 하는지에 대해서 살펴볼 필요가 있다. 그 이유는
 
 ```text
-소스코드보다 사람의 언어가 더 이해하기 쉽기 때문이다. 
+소스코드보다 사람의 언어가 더 이해하기 쉽기 때문이다.
 ```
 
-살펴볼 소통의 도구는 swagger, lombok 두가지이며 각각의 목적은 다음과 같다.
+살펴볼 소통의 도구는 swagger와 lombok 이며 각각 다음 측면에서 살펴본다.
 
 - `Swagger` 동작에 대한 설명
 - `Lombok` 소스코드 가독성 증가
@@ -17,11 +17,11 @@
 
 개발자는 소통에 임함에 있어 다음과 같은 덕목을 추구한다.
 
-- `스피드` 소통을 하는데 필요한 시간.
-- `명확함` 내용이 정확하고 오해가 없어야 한다.
-- `디테일` 상세한 내용까지 전달한다.
-- `가시성` 읽기 좋아야 한다.
-- `체험` 실제 동작을 동작을 테스트해
+- `스피드` 소통을 하는데 필요한 시간
+- `명확함` 내용이 정확성, 오해없는 전달
+- `디테일` 상세한 내용까지 전달
+- `가시성` 멋있게
+- `체험` 동작에 대한 예제 및 테스트
 
 ### 덕목의 우선순위
 
@@ -45,9 +45,9 @@
 1. 소스코드 작성자가 문서를 작성
 2. 문서를 통해서 소스코드와 동작을 파악
 
-많은 사람들은 알고 있다. 이 작업은 시간이 많이 걸리고 생성한 문서를 아무도 보지 않을 수도 있으며 문서 본다고 이해할거란 보장도 없다. 결국 문서화는 시간낭비라는 인식이 강화되고 문서로써의 요구사항만을 만족시키는 문서들이 양산된다. 또한 문서의 특성상 "체험"과는 매우 거리가 있다.
+많은 사람들은 알고 있다. 이 작업은 시간이 많이 걸리고 생성한 문서를 아무도 보지 않을 수도 있으며 문서 본다고 이해할거란 보장도 없다. 결국 문서화는 시간낭비라는 인식이 강화되고 문서로써의 요구사항만을 만족시키는 문서들이 양산된다. 또한 문서의 특성상 "체험"과는 상극이다.
 
-Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 독자가 한정적인 프로젝트에서 이런 문서를 생산해야하는지는 의문이다. 이 문서는 confluent이니까 하는 거다.
+Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 독자가 한정적인 프로젝트에서 이런 문서를 생산할 필요는 없다.
 
 ![Fleet management](https://cdn.confluent.io/wp-content/uploads/fleet_management_monitoring-1536x707.png)
 
@@ -61,7 +61,7 @@ Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 
 
 ### Code Generation
 
-설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 즉 사랑의 언어로 소통을 했더니 동작하는 소스코드가 탄생하는 것이다. 하지만 아직은 범용적인 방법은 아니다. 여전히 소스코드가 선행한다.
+설계를 하고 그 문서를 작성하면 소스코드가 생성되는 툴들이 존재한다. 즉 사랑의 언어로 소통을 했더니 동작하는 소스코드가 탄생하는 것이다. 하지만 아직은 제한적인 분야에서만 활용되고 있다. 여전히 소스코드가 선행한다.
 
 ![Code Generation](.resources/communication_of_developers/code_generation.png)
 
@@ -75,9 +75,11 @@ Confluent에서 발췌한 문서이다. 이런 문서는 매우 훌륭하지만 
 
 ![Lombok Setter javadoc](.resources/communication_of_developers/setter_javadoc.png)
 
+Javadoc은 소스코드상에 주석을 작성하면 html 문서가 되는 방식이다. 사실 javadoc은 위치만 소스코드일 뿐 컨텐츠는 별도로 작성해야한다는 면에서 고전적인 문서작성과 같다고 할 수 있다. 그러나 자동화된 도구들이 작성시간을 줄이고 오류발생을 낮춰줌으로써 일반적인 문서대비 장점을 가진다. 또한 위 스크린샷처럼 IDE들이 html을 곧바로 렌더링해서 보여줄 수 있기 때문에 고전적인 문서대비 가시성이 매우 높다.
+
 ## 도구
 
-Swagger, Lombok, JPA 로 알아본다.
+Swagger, Lombok에 대해서 알아보자
 
 ### Swagger
 
@@ -154,7 +156,7 @@ Return
   - OK(200): LogCount 타입의 json
 ```
 
-반대로 이를 swagger 로 작성한려면 code에 swagger 관련 어노테이션을 추가해야 한다. @ApiOperation, @ApiImplicitParams 어노테이션 6줄이 추가되었다. 이를 통해서 사용자는 API의 문서를 볼 수 있을 뿐 아니라 실제로 로그를 전송해서 database에 저장하고 get api를 통해서 로그수를 조회할 수도 있다. 
+반대로 이를 swagger 로 작성한려면 code에 swagger 관련 어노테이션을 추가해야 한다. @ApiOperation, @ApiImplicitParams 어노테이션 6라인이 추가되었다. 이를 통해서 사용자는 API의 문서를 볼 수 있을 뿐 아니라 실제로 로그를 전송해서 database에 저장하고 get api를 통해서 로그수를 조회할 수도 있다.
 
 <details><summary>web.ApplicationLogController.java (with swagger)</summary>
 
@@ -199,25 +201,346 @@ public class AppLogController {
 
 ### Lombok
 
-Lombok을 한단어로 줄이면 `소스 다이어트` 라고 할 수 있다. 장황하고 반복적인 관습 코드를 어노테이션으로 대체한다.
+Lombok을 한단어로 줄이면 `소스 다이어트` 라고 할 수 있다. 장황하고 반복적인 관습 코드를 어노테이션으로 대체한다. 이미 공감하고 있는 내용이라면 디테일하게 소통하는 것은 시간낭비이다.
 
-다들 아는 것을 궂이 반복해서 할 필요는 없지 않은가?
+예를 들어 A 클래스가 name, age, address 변수를 가지는 (VO, DTO 같은) 데이터 클래스라고 해보자. 다음 중 어느쪽이 더 이해하기 쉬운가?
 
-Setter()
+1. A 클래스는 getter와 setter로 캡슐화 되어 있다.
+2. A 클래스는 String getName(), void setName(String name)으로 name을 캡슐화하고, int getAge(), void setAge(int age)로 age를 캡슐화했으며 String getAddress(), void setAddress(String address)로 address를 캡슐화했다.
+
+많은 사람들이 1을 고를거라고 생각한다. 계속해서 lombok이 어떻게 소스의 가독성을 높이는지 살펴보자.
+
+#### lombok.config
+
+lombok.config에 다음 설정을 추가했다. 이 설정은 setter가 this를 리턴하게 함으로써 setter를 체인 형태로 사용할 수 있게 해준다.
+
+```bash
+ lombok.accessors.chain=true
+```
+
+#### @Getter / @Setter / @ToString
+
+lombok 의 기능중 가장 많이 사용되는 이 세가지가 아닐까? getter, setter는 필수이면서도 반복적이고 장황한 코드의 전형이다. ToString 역시 작성하기 굉장히 귀찮은 코드이다. 심지어 다른 클래스를 상속하고 있기라도 한다면 부모 클래스의 변수모두 포함해야 한다.
+
+<details><summary>With Lombok</summary>
+
+```java
+@Getter
+@Setter
+@ToString
+public class Person {
+    private String name;
+    private String birth;
+    private String address;
+
+    // new instance sample
+    public static Person newPerson() {
+        return new Person().setName("IU").setBirth("1993.05.16").setAddress("ASIA/SEOUL");
+    }
+}
+```
+
+</details>
+
+<details><summary>Without Lombok</summary>
+
+```java
+public class Person {
+    private String name;
+    private String birth;
+    private String address;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getBirth() {
+        return birth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public Person setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Person setBirth(String birth) {
+        this.birth = birth;
+        return this;
+    }
+
+    public Person setAddress(String address) {
+        this.address = address;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonWithoutLombok(name=" + name + ", birth=" + birth + ", address=" + address;
+    }
+
+    public static Person newPerson() {
+        return new Person().setName("IU").setBirth("1993.05.16").setAddress("ASIA/SEOUL");
+    }
+}
+```
+
+</details>
+
+#### @Builder
+
+Builder 패턴은 종종 쓸 것이다. 개인적으로는 builder를 만들지 않더라도 setter가 this를 리턴하게 함으로써 체인 형태로 사용가능하도록 만든다. 객체명을 매번 나열해서 지저분해지는 것도 싫고, 파라미터가 여러개인 생성자를 만들어서 오류 가능성을 높이는 것도 싫기 때문이다. 가끔은 파라미터를 "순서"가 아니라 포트란처럼 "이름"으로 매핑하면 좋겠다는 생각도 한다. 각설하고 lombok은 builder를 매우 간편하게 만들 수 있게 해준다.
+
+<details><summary>Builder with lombok</summary>
+
+```java
+@Builder
+public class PersonWithBuilder {
+    private String name;
+    private String birth;
+    private String address;
+
+    public static PersonWithBuilder newPerson() {
+        return PersonWithBuilder.builder().name("IU").birth("1993.05.16").address("ASIA/SEOUL").build();
+    }
+}
+```
+
+</details>
+
+#### @EqualsAndHashCode
+
+equals()와 hashCode() 생성을 간편화해준다. 사실 나는 아직 정확히 저 두 메소드를 어떻게 작성해야하는지 모르고 있고 그다지 알고 싶지도 않다. 그냥 EqualsAndHashCode를 쓰고 있다. JPA Entity 클래스에서 테이블에 privary key가 둘 이상인경우 equals, hashCode 메소드를 가지는 Id 정용 클래스를 작성해야 한다. 다음 예를 보면 왜 lombok이 축복인지 알 수 있다.
+
+<details><summary>With Lombok</summary>
+
+```java
+@Getter
+@Setter
+@Entity
+@Table(name = "twokeytable1")
+@IdClass(CompositeKeyEntity.Keys.class)
+public class CompositeKeyEntity {
+    @Id
+    private String brand;
+
+    @Id
+    private String item;
+
+    private String price;
+
+    private LocalDateTime expireTime;
+
+    @Getter
+    @Setter
+    @EqualsAndHashCode
+    public static class Keys implements Serializable {
+        private String brand;
+        private String item;
+    }
+}
+```
+
+</details>
+
+<details><summary>Without Lombok</summary>
+
+```java
+@Getter
+@Setter
+@Entity
+@Table(name = "twokeytable2")
+@IdClass(CompositeKeyEntity2.Keys.class)
+public class CompositeKeyEntity2 {
+    @Id
+    private String brand;
+
+    @Id
+    private String item;
+
+    private String price;
+
+    private LocalDateTime expireTime;
+
+    @Getter
+    @Setter
+    public static class Keys implements Serializable {
+        private String brand;
+        private String item;
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (!(o instanceof Keys)) {
+                return false;
+            }
+            Keys other = (Keys) o;
+            if (!other.equals((Object) this)) {
+                return false;
+            }
+            if (this.getBrand() == null ? other.getBrand() != null : !this.getBrand().equals(other.getBrand())) {
+                return false;
+            }
+            if (this.getItem() == null ? other.getItem() != null : !this.getItem().equals(other.getItem())) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            final int PRIME = 59;
+            int result = 1;
+            result = (result * PRIME) + (this.getBrand() == null ? 43 : this.getBrand().hashCode());
+            result = (result * PRIME) + (this.getItem() == null ? 43 : this.getItem().hashCode());
+            return result;
+        }
+    }
+}
+```
+
+</details>
+
+#### @Val
+
+많은 컴파일 언어들은 변수 선언시에 타입을 함께 선언할 것을 강제한다. 하지만 대입되는 value에 의해서 타입추론이 가능한 경우는 타입을 생략할 수 있는 편의장치 역시 대부분의 언어들 역시 제공한다. C++ C# Kotlin Scala java10 등. 하지만 아직까지도 가장 많이 사용되는 java8 이라면 다음과 같이 간편화할 수 있다.
+
+<details><summary>With Lombok</summary>
+
+```java
+public class FinalAuto {
+    public void valExample() {
+        val lombokValue = complexReturnMethod();
+        for (val entry1 : lombokValue.entrySet()) {
+            for (val entry2 : entry1.getValue().entrySet()) {
+                System.out.println(entry2);
+            }
+        }
+    }
+
+    private Map<String, Map<Integer, Map<String, Map<Long, List<LocalDateTime>>>>> complexReturnMethod() {
+        return new HashMap<>();
+    }
+}
+```
+
+</details>
+
+<details><summary>Without Lombok</summary>
+
+```java
+public class FinalAuto {
+    public void example() {
+        final Map<String, Map<Integer, Map<String, Map<Long, List<LocalDateTime>>>>> bareValue = complexReturnMethod();
+        for (Map.Entry<String, Map<Integer, Map<String, Map<Long, List<LocalDateTime>>>>> entry1 : bareValue.entrySet()) {
+            for (Map.Entry<Integer, Map<String, Map<Long, List<LocalDateTime>>>> entry2 : entry1.getValue().entrySet()) {
+                System.out.println(entry2);
+            }
+        }
+    }
+
+    private Map<String, Map<Integer, Map<String, Map<Long, List<LocalDateTime>>>>> complexReturnMethod() {
+        return new HashMap<>();
+    }
+}
+```
+
+</details>
+
+이해를 위한 극단적인 예일뿐, 나는 이렇게 코딩하진 않는다:-)
+
+#### @NonNull
+
+메소드 바디에서 파라미터 null 검사는 매우 자주 필요하지만 매우 번거롭고 그 코드로 인해서 나머지 코드의 가독성을 해친다. 문을 열고 들어갔더니 정리안된 신발이 수북히 쌓여 있는 느낌이랄까? @NonNull을 사용하면 메소드 최상단에 null 검사 코드를 추가된다.
+
+<details><summary>With Lombok</summary>
+
+```java
+@Slf4j
+public class ValidateNull {
+    public void logName(@NonNull String firstName, @NonNull String lastName) {
+        logger.info("Name is {} {}", firstName, lastName);
+    }
+}
+```
+
+</details>
+
+<details><summary>Without Lombok</summary>
+
+```java
+@Slf4j
+public class ValidateNull {
+    public void logName(String firstName, String lastName) {
+        if (Objects.isNull(firstName)) {
+            throw new NullPointerException("firstName is null");
+        }
+        if (Objects.isNull(lastName)) {
+            throw new NullPointerException("lastName is null");
+        }
+        logger.info("Name is {} {}", firstName, lastName);
+    }
+}
+```
+
+</details>
 
 
+#### AccessLevel
 
-### 샘플 코드
+대부분의 singleton 구현 방식은 singleton 클래스의 생성자를 private으로 숨기는 작업이 필요하다. (물론 예외도 있다: [java singleton pattern - seotory.com](https://blog.seotory.com/post/2016/03/java-singleton-pattern)) AccessLvel을 사용하면 생성자를 간단히 숨길 수 있다.
 
-[샘플코드](https://github.com/sharefeel/open.document/tree/master/.resources/communication_of_developers/snippet)
+<details><summary>With Lombok</summary>
 
+```java
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class Singleton {
+    private static class LazyHolder {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return LazyHolder.instance;
+    }
+}
+```
+
+</details>
+
+<details><summary>Without Lombok</summary>
+
+```java
+public class Singleton {
+    private Singleton() {
+    }
+
+    private static class LazyHolder {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return Singleton.LazyHolder.instance;
+    }
+}
+```
+
+</details>
 
 ## 간단한 프로젝트
 
+위 swagger와 
+
+[샘플코드](https://github.com/sharefeel/open.document/tree/master/.resources/communication_of_developers/snippet)
+
 다음 역할을 하는 springboot 기반 api 를 개발한다.
 
-0. 로그 수신해서 mysql 데이터베이스에 저장하는 api
-1. 데이터베이스에 저장된 로그의 수를 리턴하는 api
+1. AppLog 타임의 로그를 수신해서 mysql 데이터베이스에 저장하는 api
+2. 데이터베이스에 저장된 로그의 수를 리턴하는 api
 
 사용하는 database 환경
 
@@ -225,251 +548,16 @@ Setter()
 - endpoint: localhost:3306
 - database: mydb
 
-### 프로젝트 소스코드
-
-![Project tree](.resources/communication_of_developers/project_tree.png)
-
-개별 소스 코드
-
-<details><summary>application.yaml</summary>
-
-```yaml
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mydb?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
-    username: user
-    password: password
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL57Dialect
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-
-```
-
-</details>
-
-<details><summary>SnippetApplication.java</summary>
-
-```java
-package net.youngrok.snippet;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class SnippetApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(SnippetApplication.class, args);
-    }
-}
-
-```
-
-</details>
-
-<details><summary>SwaggerConfig.java</summary>
-
-```java
-package net.youngrok.snippet;
-
-import com.google.common.base.Predicates;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig {
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
-                .paths(PathSelectors.any()).build();
-    }
-}
-
-
-```
-
-</details>
-
-<details><summary>web.AppLog.java</summary>
-
-```java
-package net.youngrok.snippet.web;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class AppLog {
-    private String user;
-    private String market;
-    private String aaid;
-    private String idfa;
-
-    private String eventLog;
-    private long eventTimeEpoch;
-}
-
-```
-
-</details>
-
-<details><summary>web.LogCount.java</summary>
-
-```java
-package net.youngrok.snippet.web;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-class LogCount {
-    private String market;
-    private long count;
-}
-
-```
-
-</details>
-
-<details><summary>web.ApplicationLogController.java</summary>
-
-```java
-package net.youngrok.snippet.web;
-
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import net.youngrok.snippet.database.AppLogEntity;
-import net.youngrok.snippet.database.AppLogRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-@RequiredArgsConstructor
-@RestController
-@RequestMapping("/api/v1")
-public class AppLogController {
-    private final AppLogRepository repository;
-
-    @ApiOperation("Add new log API")
-    @PostMapping(value = "/applog", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> newLog(@RequestBody AppLog appLog) {
-        repository.saveAndFlush(AppLogEntity.newEntity(appLog));
-        return ResponseEntity.ok("OK");
-    }
-
-    @ApiOperation("Log count api")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "API-KEY", value = "api key", paramType = "header", required = true, example = "valid_api_key"),
-            @ApiImplicitParam(name = "market", value = "조회할 market", allowableValues = "all, appstore, playstore", required = true, example = "appstore")
-    })
-    @GetMapping(value = "/applog/count/{market}")
-    public ResponseEntity<LogCount> countLog(@PathVariable("market") String market,
-                                             @RequestHeader("API-KEY") String apiKey) {
-        if (!apiKey.equals("valid_api_key")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LogCount().setMarket(market).setCount(-1));
-        }
-
-        long count;
-        if (market.equalsIgnoreCase("all")) {
-            count = repository.count();
-        } else {
-            count = repository.countByMarket(market);
-        }
-        return ResponseEntity.ok(new LogCount().setMarket(market).setCount(count));
-    }
-}
-
-```
-
-</details>
-
-<details><summary>database.AppLogEntity.java</summary>
-
-```java
-package net.youngrok.snippet.database;
-
-import lombok.Getter;
-import lombok.Setter;
-import net.youngrok.snippet.web.AppLog;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
-@Getter
-@Setter
-@Entity
-@Table(name = "applog")
-public class AppLogEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "user", length = 20, nullable = false)
-    private String user;
-
-    @Column(name = "market", length = 10, nullable = false)
-    private String market;
-
-    @Column(name = "idfa", length = 40)
-    private String idfa;
-
-    @Column(name = "aaid", length = 40)
-    private String aaid;
-
-    @Column(name = "eventlog", length = 3000, nullable = false)
-    private String eventLog;
-
-    @Column(name = "eventtime", nullable = false)
-    private LocalDateTime eventTime;
-
-    public static AppLogEntity newEntity(AppLog appLog) {
-        return new AppLogEntity()
-                .setUser(appLog.getUser())
-                .setMarket(appLog.getMarket())
-                .setIdfa(appLog.getIdfa())
-                .setAaid(appLog.getAaid())
-                .setEventLog(appLog.getEventLog())
-                .setEventTime(LocalDateTime.ofEpochSecond(appLog.getEventTimeEpoch(), 0, ZoneOffset.UTC));
-    }
-}
-
-```
-
-</details>
-
-<details><summary>database.AppLogRepository.java</summary>
-
-```java
-package net.youngrok.snippet.database;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface AppLogRepository extends JpaRepository<AppLogEntity, Long> {
-    long countByMarket(String market);
-}
-
-```
-
-</details>
-
 ### 실행
 
-다음과 같이 시작 로그가 올라간다. `jpa.hibernate.ddl-auto: create`로 설정했기 때문에 Hibernate에 의해 create table 쿼리가 실행되는 것을 볼 수 있다. 참고로 `jpa.show-sql: true` 설정에 의해서 실행되는 쿼리가 출력된다.
+다음과 같이 시작 로그가 올라간다. 참고로 다음 jpa(hibernate) 설정이 추가된 상태이다.
+
+```bash
+# 프로그램 초기화 시 entity 에 맞는 테이블을 생성한다. drop table 후 create table 쿼리가 실행되는 것을 볼 수 있다.
+jpa.hibernate.ddl-auto: create
+# JPA 에 의해 실행되는 쿼리가 화면에 출력된다.
+jpa.show-sql: true
+```
 
 <details><summary> 시작 로그 </summary>
 
@@ -572,6 +660,15 @@ Hibernate: create table applog (id bigint not null auto_increment, aaid varchar(
 }
 ```
 
+## 결론
+
+소통을 할때는 항상 다음을 명심하자.
+
+- 소통의 효율 != sum(소통의 효과)
+- 소통의 효율 == sum(소통의 효과) / 투입된 시간
+
+이는 도구를 선택하고 사용할 때도 마찬가지이다. Swagger에 훨씬 많은 기능이 있지만 그것을 다 익혀서 swagger 장인이 될 필요는 없다.
+
 ## Tags
 
-`#Lombok` `#Swagger` `#Jpa` `#Swagger`
+`#Lombok` `#Swagger` `#Swagger`
