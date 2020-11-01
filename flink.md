@@ -48,12 +48,8 @@
 
 다음 화면이 나올때까지 쭉 입력하자.
 
-![GCP 가입](.resources/gcp_streaming_processing/gcp_register.png)
-
+![GCP 가입](.resources/gcp_stream_processing/gcp_register.png)
 
 우선 참고 문서. 백서이긴 하지만 내용은 읽기 불편하지 않다.
 
 [Google Streaming Analytics Platform White Paper](https://services.google.com/fh/files/misc/google-streaming-analytics-platform.pdf)
-
-
-
