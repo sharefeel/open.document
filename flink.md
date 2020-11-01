@@ -40,16 +40,57 @@
 
 ### 간단한 모델
 
-## GCP 로 해보자
-
-### 가입
-
-최초 사용시 90일간 300$을 자유롭게 사용할 수 있다. 카드정보를 입력하지만 자동 결제가 되지 않는다는 것을 매우 강조하고 있다. 유치한 디스로 보일 수 있다. (하지만 나역시 50만원쯤 날려먹은 기억이 있어서 유치하다고 말하기엔 자괴감이 좀 든다.)
-
-다음 화면이 나올때까지 쭉 입력하자.
-
-![GCP 가입](.resources/gcp_stream_processing/gcp_register.png)
+## 시작
 
 우선 참고 문서. 백서이긴 하지만 내용은 읽기 불편하지 않다.
 
 [Google Streaming Analytics Platform White Paper](https://services.google.com/fh/files/misc/google-streaming-analytics-platform.pdf)
+
+## 준비작업
+
+### 가입
+
+최초 사용시 90일간 300$을 자유롭게 사용할 수 있다. 카드정보를 입력하지만 자동 결제가 되지 않는다는 것을 매우 강조하고 있다. 유치한 디스로 보일 수 있다. 하지만 나역시 50만원쯤 날려먹은 기억이 있어서 유치하다고 말하기엔 자괴감이 좀 든다. AWS 쓸 땐 조심하자. 꺼진 인스턴스도 다시 봐라.
+
+다음 화면이 나올때까지 정보들을 입력하자 입력하자.
+
+![GCP 가입](.resources/gcp_stream_processing/gcp_register.png)
+
+백서 내용 중 아래 아키텍처로 구성할 거다.
+
+![참고 아키텍처](.resources/gcp_stream_processing/analytics_architecture.png)
+
+이 문서에서는 데이터적재, 파이프라인, DW / DL 의 세번째 스텝까지 실습해본다. 네번째인 advanced analytics 의 경우 비교적 특정 도메인이 적합한 서비스인데 아쉽게도 저 중에 내가 아는 분야가 없다. 나열된 단어중 사용할 서비스는 다음과 같다.
+
+- `Cloud Pub/Sub` Kafka 같은 거
+- `Cloud Dataflow` Stream Processing. Apache beam 기반의 managed service. [Cloud Dataproc vs Cloud Dataflow](https://dong-life.tistory.com/58)
+- `BigQuery` 성능 좋은 DB
+
+추가로 데이터를 수집하고 처리하기 위해서 다음 항목도 추가
+
+- `Cloud Functions` 이것으로 데이터 수집 예정
+- `Compute Engine` 가상 머신
+
+### 참고
+
+예시를 위한 것이며 프로젝트 권한과 같은 부분은 다루지 않음
+
+## 만들어보자
+
+### 만들 것 요약
+
+데이터 처리 시스템에 사용되는 서비스
+
+1. `Cloud Functions` Json 데이터를 web 으로 수신한 후 pub/sub 으로 publish
+2. `Pub/Sub` Message queue
+3. `DataFlow` Pub/Sub의 메세지를 파싱하여 bigquery 테이블에 저장
+4. `BigQuery` DW
+
+테스트에는 일반 가상머신을 사용한다.
+
+- `Compute Engine` Json 데이터 발송
+
+### 우선 pub/sub
+
+
+
