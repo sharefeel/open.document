@@ -40,4 +40,20 @@
 
 ### 간단한 모델
 
+## GCP 로 해보자
+
+### 가입
+
+최초 사용시 90일간 300$을 자유롭게 사용할 수 있다. 카드정보를 입력하지만 자동 결제가 되지 않는다는 것을 매우 강조하고 있다. 유치한 디스로 보일 수 있다. (하지만 나역시 50만원쯤 날려먹은 기억이 있어서 유치하다고 말하기엔 자괴감이 좀 든다.)
+
+다음 화면이 나올때까지 쭉 입력하자.
+
+![GCP 가입](.resources/gcp_streaming_processing/gcp_register.png)
+
+
+우선 참고 문서. 백서이긴 하지만 내용은 읽기 불편하지 않다.
+
+[Google Streaming Analytics Platform White Paper](https://services.google.com/fh/files/misc/google-streaming-analytics-platform.pdf)
+
+
 
