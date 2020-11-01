@@ -90,7 +90,38 @@
 
 - `Compute Engine` Json 데이터 발송
 
-### 우선 pub/sub
+### 우선 프로젝트 생성
 
+stream-ex 라는 이름으로 프로젝트를 하나 생성했다. 기본 프로젝트로 해도 상관은 없지만 왠지 없어보이니 만들자. 만드는 메뉴위치는 찾기 어렵지 않기에 따로 설명하지는 않는다. 이후에도 찾기 어렵거나 옵션이 필요하지 않는 이상 만드는 메뉴를 모두 설명하진 않는다.
 
+![stream-ex](.resources/gcp_stream_processing/project.png)
 
+### pub/sub 설정
+
+Pubsub 주제 생성
+
+![stream-ex](.resources/gcp_stream_processing/pubsub_topic.png)
+
+### 빅쿼리 설정
+
+데이터셋과 테이블을 생성하자. 데이터셋 이름은 spending이고 테이블은 cash, credit_card 두가지를 생성한다. 테이블은 모두 spending_time 을 기준으로 일단위 파티션 되어 있다.
+
+컬럼 스키마는 아래를 보고 정하자
+
+[빅쿼리 표준 SQL 데이터 유형](https://cloud.google.com/bigquery/docs/schemas?hl=ko#standard_sql_data_types)
+
+#### 데이터셋
+
+![spending dataset](.resources/gcp_stream_processing/bigquery_dataset.png)
+
+#### credit_card table
+
+Credit_card 테이블에는 신용카드 사용 정보를 저장한다.
+
+![spending dataset](.resources/gcp_stream_processing/bigquery_schema_credit_card.png)
+
+#### cash table
+
+Cash 테이블은 현금 사용 정보를 저장한다. 신용카드보다 정보가 적고 consumer와 amount가 nullable인 것이 특징이다.
+
+![spending dataset](.resources/gcp_stream_processing/bigquery_schema_cash.png)
