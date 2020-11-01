@@ -86,9 +86,10 @@
 3. `DataFlow` Pub/Sub의 메세지를 파싱하여 bigquery 테이블에 저장
 4. `BigQuery` DW
 
-테스트에는 일반 가상머신을 사용한다.
+그외 다음 서비스도 이용한다.
 
-- `Compute Engine` Json 데이터 발송
+- `Compute Engine` 테스트를 위해 json 데이터 발송
+- `Cloud Build API` Cloud Functions 를 빌드 배포 (?)
 
 ### 우선 프로젝트 생성
 
@@ -112,16 +113,58 @@ Pubsub 주제 생성
 
 #### 데이터셋
 
+다음과 같이 데이터셋을 생성하자.
+
 ![spending dataset](.resources/gcp_stream_processing/bigquery_dataset.png)
 
-#### credit_card table
-
-Credit_card 테이블에는 신용카드 사용 정보를 저장한다.
-
-![spending dataset](.resources/gcp_stream_processing/bigquery_schema_credit_card.png)
-
-#### cash table
-
-Cash 테이블은 현금 사용 정보를 저장한다. 신용카드보다 정보가 적고 consumer와 amount가 nullable인 것이 특징이다.
+현금 사용 내역을 저장할 cash 테이블과 신용카드 사용 내역을 저장할 cred_card 테이블을 다음 스키마로 생성하자. 신용카드 테이블이 저장하는 정보가 더 많으며 현금 테이블과 달리 consumer와 amount가 required이다.
 
 ![spending dataset](.resources/gcp_stream_processing/bigquery_schema_cash.png)
+![spending dataset](.resources/gcp_stream_processing/bigquery_schema_credit_card.png)
+
+### Cloud function
+
+이제 pubsub에 데이터를 부어넣을 cloud function을 만들자. 함수만들기 설정은 다음과 같이했다.
+
+- `함수이름` spending-ingest
+- `리전` asia-northeast3 (서울)
+- `인증되지 않은 호출 허용`
+- `할당 메모리` 256MiB
+- `제한시간` 10초
+- `최대 함수 인스턴스` 5
+- `내부트래픽만 허용` 테스트 메세지는 같은 프로젝트 내의 compute engine으로 할 것이므로 내부만 허용
+
+다음을 누르면 코드 inline editor가 나온다. 직접 업로드하거나 GCS에 올려두고 쓸수도 있는데 길지 않은 코드이니 직접 입력하자. 무슨 언어로 하지? 아는건 java 밖에 없는데, 그래도 정석대로 js로 가자. (기본이 node.js 10 이기도 하고)
+
+inline 에디터에는 아래 껍데기 코드가 있다.
+
+```js
+/**
+ * Responds to any HTTP request.
+ *
+ * @param {!express:Request} req HTTP request context.
+ * @param {!express:Response} res HTTP response context.
+ */
+exports.helloWorld = (req, res) => {
+  let message = req.query.message || req.body.message || 'Hello World!';
+  res.status(200).send(message);
+};
+```
+
+Inline editor에서 직접 코드를 작성할까 생각했지만 cloud build api가 따로 존재하는 걸 보면 이거 배포할때마다 과금당할 듯한 느낌이 든다. Pubsub 보내는 것을 제외하고는 오프라인에서 작성하자.
+
+```js
+const http = require('http');
+const message = '{"Hello": "World"}'
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  var messageJson = JSON.parse(message);
+  res.end(JSON.stringify(messageJson));
+});
+
+server.listen(8080, '127.0.0.1', () => {
+  console.log(`Server running at http://127.0.0.1:8080/`);
+});
+```
