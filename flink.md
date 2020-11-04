@@ -127,7 +127,7 @@ Pubsub 주제 생성
 이제 pubsub에 데이터를 부어넣을 cloud function을 만들자. 함수만들기 설정은 다음과 같이했다.
 
 - `함수이름` spending-ingest
-- `리전` asia-northeast3 (서울)
+- `리전` us-central1
 - `인증되지 않은 호출 허용`
 - `할당 메모리` 256MiB
 - `제한시간` 10초
@@ -151,7 +151,9 @@ exports.helloWorld = (req, res) => {
 };
 ```
 
-Inline editor에서 직접 코드를 작성할까 생각했지만 cloud build api가 따로 존재하는 걸 보면 이거 배포할때마다 과금당할 듯한 느낌이 든다. Pubsub 보내는 것을 제외하고는 오프라인에서 작성하자.
+Inline editor에서 직접 코드를 작성할까 생각했지만 cloud build api가 따로 존재하는 걸 보면 이거 배포할때마다 과금당할 듯한 느낌이 든다. Pubsub 보내는 것을 제외하고는 오프라인에서 작성하자. Pubsub 으로 publishing는 코드는 아래 문서를 작성하자.
+
+[메시지를 pubsub 주제에 게시](https://cloud.google.com/pubsub/docs/publisher?hl=ko#publishing_messages)
 
 ```js
 const http = require('http');
