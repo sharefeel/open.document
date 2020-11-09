@@ -1,48 +1,12 @@
-# Flink
+# Google Cloud Stream Processing
 
 ## 필자 수준
 
-글 작성자가 가진 flink 에 대한 경험은 샘플 몇개 실행하고서 UI 구경해본게 전부이다. 하지만 hot 하다고들 하니 일단 배경 지식부터 좀 쌓고, 어떤 use case 하나 가정해서 코딩해보는 기로 했다. 돌이켜보면 storm이든 spark이든 처음에 워드카운트 돌려보고서 알 수 있는 건 아무것도 없고 일단 어느정도 개념을 쌓아야 했다. 그나저나 왜 워드카운트를 가장 먼저 샘플로 내세우는 걸까?
+참고로 빅쿼리에 벌크업로드 정도 해본 정도이며 오늘 소개하는 건 전부 처음 해보는 것임. 실제 내용도 별거 없음
 
-## 어떻게 접근할까?
+## 오늘 다룰 내용의 공식 문서
 
-어떤 식으로 flink 에 접근할지 고민이 됐다.
-
-0. Akka 에 기반하고 있다고 하니 actors 패턴부터 시작해서 플랫폼 내부에 대해서 다룰까? [Akka and Actors](https://cwiki.apache.org/confluence/display/FLINK/Akka+and+Actors)
-1. 스트림 프로세싱에 대한 배결설명부터 설명할까?
-2. 대표적인 use case 를 잡고 설명할까?
-3. 다 됐고 쉬운 것으로 hands on을 할까?
-
-사실 마음같아서는 다하고 싶지만 막상 하나도 제대로 작성할 능력이 안되는 게 현실이다. 그래서 비교적 쉬운 방식인 (하지만 가장 지루한 방식인) 1번으로 하기로 했다.
-
-필자가 너무 무식한 사람으로 깔고 시작했는데 그래도 아주 오래전에 storm, kafka 등의 스트림 프로세싱 툴을 운영하고 코딩도 해봤다.
-
-## 배경 지식
-
-### 배치 프로세싱 vs 스트림 프로세싱
-
-[아파치 실시간 처리 프레임워크 비교분석 (1) - popit.kr](https://www.popit.kr/%EC%95%84%ED%8C%8C%EC%B9%98-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B2%98%EB%A6%AC-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC-%EB%B9%84%EA%B5%90%EB%B6%84%EC%84%9D-1/)
-
-[아파치 실시간 처리 프레임워크 비교분석 (2) - popit.kr](https://www.popit.kr/%EC%95%84%ED%8C%8C%EC%B9%98-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%B2%98%EB%A6%AC-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC-%EB%B9%84%EA%B5%90%EB%B6%84%EC%84%9D-2/)
-
-
-### 스트림 프로세싱
-
-### 스트림 프로세싱 플랫폼 비교
-
-
-
-## Flink
-
-### 구조
-
-### 프로그래밍 모델
-
-### 간단한 모델
-
-## 시작
-
-우선 참고 문서. 백서이긴 하지만 내용은 읽기 불편하지 않다.
+백서이긴 하지만 내용은 읽기 불편하지 않다.
 
 [Google Streaming Analytics Platform White Paper](https://services.google.com/fh/files/misc/google-streaming-analytics-platform.pdf)
 
@@ -50,11 +14,15 @@
 
 ### 가입
 
-최초 사용시 90일간 300$을 자유롭게 사용할 수 있다. 카드정보를 입력하지만 자동 결제가 되지 않는다는 것을 매우 강조하고 있다. 유치한 디스로 보일 수 있다. 하지만 나역시 50만원쯤 날려먹은 기억이 있어서 유치하다고 말하기엔 자괴감이 좀 든다. AWS 쓸 땐 조심하자. 꺼진 인스턴스도 다시 봐라.
+최초 사용시 90일간 300$을 자유롭게 사용할 수 있다. 카드정보를 입력하지만 자동 결제가 되지 않는다는 것을 매우 강조하고 있다. 유치한 디스로 보일 수 있다. 하지만 AWS 50만원쯤 날려먹은 기억이 있어서 유치하다고 말하기엔 자괴감이 좀 든다. AWS 쓸 땐 조심하자. 꺼진 인스턴스도 다시 봐라.
 
 다음 화면이 나올때까지 정보들을 입력하자 입력하자.
 
 ![GCP 가입](.resources/gcp_stream_processing/gcp_register.png)
+
+## 만들어보자
+
+### 만들 것 요약
 
 백서 내용 중 아래 아키텍처로 구성할 거다.
 
@@ -62,34 +30,12 @@
 
 이 문서에서는 데이터적재, 파이프라인, DW / DL 의 세번째 스텝까지 실습해본다. 네번째인 advanced analytics 의 경우 비교적 특정 도메인이 적합한 서비스인데 아쉽게도 저 중에 내가 아는 분야가 없다. 나열된 단어중 사용할 서비스는 다음과 같다.
 
-- `Cloud Pub/Sub` Kafka 같은 거
-- `Cloud Dataflow` Stream Processing. Apache beam 기반의 managed service. [Cloud Dataproc vs Cloud Dataflow](https://dong-life.tistory.com/58)
-- `BigQuery` 성능 좋은 DB
-
-추가로 데이터를 수집하고 처리하기 위해서 다음 항목도 추가
-
-- `Cloud Functions` 이것으로 데이터 수집 예정
-- `Compute Engine` 가상 머신
-
-### 참고
-
-예시를 위한 것이며 프로젝트 권한과 같은 부분은 다루지 않음
-
-## 만들어보자
-
-### 만들 것 요약
-
-데이터 처리 시스템에 사용되는 서비스
-
-1. `Cloud Functions` Json 데이터를 web 으로 수신한 후 pub/sub 으로 publish
-2. `Pub/Sub` Message queue
-3. `DataFlow` Pub/Sub의 메세지를 파싱하여 bigquery 테이블에 저장
-4. `BigQuery` DW
-
-그외 다음 서비스도 이용한다.
-
-- `Compute Engine` 테스트를 위해 json 데이터 발송
-- `Cloud Build API` Cloud Functions 를 빌드 배포 (?)
+1. `Cloud Pub/Sub` Kafka 같은 거
+2. `Cloud Dataflow` Apache beam 기반의 managed service. [Cloud Dataproc vs Cloud Dataflow](https://dong-life.tistory.com/58)
+3. `BigQuery` 성능 좋은 DB
+4. `Cloud Functions` 이것으로 데이터 수집 예정
+5. `Compute Engine` 가상 머신
+6. `Storage` Object storage. Dataflow 임시 파일을 저장할 목적으로 사용함
 
 ### 우선 프로젝트 생성
 
@@ -136,7 +82,7 @@ Pubsub 주제 생성
 
 다음을 누르면 코드 inline editor가 나온다. 직접 업로드하거나 GCS에 올려두고 쓸수도 있는데 길지 않은 코드이니 직접 입력하자. 무슨 언어로 하지? 아는건 java 밖에 없는데, 그래도 정석대로 js로 가자. (기본이 node.js 10 이기도 하고)
 
-inline 에디터에는 아래 껍데기 코드가 있다.
+초기 inline 에디터에는 아래 껍데기 코드가 있다.
 
 ```js
 /**
@@ -151,22 +97,120 @@ exports.helloWorld = (req, res) => {
 };
 ```
 
-Inline editor에서 직접 코드를 작성할까 생각했지만 cloud build api가 따로 존재하는 걸 보면 이거 배포할때마다 과금당할 듯한 느낌이 든다. Pubsub 보내는 것을 제외하고는 오프라인에서 작성하자. Pubsub 으로 publishing는 코드는 아래 문서를 작성하자.
-
 [메시지를 pubsub 주제에 게시](https://cloud.google.com/pubsub/docs/publisher?hl=ko#publishing_messages)
 
+아래는 cash테이블과 credit-card 테이블에 적재될 json을 받아서 pubsub으로 publish 하는 cloud function 코드. 각종 node js 샘플은 여기를 참고: [github://GoogleCloudPlatform/nodejs-docs-samples](https://github.com/GoogleCloudPlatform/nodejs-docs-samples)
+
 ```js
-const http = require('http');
-const message = '{"Hello": "World"}'
+'use strict';
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  var messageJson = JSON.parse(message);
-  res.end(JSON.stringify(messageJson));
-});
+// [START functions_pubsub_publish]
+const {PubSub} = require('@google-cloud/pubsub');
 
-server.listen(8080, '127.0.0.1', () => {
-  console.log(`Server running at http://127.0.0.1:8080/`);
-});
+// Instantiates a client
+const pubsub = new PubSub();
+
+exports.publish = async (req, res) => {
+  if (!req.body) {  
+    res .status(400).send('nobody');
+    return;
+  }
+
+  console.log(`Publishing message to topic projects/stream-ex/topics/spending`);
+
+  const messageObject = JSON.parse(req.body);
+  messageObject['collect_time'] = Date.now();
+  const messageBuffer = Buffer.from(JSON.stringify(messageObject), 'utf8');
+
+  // References an existing topic
+
+  // Publishes a message
+  try {
+    if (req.query['type'] == 'cash') {
+      const topic = pubsub.topic('projects/stream-ex/topics/spending-cash');
+      await topic.publish(messageBuffer);
+      console.log('Message published to cash topic');
+      res.status(200).send('Message published to cash topic');
+
+    } else if (req.query['type'] == 'creditCard') {
+      const topic = pubsub.topic('projects/stream-ex/topics/spending-cred-card');
+      await topic.publish(messageBuffer);
+      console.log('Message published to credit card topic');
+      res.status(200).send('Message published to credit card topic');
+
+    } else {
+      console.log('Bad spending type');
+      res.status(400).send('Bad spending type');
+    }
+  } catch (err) {
+      console.error(err);
+      res.status(500).send(err);
+      return Promise.reject(err);
+  }
+};
 ```
+
+### PubSub 2 BigQuery Dataflow 설정
+
+spending-cash 주제를 빅쿼리 spending:cash 테이블에 적재해보자.
+
+![stream-ex](.resources/gcp_stream_processing/pubsub_to_dataflow.png)
+
+만드는 창이 뜨면 적절한 정보를 입력한 후 생성.
+
+- `작업이름` unique한 이름. 사전에 입력되어 있음.
+- `리전 엔드포인트` us-central1
+- `Dataflow 템플릿` Pub/Sub Topic to Bigquery. 입력되어 있음
+- `필수 매개변수` 데이터를 가져올 토픽. 입력되어 있음.
+- `BigQuery output table` 데이터를 저장할 테이블 입력. stream-ex:spending.cash
+- `임시 위치` Dataflow 도중 생성되는 임시 파일을 저장할 gs 주소
+
+생성하고 나면 아래 그림처럼 dataflow의 작업 그래프가 나오며 메세지가 어떻게 처리되는지 보여준다. 사실 처음엔 apache nifi ([demo](https://www.youtube.com/watch?v=4yBc7hHvaQU)) 처럼 작업 그래프상에서 뭔가 편집 가능할 줄 알고 감탄했는데 그렇지는 않았다. 그냥 모니터링용.
+
+![stream-ex](.resources/gcp_stream_processing/dataflow_graph.png)
+
+### 테스트 해 봅시다
+
+우선 curl로 하나 보내보자. Cloud shell 터미널 실행하고 다음 명령어 입력 (우상단에 >_ 이렇게 생긴 아이콘클릭) application/json이 아니라 text/plain인 이유는 묻지 마라. json으로 보내니까 제대로 처리가 안되는게 아마도 cloud function의 js 코드가 잘못된 듯 한데 삽질하고 싶지 않았다. 게으른게 부끄러운 건 아니잖아.
+
+```bash
+curl -X POST "https://us-central1-stream-ex.cloudfunctions.net/spending-ingest?type=cash" -H "Content-Type: text/plain" -d '{"consumer": "consumer-1", "amount": "100000", "merchant": "불란서 제빵소", "spending_time": "2020-01-01"}'
+```
+
+운이 좋다면 shell을 볼 수 있겠지만 개인적으로는 안될때가 더 많았다. 안되면 인스턴스에서 테스트하자.
+
+그리고 미리 만들어둔 테스트용 jar로 여러개의 데이터를 보내보다. jar는 미리 빌드해서 gs에 올려뒀다.
+
+1. java 설치
+2. gsutil 로 storage 에 저장된 jar 다운로드
+3. 실행
+
+```bash
+sudo apt-get install openjdk-11-kdk
+gsutil cp gs://spending-resource/jsongen-jar-with-dependencies.jar .
+java -cp jsongen-jar-with-dependencies.jar net.youngrok.jsongen.JsonGenApp
+```
+
+### credit card 테이블 적재
+
+Dataflow를 하나 더 띄워서 credit card 도 적재해볼까? Cash에 입력할때와 동일하게 실행! 하면 짤없이 실패한다. 다음은 에러 메세지 내용이다.
+
+```text
+Workflow failed. Causes: Project stream-ex has insufficient quota(s) to execute this workflow with 1 instances in region us-central1. Quota summary (required/available): 1/6 instances, 4/3 CPUs, 1230/808 disk GB, 0/250 SSD disk GB, 1/99 instance groups, 1/49 managed instance groups, 1/99 instance templates, 1/2 in-use IP addresses.
+```
+
+4/3 CPUs 라는 부분이 눈에 띈다. VCPU 4개가 필요한데 3개밖에 여유가 없어서 dataflow를 만들 수 없다는 뜻이다. Compute Engine 대시보드에 가보면 ps-to-bq-spending-cash... 이라는 내가 만든건 아니지만 익숙한 이름의 인스턴스가 하나 있다. 바로 DataFlow가 동작하기 위해서 필요한 인스턴스이고, 4CPU 를 사용한다. 테스트 계정은 CPU 리밋이 8로 걸려 있고 변경할 수도 없기 때문에 dataflow를 하나 더 돌리려면 instance를 없애야 한다. 그렇다면 dataflow는 managed service일까 아닐까?
+
+![dataflow-instance](.resources/gcp_stream_processing/dataflow_vm_instance.png)
+
+### 그러면 어쩌지
+
+그래도 적재하고 싶은데. 지금까지 코딩하고 스샷 뜬게 너무 아까운데.. 다음 정도가 생각났지만 전부다 하지 말아야할 필계가 생각났기 때문에 그냥 포기
+
+1. 돈내고 CPU 제한을 푼다. --> 내가 왜?
+2. Bean SDK로 코딩해서 두개의 pipeline을 하나에 dataflow에 구동한다. --> 될지 확신이 없음.
+3. Pubsub 가져와서 bigquery로 내보내는 java app 작성. --> 의미 없는 일이라 생각해서 조금하다가 관둠.
+
+## 결론
+
+없음. 사실 튜토리얼이란게 딱히 결론 내리는 글은 아니잖아.
