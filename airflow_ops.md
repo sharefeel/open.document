@@ -3,7 +3,7 @@
 이 문서에서는 apache airflow를 설치과 간단한 사용법에 대해서 다룬다. Airflow는 Airbnb에서 만든 Workflow Management System 중 하나로써 비슷한 시스템으로는 spotify의 luigi가 있고, hadoop 에코시스템에서는 oozie와 azkaban 등이 있다. Airflow를 사용한다는 것은 다음 두가지로 나눠볼 수 있다.
 
 1. 실행할 dag을 작성
-2. dag의 실행 
+2. dag의 실행
 
 아래에 다시 설명하겠지만 dag은 workflow 라고 이해하면 된다. 이글은 dag의 개발보다는 airflow 운영과 dag을 스케줄링하는 방법 대해서 다룬다.
 
