@@ -18,8 +18,10 @@ public class HelloApp {
 @RequestMapping("/")
 public class HelloController {
     @GetMapping("/hello")
-    public ResponseEntity<String> helloWorld() {
-        return ResponseEntity.ok("Hello World");
+        public ResponseEntity<String> helloWorld(HttpServletRequest request) throws UnknownHostException {
+        String localAddress = InetAddress.getLocalHost().getHostAddress();
+        String localHostName = InetAddress.getLocalHost().getHostName();
+        return ResponseEntity.ok("Hello. I am " + localHostName + "(" + localAddress + ")");
     }
 }
 ```
@@ -40,8 +42,7 @@ Storage > 버킷 만들기
 
 ### VM 인스턴스 구성
 
-Compute Engine > VM 인스턴스 > 만들기 > 템플릿에서 VM 인스턴스 만들기.
-위에서 생성해둔 hellorest-instance-template 템플릿으로 계속
+Compute Engine > VM 인스턴스 > 만들기 > VM 인스턴스 만들기.
 
 - 이름: hellorest-instance
 - 리전: asia-northeast3
@@ -51,8 +52,21 @@ Compute Engine > VM 인스턴스 > 만들기 > 템플릿에서 VM 인스턴스 �
 
 #### 설치
 
-1. sudo apt install default-jre
-2. gsutil cp gs://ce-resource/hellorest-0.0.1.jar .
+java 설치
+
+```bash
+sudo apt install default-jre
+```
+
+downloadAndrun.sh 스크립트를 /home/sharefeel 경로에 생성. GCS 에서 jar 파일 다운로드 후 실행하는 스크립트임
+
+```bash
+cat downloadAndRun.sh
+pushd $(dirname $0) > /dev/null
+/snap/bin/gsutil cp gs://ce-resource/hellorest-0.0.1.jar .
+/usr/bin/java -jar hellorest-0.0.1.jar
+popd
+```
 
 #### 서비스 등록
 
@@ -64,7 +78,7 @@ Description=Hello Rest App Service
 
 [Service]
 WorkingDirectory=/home/sharefeel
-ExecStart=/usr/bin/java -jar /home/sharefeel/hellorest-0.0.1.jar
+ExecStart=/bin/bash /home/sharefeel/downloadAndRun.sh
 ExecStop=/bin/kill -INT $MAINPID
 ExecReload=/bin/kill -TERM $MAINPID
 
@@ -199,4 +213,6 @@ Compute Engine > 인스턴스 그룹 만들기 > 새로운 스테이트리스 �
 - 프런트 엔드 구성
   - 이름: hellorest-ce-front-end
   - 포트: 8080
+
+## 테스트
 
