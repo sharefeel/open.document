@@ -168,22 +168,35 @@ VPC 네트워크 > 방화벽 > 방화벽 규칙 만들기
 
 Compute Engine > 인스턴스 그룹 만들기 > 새로운 스테이트리스 관리형 인스턴스 그룹
 
-- 이름: hellorest-ce-group1
-- asia-northeast3(서울), asia-northeast3-b
-- hellorest-ce-template
-- 인스턴스의 최대 개수: 3
-- 자동복구 상태확인: hellorest-ce-state (HTTP)
+- 인스턴스 그룹 1
+  - 이름: hellorest-ce-group1
+  - asia-northeast3(서울), asia-northeast3-b
+  - hellorest-ce-template
+  - 인스턴스의 최대 개수: 2
+  - 자동복구: hellorest-ce-state (HTTP) / 600초
+- 인스턴스 그룹 2
+  - 이름: hellorest-ce-group2
+  - asia-northeast3(서울), asia-northeast3-c
+  - hellorest-ce-template
+  - 인스턴스의 최대 개수: 2
+  - 자동복구 hellorest-ce-state (HTTP) / 600초
 
-- 이름: hellorest-ce-group2
-- asia-northeast3(서울), asia-northeast3-c
-- hellorest-ce-template
-- 인스턴스의 최대 개수: 3
-- 자동복구 상태확인: hellorest-ce-state (HTTP)
+이때 주의할 점은 잠재적으로 생생될 수 있는 최대 인스턴스 수가 쿼터보다 작아야 한다. 즉 위 두개의 인스턴스 그룹을 만들면 최대 인스턴스 쿼터를 6개 먹고 들어간다.
 
-## VPC 생성
+## 부하 분산기 만들기
 
-- 이름: hellorest-vpc
-- VPC
-  - 이름: hellorest-subnet
-  - 리전: asia-northeast3
-  - IP 주소범위: 10.0.0.0/9
+네트워크 서비스 > 부하 분산 > 부하 분산기 만들기 > HTTP(S) 부하 분산 > 인터넷 트래픽을 VM으로 분산
+
+- 이름: hellorest-ce-load-balancer
+- 백엔드 서비스
+  - 이름: hellorest-ce-backend-service
+  - 백엔드 유형: 인스턴스 그룹
+  - 백엔드
+    - hellorest-ce-group1 (asia-northeast3-b) / 8080 포트
+    - hellorest-ce-group2 (asia-northeast3-c) / 8080 포트
+  - 상태 확인: hellorest-ce-state (HTTP)
+- 호스트 및 경로 규칙: 단순한 호스트 및 경로 규칙
+- 프런트 엔드 구성
+  - 이름: hellorest-ce-front-end
+  - 포트: 8080
+
