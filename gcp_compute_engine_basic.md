@@ -1,10 +1,29 @@
 # Google Cloud Compute Engine Basic
 
-## 준비
+## 구성할 것
+
+### 형상
+
+- java rest api on compute engine vm
+- 리전내 두 영역에 걸쳐서 서버 배포
+- 로드밸런싱
+
+### 구성 절차
+
+1. 준비단계
+   1. 배포할 VM 구성
+   2. 구성한 VM의 스토리지 이미지 생성
+   3. 디스크 이미지 기반의 인스턴스 템플릿 생성
+2. 실제 구성
+   1. 템플릿 기반으로 인스턴스 그룹 생성
+   2. 환경 구성: 방화벽, health check
+   3. 인스턴스 그룹으로 트래픽을 보내는 로드밸런서 생성
+
+## Java 앱 준비
 
 ### 실행할 java 앱
 
-Compute engine에서 실행될 spring boot rest api code
+Compute engine에서 실행될 spring boot rest api code. 현재 실행된 장비의 호스트네임과 IP를 리턴한다.
 
 ```java
 @SpringBootApplication
@@ -28,7 +47,7 @@ public class HelloController {
 
 ### 앱을 GCS에 업로드
 
-.jar 로 패키징후 gcs 에 업로드
+Spring boot embedded tomcat .jar 로 패키징후 gcs 에 업로드. 파일명: hellorest-0.0.1.jar
 
 Storage > 버킷 만들기
 
@@ -36,7 +55,7 @@ Storage > 버킷 만들기
 - 위치: Region, asia-northeast3
 - 그외 기본값
 
-위 설정으로 버킷 생성후 .jar 파일 업로드. (hellorest-0.0.1.jar 로 가정)
+버킷 최상위 경로에 .jar 파일 업로드
 
 ## Compute Engine 생성
 
@@ -44,7 +63,7 @@ Storage > 버킷 만들기
 
 Compute Engine > VM 인스턴스 > 만들기 > VM 인스턴스 만들기.
 
-- 이름: hellorest-instance
+- 이름: hellorest-ce
 - 리전: asia-northeast3
 - 영역: asia-northeast3-a
 
@@ -104,42 +123,32 @@ sudo systemctl status hellorest
     Tasks: 34 (limit: 2332)
    CGroup: /system.slice/hellorest.service
            └─9080 /usr/bin/java -jar /home/sharefeel/hellorest-0.0.1.jar
-Nov 21 08:08:01 hellorest-instance java[9080]: 2020-11-21 08:08:01.161  INFO 9080 --- [           main] org.example.hellorest.HelloApp           : Starting Hel
-Nov 21 08:08:01 hellorest-instance java[9080]: 2020-11-21 08:08:01.169  INFO 9080 --- [           main] org.example.hellorest.HelloApp           : No active pr
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.464  INFO 9080 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initi
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.483  INFO 9080 --- [           main] o.apache.catalina.core.StandardService   : Starting ser
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.483  INFO 9080 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Ser
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.605  INFO 9080 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.605  INFO 9080 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebAppl
-Nov 21 08:08:03 hellorest-instance java[9080]: 2020-11-21 08:08:03.943  INFO 9080 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing
-Nov 21 08:08:04 hellorest-instance java[9080]: 2020-11-21 08:08:04.366  INFO 9080 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat start
-Nov 21 08:08:04 hellorest-instance java[9080]: 2020-11-21 08:08:04.398  INFO 9080 --- [           main] org.example.hellorest.HelloApp           : Started Hell
+:
+:
 ```
 
 호출 테스트
 
 ```bash
 curl http://localhost:8080/hello
-Hello World
+Hello. I am hostname(ipaddress)
 ```
 
 #### 리부팅 후 자동 실행되는지 테스트
 
-1. hellorest-instance 중지
-2. hellorest-instance 시작
+1. hellorest-ce 중지
+2. hellorest-ce 시작
 3. SSH 접속후 확인
    - sudo systemctl status hellorest.service 또는
    - curl http://localhost:8080/hello
 
-### 머신 이미지 생성
+#### 인스턴스 중지
 
-Compute Engine > 머신 이미지 > 머신 이미지 만들기
+더이상 이 인스턴스는 필요하지 않다. 돈드니까 그냥 중지하자.
 
-다음 내용으로 create. 이작업은 굉장히 오래 걸린다. (한시간 이상)
+Compute Engine > VM 인스턴스
 
-- 이름: hellorest-ce-image
-- 소스 VM 인스턴스: hellorest-ce
-- 위치: 리전, asia-northeast3(서울)
+hellorest-ce VM 중지
 
 ### 스토리지 이미지 생성
 
@@ -157,17 +166,6 @@ Compute engine > 인스턴스 템플릿 > 인스턴스 템플릿 만들기
 - 머신 유형: e2-small
 - 부팅디스크: 맞춤이미지, hellorest-ce-storage-image 으로 변경
 - 방화벽: http 트래픽 허용
-
-### 상태 확인 생성
-
-장비가 정상적으로 동작하는지 확인하기 위한 상태확인 등록 (health-check)
-
-Compute Engine > 상태 확인 > 상태 확인 만들기
-
-- 이름: hellorest-ce-state
-- 프로토콜: HTTP
-- 포트: 8080
-- 요청경로: /hello
 
 ### 상태 확인을 위한 방화벽 규칙 만들기
 
@@ -187,13 +185,13 @@ Compute Engine > 인스턴스 그룹 만들기 > 새로운 스테이트리스 �
   - asia-northeast3(서울), asia-northeast3-b
   - hellorest-ce-template
   - 인스턴스의 최대 개수: 2
-  - 자동복구: hellorest-ce-state (HTTP) / 600초
+  - 자동복구: hellorest-ce-state (HTTP, 8080) /hello 600초
 - 인스턴스 그룹 2
   - 이름: hellorest-ce-group2
   - asia-northeast3(서울), asia-northeast3-c
   - hellorest-ce-template
   - 인스턴스의 최대 개수: 2
-  - 자동복구 hellorest-ce-state (HTTP) / 600초
+  - 자동복구 hellorest-ce-state (HTTP, 8080) /hello 600초
 
 이때 주의할 점은 잠재적으로 생생될 수 있는 최대 인스턴스 수가 쿼터보다 작아야 한다. 즉 위 두개의 인스턴스 그룹을 만들면 최대 인스턴스 쿼터를 6개 먹고 들어간다.
 
@@ -216,3 +214,10 @@ Compute Engine > 인스턴스 그룹 만들기 > 새로운 스테이트리스 �
 
 ## 테스트
 
+Http 호출을 처리하는 서버가 fail-over, recovery 되는 것을 다음과 같이 확인할 수 있다.
+
+1. http://IP:8080/hello 호출 (참고. IP는 부하 분산기 정보에서 얻을 수 있음)
+2. 리턴된 IP 에 SSH 접속하여 서비스 종료 (sudo systemctl stop hellorest.service)
+3. http://IP:8080/hello 호출하여 다른 인스턴스로 라우팅 되었는지 확인
+4. 서비스 종료한 인스턴스가 종료되는 것 확인
+5. 인스턴스가 사라진 인스턴스 그룹에 다시 인스턴스가 생성되는 것 확인
