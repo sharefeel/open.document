@@ -36,8 +36,8 @@ public class HelloApp {
 @RestController
 @RequestMapping("/")
 public class HelloController {
-    @GetMapping("/hello")
-        public ResponseEntity<String> helloWorld(HttpServletRequest request) throws UnknownHostException {
+    @GetMapping("hello")
+    public ResponseEntity<String> helloWorld() throws UnknownHostException {
         String localAddress = InetAddress.getLocalHost().getHostAddress();
         String localHostName = InetAddress.getLocalHost().getHostName();
         return ResponseEntity.ok("Hello. I am " + localHostName + "(" + localAddress + ")");
