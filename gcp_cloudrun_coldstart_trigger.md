@@ -175,4 +175,4 @@ WaitColdStart 스텝이 sleep 10초 부분, 즉 cold start가 끝나길 기다�
 
 ## tags
 
-GCP, CloudRun, CloudRun ColdStart
+ #GCP, #CloudRun, #CloudRun #ColdStart
