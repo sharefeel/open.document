@@ -4,7 +4,7 @@
 
 기본적으로 CloudRun은 인스턴스가 생성되면 트래픽을 라우팅한다. 즉 인스턴스가 실행하는 앱의 서비스 rediness 체크는 없으며, cold start 가 긴 앱의 경우 서비스가 가용해지기 전에 호출될 수 있다. 이는 첫번째 배포에서는 문제가 되지 않는다. 하지만 이후 새버전을 재배포할때 앱이 서비스 준비가 되기 전에 새버전 인스턴스로 트래픽이 라우팅된다. 반복 호출 테스트한 결과 호출이 실패하지는 않지만 신규 인스턴스의 초반 리턴 시간이 길어진다.
 
-## 문제 대응
+### 배포 명령어
 
 다음은 CloudRun 재배포(update) 명령어 레퍼런스이다. (레퍼런스 치고는 보기 편하고 커맨드 편집 기능도 제공한다.)
 
@@ -75,6 +75,8 @@ gcloud run run services update $_SERVICE_NAME --platform=managed --image=$_GCR_H
 ```
 
 이 명령어가 실행되면 "문제" 단락에서 설명한 것처럼 배포와 트래픽 전환이 한번에 일어나게 된다.
+
+## 문제 대응
 
 ### 배포와 트래픽 전환 분리
 
@@ -173,4 +175,4 @@ WaitColdStart 스텝이 sleep 10초 부분, 즉 cold start가 끝나길 기다�
 
 ## tags
 
-GCP, CloudRun, CloudRun ColdStart
+ #GCP, #CloudRun, #CloudRun #ColdStart
