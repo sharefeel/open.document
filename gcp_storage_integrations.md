@@ -4,7 +4,7 @@
 
 ## Google Cloud Storage 개요
 
-### Object Storage
+[GCS 설명](https://cloud.google.com/storage?hl=ko)
 
 ## 연동
 
@@ -42,9 +42,16 @@ CloudCDN 은 여러가지 백엔드를 가짐. 그중에 GCS가 가능함
 
 ### Log bucket
 
-https://cloud.google.com/logging/docs/buckets
+[로그 버킷](https://cloud.google.com/logging/docs/buckets)
+
+### Migration
+
+S3, On premise
 
 ### 기타 구글 코드들
 
 Dataflow
 
+DataProc
+
+AI Platform
