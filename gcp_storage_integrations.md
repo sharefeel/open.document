@@ -66,6 +66,7 @@ TOTAL: 1 objects, 162 bytes (162 B)
 
 # 빅쿼리 import
 $ bq load --autodetect --source_format=CSV --skip_leading_rows=1 gs://youngrok_storage bigquery_data.tsv gcs_upload.arsenal_players
+Waiting on bqjob_r6a4e168b4d38df5d_000001780d2088aa_1 ... (0s) Current status: DONE
 ```
 
 콘솔에서 확인한 생성된 테이블
