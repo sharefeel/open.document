@@ -74,8 +74,10 @@ $ bq load --autodetect --source_format=CSV --skip_leading_rows=1 gs://youngrok_s
 
 참고문서
 
-- [gsutil을 사용한 업로드](https://cloud.google.com/storage/docs/uploading-objects?hl=ko#gsutil)
-- [Cloud Storage에서 CSV 데이터 로드](https://cloud.google.com/bigquery/docs/loading-data-cloud-storage-csv?hl=ko#bq)
+1. [gsutil을 사용한 업로드](https://cloud.google.com/storage/docs/uploading-objects?hl=ko#gsutil)
+2. [Cloud Storage에서 CSV 데이터 로드](https://cloud.google.com/bigquery/docs/loading-data-cloud-storage-csv?hl=ko#bq)
+
+빅쿼리 import에는 훨씬 다양한 옵션이 존재하는데 이 예는 빅쿼리가 아닌 gcs에 관한 예제이므로 상세 옵션은 설명하지 않는다.
 
 ### Http direct access
 
