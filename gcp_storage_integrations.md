@@ -177,10 +177,6 @@ S3, On premise
 
 ### API (java 예제)
 
-### Spring
-
-
-
 ### 기타 코드기반 product
 
 다음 product 은 연동이 된다.
@@ -189,3 +185,12 @@ S3, On premise
 - DataProc
 
 등등 여러 product 에서 가능하지만 이건 그냥 템플릿 코드를 사용하며 그속에 API가 있는 것이므로 딱히 언급할 필요는 없을 것 같다.
+
+### Spring
+
+스프링도 결국 내부적으로 java api 를 사용하는 것은 같지만 스프링은 스프링 아니겠는가. 간단히 코드 샘플 정도만 살펴보자.
+
+```java
+```
+
+참고.
