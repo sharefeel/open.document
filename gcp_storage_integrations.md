@@ -87,6 +87,22 @@ hadoop fs distcp gs://..
 
 #### hive 파티션에 gs 입력
 
+Hive는 external table을 사용하여 데이터가 저장될 파티션의 경로를 지정할 수 있다. 이 경로를 GCS로 지정가능하다. 
+
+```HQL
+CREATE EXTERNAL TABLE IF NOT EXIST
+..
+..
+..
+파티션 위치: ..
+```
+
+- 몇줄 인서트
+
+- GCS 에 생긴 파티션 파일 보임
+
+
+
 #### default fs 변경에 대한 여담
 
 Default FS를 변경하는 것은 궂이 생각할 필요도 없는 거지만 테스트는 해봤으니까 몇자 적어본다.
@@ -145,6 +161,7 @@ Waiting on bqjob_r6a4e168b4d38df5d_000001780d2088aa_1 ... (0s) Current status: D
 ### Http direct access
 
 기본적으로 웹에서 읽을 수 있음
+스크린 샷
 
 ### Http through CloudCDN
 
@@ -162,10 +179,13 @@ S3, On premise
 
 ### Spring
 
-### 기타 구글 코드들
 
-Dataflow
 
-DataProc
+### 기타 코드기반 product
 
-AI Platform
+다음 product 은 연동이 된다.
+
+- DataFlow
+- DataProc
+
+등등 여러 product 에서 가능하지만 이건 그냥 템플릿 코드를 사용하며 그속에 API가 있는 것이므로 딱히 언급할 필요는 없을 것 같다.
