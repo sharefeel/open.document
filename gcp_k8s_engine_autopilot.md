@@ -15,11 +15,24 @@
 
 참고할만한 링크
 
-### Auto Pilot 모드에 생성되는 클러스터
+### Auto Pilot으로 클러스터 생성
 
-Auto pilot으로 생성하면 도대체 어떤 형태로 클러스터가 
+콘솔에서 auto pilot으로 생성하는 방법. 리전만 설정하면 만들 수 있다.
 
-## 배포할 컨테이너
+![create autopilot cluster](.resources/gcp_k8s_engine_autopilot/create_cluster_01.png)
+
+![create autopilot cluster](.resources/gcp_k8s_engine_autopilot/create_cluster_02.png)
+
+실제 생성된 클러스터 설정은 다음과 같다. 여러 설정이 기본으로 세팅되어 있다.
+
+<details> <summary> cluster 상세 설정 (펼쳐보기) </summary>
+
+![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_01.png)
+![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_02.png)
+
+</details>
+
+### 배포할 컨테이너
 
 매우 간단한 spring-boot code 이다.
 
@@ -62,3 +75,17 @@ COPY --from=build /home/app/target/hellorest-github.jar /usr/local/lib/app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/local/lib/app.jar"]
 ```
+
+### Cloud Build
+
+Dockerfile 빌드후 gcr 업로드
+
+위 소스코드는 github에 업로드 되어 있다.
+
+gcr 에 올라간다.
+
+### 배포
+
+port, ... 등
+
+### 배포에 의해 생성된 모습
