@@ -113,7 +113,12 @@ kubernetes engine > deploy
 
 몇분 기다리면 배포 결과 화면이 나온다. 리소스가 모자른다는 식의 에러들은 무시하자. 리프레시 하다보면 에러가 없어진다. 배포작업 완료후에 측정해야할 값들을 배포중에 측정함으로써 리소스가 모자라다고 출력된가 아닐까? 라고 추측은 해보지만 뇌피셜이다.
 
-배포 설정 이미지 추가
+<details> <summary> 배포된 상태의 클러스터 </summary>
+
+![deploy](.resources/gcp_k8s_engine_autopilot/cluster_overview_01.png)
+![deploy](.resources/gcp_k8s_engine_autopilot/cluster_overview_02.png)
+
+</details>
 
 설명
 
@@ -121,7 +126,7 @@ kubernetes engine > deploy
 
 서비스 노출 하라고 나올 것이다. 이 클러스터는 진입점이 없이 pod 만 배포된 상태이다. 이를 설정해야 접속이 가능하다.
 
-서비스 노출 스크린샷
+![deploy](.resources/gcp_k8s_engine_autopilot/load_balancer.png)
 
 ```yaml
 ---
@@ -143,7 +148,7 @@ spec:
   loadBalancerIP: ""
 ```
 
-생성된 서비스 오버뷰 이미지
+![deploy](.resources/gcp_k8s_engine_autopilot/service_overview.png)
 
 접속 가능하다.
 
