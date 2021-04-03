@@ -25,12 +25,9 @@
 
 실제 생성된 클러스터 설정은 다음과 같다. 여러 설정이 기본으로 세팅되어 있다.
 
-<details> <summary> cluster 상세 설정 (펼쳐보기) </summary>
-
 ![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_01.png)
-![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_02.png)
 
-</details>
+![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_02.png)
 
 ### 배포할 컨테이너
 
