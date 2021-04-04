@@ -1,27 +1,43 @@
 # GCP Kubernetes Engine AutoPilot Mode
 
+## 개요
+
+### 문서 내용
+
+이 문서는 다음 내용으로 구성되어 있다.
+
+1. GKE Autopilot 모드로 심플한 k8s 서비스 생성 예제
+2. Kubernetes 개요
+
+맞다. 개요보다 예제가 먼저 있다. 사실 이 문서는 ops 좀 아는 devs를 위한 게 아니다. 이 문서의 대상 독자는 "docker start" 정도 해본 사람 중 GKE에서 프로그램을 구동해야하는 자들이다.
+
+### GKE 클러스터 두가지
+
 2021/04/03 기준 GKE에서는 두가지 방법으로 클러스터를 생성할 수 있다.
 
-1. 기본(?)
-2. Auto Pilot
+1. 표준모드
+2. Auto Pilot 모드
 
-사용의 간편함부터 과금 단위까지 여러가지 차이가 있다. 자세한건 auto pilot 문서를 참고하라. 그냥 문서 링크.
+사용의 간편함부터 과금 단위까지 여러가지 차이가 있다. 자세한건 여길 참고: [Autopilot 개요 - Google GKE 가이드](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview?hl=ko)
+
 이 문서에서는 Auto Pilot을 다룰 것인데 그 이유는 다음과 같다.
 
-- Pod 단위만 생각하면 되므로 쉽다
-- 클러스터의 한가지 표준을 볼 수 있다.
+- `쉽다` Pod 단위만 생각하면 되므로 쉽다. 상술했듯이 이 문서의 독자는 docker start 정도 해본사람이다.
+- `전형적인 클러스터` 매우 전형적이고 단순한 서비스를 배포할 것이며 그 목적에 autopilot 모드가 딱이다.
 
-## 일단 Kubernetes 가 뭔지는 아래 링크 참고
+## Autopilot 모드를 사용한 서비스 생성 예제
 
-참고할만한 링크
+### Auto Pilot으로 kubernetes 클러스터 생성
 
-### Auto Pilot으로 클러스터 생성
+가장 먼저 k8s 클러스터 생성이 필요하다. Auto pilot으로 생성하는 화면으로 이름과 리전만 설정하면 된다. 입력 내용이 중요한 것은 아니고 autopilot 이 무엇을 해주는지 한번 읽어보자.
 
-콘솔에서 auto pilot으로 생성하는 화면으로 이름과 리전만 설정하면 된다. 입력 내용이 중요한 것은 아니고 autopilot 이 무엇을 해주는지 한번 읽어보자.
+메뉴: Kubernetes Engine > 클러스터 > 만들기 > Autopilot 구성
+
+다음은 생성화면인데 클러스터 이름과 리전만 입력하면 클러스터가 생성된다. 생성까지는 꽤 걸린다. 여담인데 삭제도 꽤 걸린다.
 
 ![create autopilot cluster](.resources/gcp_k8s_engine_autopilot/create_cluster_01.png)
 
-실제 생성된 클러스터 설정은 다음과 같다. 여러 설정이 기본으로 세팅되어 있다.
+실제 생성된 클러스터 설정은 다음과 같다. 위치 유형은 자동으로 리전으로 되어 있으며 세가지 영역이 모두 포함되어 있다. 참고로 표준모드로 생성하면 위치 유형을 리전과 영역 중 선택할 수 있다. 참고로 autopilot 서울리전의 a,b,c 모든 영역이 포함되는 것처럼 보이지만 실제로 그렇지는 않다. 때에 따라 a,b,b 영역이 포함되기도 하는데 이유는 모르겠다. 위치 유형 외에도 여러가지가 기본으로 설정되어 있다.
 
 <details> <summary> cluster 상세 설정 (펼쳐보기) </summary>
 
@@ -32,7 +48,7 @@
 
 ### 배포할 컨테이너
 
-매우 간단한 spring-boot code 이다.
+배포할 프로그램은 매우 간단한 spring-boot 프로그램이다. 이 소스코드는 `github.com/sharefeel/hellorest`에 업로드되어 있다고 가정한다.
 
 ```java
 @RestController
@@ -58,7 +74,7 @@ public class HelloRestApp {
 }
 ```
 
-아래는 cloud build 에 의해서 실행될 Dockerfile이다. Java 11 상에서 위 프로그램을 동작시킨다.
+아래는 cloud build 에 의해서 실행될 Dockerfile이다. Java 11 상에서 프로그램을 구동하는 이미지를 생성한다. Distroless java는 경량의 리눅스와 open-jdk 기반 runtime 이다. Java 8과 11이 지원된다. [[GitHub Distroless Java]](https://github.com/GoogleContainerTools/distroless/tree/master/java) Open-jdk jre를 base image로 사용하는 경우보다 이미지 크기가 작다.
 
 ```Dockerfile
 # Build stage
@@ -74,13 +90,11 @@ EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/local/lib/app.jar"]
 ```
 
-### Cloud Build
+### 배포할 컨테이너 이미지 빌드
 
-Dockerfile 빌드후 gcr 업로드
+배포를 위해서 github 소스를 가져와 docker 빌드 후 gcr 업로드해야 한다. 다음 정보로 build trigger 생성하고 트리거를 실행하자.
 
-위 소스코드는 github에 업로드 되어 있다.
-
-다음 정보로 build trigger 생성
+콘솔메뉴: Cloud 빌드 > 트리거 > 트리거 만들기
 
 - `이름` hellorest-trigger
 - `태그` k8s-autopilot (필수 입력 아님)
@@ -95,11 +109,13 @@ Dockerfile 빌드후 gcr 업로드
   - `Dockerfile 이름` Dockerfile (default)
   - `이미지 이름` gcr.io/youngrok/github.com/sharefeel/hellorest:$COMMIT_SHA (default)
 
-Github main branch 를 가져와 docker 빌드하는 것으로써 설정상 특별한 것은 없다. 알아둘 것은 가장 마지막행 `이미지 이름` 부분으로 이 이름으로 container registry 에 push 된다.
+Github main branch 를 가져와 docker 빌드하는 것으로써 설정상 특별한 것은 없다. 알아둘 것은 가장 마지막행 `이미지 이름` 부분으로 이 이름으로 container registry 에 push 된다. 사실 CI/CD를 구성한다면 Dockerfile 이 아니라 inline 스크립트 또는 cloudbuild.yaml 파일을 사용하게 될 것이다.
 
-### 배포
+### Cluster에 이미지 배포
 
-kubernetes engine > deploy
+성공적으로 빌드되고 gcr에 이미지가 push되었으면 k8s 클러스터에 배포할 수 있다.
+
+콘솔메뉴: kubernetes engine > deploy
 
 1. `컨테이너`
    1. 기존 컨테이너 이미지 (default)
@@ -109,7 +125,7 @@ kubernetes engine > deploy
    2. `Kubernetes 클러스터` autopilot-cluster-1 (asia-northeast3)
 3. `배포`
 
-몇분 기다리면 배포 결과 화면이 나온다. 리소스가 모자른다는 식의 에러들은 무시하자. 리프레시 하다보면 에러가 없어진다. 배포작업 완료후에 측정해야할 값들을 배포중에 측정함으로써 리소스가 모자라다고 출력된가 아닐까? 라고 추측은 해보지만 뇌피셜이다.
+(오래) 기다리면 배포 결과 화면이 나온다. 리소스가 모자른다는 식의 에러들은 무시하자. 리프레시 하다보면 에러가 없어진다. 배포작업 완료후에 측정해야할 값들을 배포중에 측정함으로써 리소스가 모자라다고 출력된가 아닐까? 라고 추측은 해보지만 뇌피셜이다.
 
 <details> <summary> 배포된 상태의 클러스터 </summary>
 
@@ -118,11 +134,11 @@ kubernetes engine > deploy
 
 </details>
 
-설명
+전체적으로 특별한 내용은 없다. 단 `노출하라` 라는 메세지가 눈에 띈다. 현재 컨테이너가 pod로 배포되어 있지만 접속 가능한 상태는 아니다.
 
 ### 서비스 노출
 
-서비스 노출 하라고 나올 것이다. 이 클러스터는 진입점이 없이 pod 만 배포된 상태이다. 이를 설정해야 접속이 가능하다.
+이 클러스터는 진입점이 없이 pod 만 배포된 상태이다. 그럼 접속 가능하도록 노출시켜보자. 노출 버튼을 클릭하고 다음 내용을 입력.
 
 - `포트매핑`
   - `포트` 80
@@ -131,27 +147,7 @@ kubernetes engine > deploy
 - `서비스 유형` 부하 분산기
 - `서비스 이름` hellorest-service
 
-다음과 같은 yaml로 실행된다고 한다.
-
-```yaml
----
-apiVersion: "v1"
-kind: "Service"
-metadata:
-  name: "hellorest-service"
-  namespace: "default"
-  labels:
-    app: "hellorest"
-spec:
-  ports:
-  - protocol: "TCP"
-    port: 80
-    targetPort: 8080
-  selector:
-    app: "hellorest"
-  type: "LoadBalancer"
-  loadBalancerIP: ""
-```
+아래는 실행한 결과이다. 접속가능한 endpoint가 생성되어 있다.
 
 ![service_detail](.resources/gcp_k8s_engine_autopilot/service_detail.png)
 
@@ -162,54 +158,50 @@ spec:
 GitHub ver 2. I am hellorest-59d4598d88-fd4w9(10.114.0.194)
 ```
 
+쉽다.
+
 ### 알게 모르게 생성된 infra
 
-생성되는 것
-Kubernetes 요소들, Kubernetes node health check
-네트웍 요소들: Load Balancer, 외부IP, 포워딩 룰
+배포해서 접속테스트 하는 것까지 살펴봤다. 여기서부터는 생성되어 있는 리소스를 살펴보자. 직접적으로 생성한 것도 있고 google cloud가 알아서 생성한 것도 있는데 크게 다음 두가지로 나눠볼 수 있을 것이다. ("것"은 편의상 리소스로 통칭)
+
+- `Kubernetes 리소스` Kubernetes cluster, node instance, health check (상태확인) 기능
+- `네트워크 리소스` Load Balancer, 외부IP, 포워딩 룰
+- `빌드 리소스` CloudBuild 트리거, Container registry 이미지
+
+나열되지 않은 것이 더 있을 수도 있다. 클릭 몇번에 필요 리소스를 대신 식별해주니 편리하고 운영 코스트가 줄어드니 좋다고 생각할 수도 있다. 하지만 주의할 것이 있다. GKE autopilot은 그 자체로 managed 서비스가 아니며 기존 리소스를 조합하여 하나의 서비스처럼 보이는 것이다. 이때 각 리소스 단위로 빌링이 이루어지며 리소스의 해제의 최종적인 책임 역시 사용자에게있다. 예를 들어 k8s 클러스터를 삭제하더라도 네트워크리소스는 삭제되지 않기 때문에 외부IP 비용이 계속 발생하게 된다.
 
 #### VM Instance
 
-VM 인스턴스는 생성되지 않는다.
+Autopilot 모드에서는 VM 인스턴스는 생성되지 않는다. 즉 사람은 pod가 동작할 node는 신경쓸 필요가 없다.
 
 ```bash
 % gcloud compute instances list
 Listed 0 items.
 ```
 
-반면 autopilot 모드가 아닌경우 다음과 node instance 가 생성된다.
+반면 표준 모드로 k8s 클러스터를 생성한 경우 다음과 node instance가 생성된다. 사실 autopilot 모드로 생성하면 클러스터 정보에서 `노드` 탭 자체가 없다.
 
 ![create node](.resources/gcp_k8s_engine_autopilot/created_cluster_k8s.png)
 
-생성 정보
-이름: k8s-cluster-1
-리전: asia-northeast3
-
--- 일반 클러스터의 스크린샷 --------------------------
-
 #### 외부 IP
 
-메뉴: VPC 네트워크 > 외부 IP 주소
+노출을 위해서 외부 IP가 하나 할당된다.
 
-![exposed_ip](.resources/gcp_k8s_engine_autopilot/created_cluster_k8s.png)
+콘솔메뉴: VPC 네트워크 > 외부 IP 주소
 
-노드 부분은 실제 인스턴스이다. 실제 이는 vm instance 에서도 확인 가능하다.
+![exposed_ip](.resources/gcp_k8s_engine_autopilot/exposed_ip.png)
 
-![exposed_ip](.resources/gcp_k8s_engine_autopilot/create_k8s_instances.png)
+#### Load Balancer
 
-#### LoadBalancer & IP
+로드밸런서 역시 생성된다.
 
 메뉴: 네트워크 서비스 > 부하 분산
 
-![exposed_ip](.resources/gcp_k8s_engine_autopilot/load_balancer_detail.png)
-
-## Kubernetes (k8s)
-
-어떤가 autopilot 모드로 region 단위 가용성을 가지는 http rest 서비스를 만드는 것은 매우 쉽지 않은가?
+![load_balancer_detail](.resources/gcp_k8s_engine_autopilot/load_balancer_detail.png)
 
 ---
 
-## 이제 우리가 한 일을 설명해보자
+## 이제 위에서 한 일을 설명해보자
 
 ### Kubernetes?
 
