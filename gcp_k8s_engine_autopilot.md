@@ -25,9 +25,12 @@
 
 실제 생성된 클러스터 설정은 다음과 같다. 여러 설정이 기본으로 세팅되어 있다.
 
-![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_01.png)
+<details> <summary> cluster 상세 설정 (펼쳐보기) </summary>
 
+![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_01.png)
 ![created cluster](.resources/gcp_k8s_engine_autopilot/created_cluster_02.png)
+
+</details>
 
 ### 배포할 컨테이너
 
@@ -123,7 +126,14 @@ kubernetes engine > deploy
 
 서비스 노출 하라고 나올 것이다. 이 클러스터는 진입점이 없이 pod 만 배포된 상태이다. 이를 설정해야 접속이 가능하다.
 
-![deploy](.resources/gcp_k8s_engine_autopilot/load_balancer.png)
+- `포트매핑`
+  - `포트` 80
+  - `대상 포트` 8080
+  - `프로토콜` TCP
+- `서비스 유형` 부하 분산기
+- `서비스 이름` hellorest-service
+
+다음과 같은 yaml로 실행된다고 한다.
 
 ```yaml
 ---
@@ -145,7 +155,7 @@ spec:
   loadBalancerIP: ""
 ```
 
-![deploy](.resources/gcp_k8s_engine_autopilot/service_overview.png)
+![service_detail](.resources/gcp_k8s_engine_autopilot/service_detail.png)
 
 접속 가능하다.
 
@@ -171,18 +181,44 @@ Listed 0 items.
 
 반면 autopilot 모드가 아닌경우 다음과 node instance 가 생성된다.
 
--- 일반 클러스터의 스크린샷
+![create node](.resources/gcp_k8s_engine_autopilot/created_cluster_k8s.png)
+
+생성 정보
+이름: k8s-cluster-1
+리전: asia-northeast3
+
+-- 일반 클러스터의 스크린샷 --------------------------
+
+#### 외부 IP
+
+메뉴: VPC 네트워크 > 외부 IP 주소
+
+![exposed_ip](.resources/gcp_k8s_engine_autopilot/created_cluster_k8s.png)
+
+노드 부분은 실제 인스턴스이다. 실제 이는 vm instance 에서도 확인 가능하다.
+
+![exposed_ip](.resources/gcp_k8s_engine_autopilot/create_k8s_instances.png)
 
 #### LoadBalancer & IP
 
 메뉴: 네트워크 서비스 > 부하 분산
 
-접속 가능한 로드밸런서 외부 ip가 생성되었다.
-
-메뉴: VPC 네트워크 > 외부 IP 주소
+![exposed_ip](.resources/gcp_k8s_engine_autopilot/load_balancer_detail.png)
 
 ## Kubernetes (k8s)
 
 어떤가 autopilot 모드로 region 단위 가용성을 가지는 http rest 서비스를 만드는 것은 매우 쉽지 않은가?
 
-Kubernetes 작업과, 
+---
+
+## 이제 우리가 한 일을 설명해보자
+
+### 기본적인 kubernetes cluster
+
+### Autopilot 일때 구글이 해주는 부분
+
+### GCP 에서 추가한 부분
+
+### GCP 에서 추가한 부분을 kubernetes 로의 대체
+
+(이건 없을 수도 있음)
