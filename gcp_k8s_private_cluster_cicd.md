@@ -18,4 +18,44 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
    1. k8s 클러스터의 credential을 가져옴
    2. kubectl set image 를 통해서 pod의 컨테이너 이미지 교체
 
-이때 control plane의 endpoint가 external ip를 가지지 않은 경우 4.2 단계에서 실패하게 된다. 
+이때 control plane의 endpoint가 external ip를 가지지 않은 경우 4.2 단계에서 실패하게 된다. 이는 Cloud Build의 워커장비 즉 kubectl을 호출하는 장비가 endpoint에 접속을 못하기 때문이다. 또 external ip를 부여한 후 방화벽으로 Cloud Build 의 접속만을 허용하는 방법도 사용할 수 없다. 이유는 Cloud Build 워커장비의 IP를 특정할 수 없기 때문이다.
+
+## 어떻게 해결할 것인가?
+
+해결 방법
+
+## 해보자
+
+### 준비작업
+
+#### Network
+
+#### GKE Cluster
+
+1. Cluster
+3. Pod 배포
+
+#### 배포할 소스코드 github
+
+### 배포를 실패해보자
+
+#### 트리거 작성
+
+#### 배포 실패
+
+봐라.. 에러 나지?
+
+External ip가 있으면 성공한다.
+
+### 그러면 성공하도록 고쳐보자
+
+핵심은 GKE Manager 에서 실행되도록 하는 것이다.
+
+같은 subnet 에 gke manager 를 만들자.
+
+CloudBuild 에서 kubectl 을 gcloud 로 감싸서 실행한다.
+
+#### 배포 성공
+
+어때 되지 않냐?
+
