@@ -22,7 +22,10 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
 
 ## 어떻게 해결할 것인가?
 
-해결 방법
+Compute Engine을 gke 클러스터와 같은 서브넷 내에 생성한다. 이 VM은 private endpoint에도 kubectl 명령어를 실행할 수 있고, node와 pod에도 접속가능하다.
+Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실행한다.
+
+사실 CloudSDK를 사용해서는 k8s 관리가 충분하지 않기 때문에 어차피 클러스터를 관리할 VM이필요하다. Cloud SDK
 
 ## 해보자
 
