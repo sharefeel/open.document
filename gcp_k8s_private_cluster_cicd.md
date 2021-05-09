@@ -34,18 +34,20 @@ Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실�
 0. 준비, 세팅
    1. VPC, Subnet 설정
    2. 배포할 컨테이너 소스코드
-   3. Pod 생성 방법
 1. External Endpoint
    1. GKE Cluster 생성
-   2. 트리거
-   3. 배포 성공
+   2. 워크로드 배포 (초기 pod 배포)
+   3. 클라우드빌드 트리거 설정
+   4. 배포 성공
 2. Private Endpoint
    1. GKE Cluster 생성
-   2. 배포 실패 (트리거 수정 없음)
+   2. 워크로드 배포 (초기 pod 배포)
+   3. 배포 실패 (트리거 수정 없음)
 3. Private Endpoint + Manager VM
    1. Manager VM 추가
-   2. 트리거 수정
-   3. 배포 성공
+   2. 워크로드 배포 (초기 pod 배포)
+   3. 트리거 수정
+   4. 배포 성공
 
 ### 준비, 세팅
 
@@ -95,9 +97,68 @@ gke-subnet  asia-northeast3  own-vpc  172.16.3.0/24
   - `Private Google access` On
   - `Flow logs` On
 
-다음은 생성된 VPC Detail
+다음은 생성된 VPC Detail`
 
 ![vpc_subnet](.resources/gcp_k8s_private_cluster_cicd/vpc_subnet.png)
+
+#### 배포할 컨테이너
+
+배포할 컨테이너는 / 호출시 200 OK를 리턴하는 spring-boot 프로그램이다. 이 파일을 GCR에 배포하자.
+
+```java
+@RestController
+@RequestMapping("/")
+@SpringBootApplication
+public class HelloRestApp {
+
+    public static void main(String... args) {
+        SpringApplication.run(HelloRestApp.class);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<String> root() {
+        return ResponseEntity.ok("ok");
+    }
+}
+```
+
+```Dockerfile
+# Build stage
+FROM maven:3-openjdk-11-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package -Dmaven.test.skip=true
+
+# Package stage
+FROM gcr.io/distroless/java:11
+COPY --from=build /home/app/target/hellorest-github.jar /usr/local/lib/app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/usr/local/lib/app.jar"]
+```
+
+Pod 배포시 사용하기 위해 빌드 후 container registry에 push하는 cloudbuild trigger를 작성하자. 복잡한 설정없이 단순히 Dockerfile 만으로 빌드한다.
+
+메뉴: CloudBuild > Triggers > Create trigger
+
+아래 내용 입력후 create. 다른 내용은 수정하지 않는다.
+
+- `Name` hellorest-trigger
+- `Event` Manual invocation
+- `Source`
+  - `Repository` sharefeel/hellorest (GitHub App)
+  - `Revision` Branch, main
+- `Configuration`
+  - `Type` Dockerfile
+
+다음은 생성된 트리거
+
+![cloudbuild_trigger](.resources/gcp_k8s_private_cluster_cicd/cloudbuild_trigger.png)
+
+**`RUN`** 버튼을 눌러 빌드하면 image name에 설정한 `gcr.io/youngrok/github.com/sharefeel/hellorest:$COMMIT_SHA`에 컨테이너 이미지가 push된다. 참고. PC에서 빌드시 .m2 캐시를 사용하는 것과 달리 클라우드빌드는 maven central에서 이미지를 매번 다시 받기 때문에 빌드시간이 길다.
+
+![GCR에 배포된 container 이미지](.resources/gcp_k8s_private_cluster_cicd/gcr_hellorest.png)
+
+#### Pod 생성 방법
 
 ### External Endpoint Cluster
 
