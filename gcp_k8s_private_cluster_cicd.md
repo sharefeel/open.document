@@ -49,6 +49,54 @@ Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실�
 
 ### 준비, 세팅
 
+#### VPC, Subnet 준비
+
+테스트에 사용할 VPC와 subnet을 생성하자. 이 항목은 ontheterrace님 블로그의 [[GCP] GKE 구성하기 (1) - VPC 생성](https://ontheterrace.tistory.com/entry/GKE-VPC-%EC%83%9D%EC%84%B1%ED%95%98%EA%B8%B0?category=825811) 포스트를 참고했다. Cloud shell (또는 CloudSDK 설치된 장비)에서 다음 두 명령어를 실행하자.
+
+```bash
+gcloud compute networks create own-vpc --project=youngrok --subnet-mode=custom --mtu=1460 --bgp-routing-mode=regional
+
+gcloud compute networks subnets create gke-subnet --project=youngrok --range=172.16.3.0/24 --network=own-vpc --region=asia-northeast3 --enable-private-ip-google-access --enable-flow-logs --logging-aggregation-interval=interval-5-sec --logging-flow-sampling=0.5 --logging-metadata=include-all
+```
+
+아래는 실제 실행한 후 출력화면이다.
+
+```bash
+ko_youngrok@cloudshell:~ (youngrok)$ gcloud compute networks create own-vpc --project=youngrok --subnet-mode=custom --mtu=1460 --bgp-routing-mode=regional
+Created [https://www.googleapis.com/compute/v1/projects/youngrok/global/networks/own-vpc].
+NAME     SUBNET_MODE  BGP_ROUTING_MODE  IPV4_RANGE  GATEWAY_IPV4
+own-vpc  CUSTOM       REGIONAL
+
+Instances on this network will not be reachable until firewall rules
+are created. As an example, you can allow all internal traffic between
+instances as well as SSH, RDP, and ICMP by running:
+
+$ gcloud compute firewall-rules create <FIREWALL_NAME> --network own-vpc --allow tcp,udp,icmp --source-ranges <IP_RANGE>
+$ gcloud compute firewall-rules create <FIREWALL_NAME> --network own-vpc --allow tcp:22,tcp:3389,icmp
+
+ko_youngrok@cloudshell:~ (youngrok)$ gcloud compute networks subnets create gke-subnet --project=youngrok --range=172.16.3.0/24 --network=own-vpc --region=asia-northeast3 --enable-private-ip-google-access --enable-flow-logs --logging-aggregation-interval=interval-
+5-sec --logging-flow-sampling=0.5 --logging-metadata=include-all
+Created [https://www.googleapis.com/compute/v1/projects/youngrok/regions/asia-northeast3/subnetworks/gke-subnet].
+NAME        REGION           NETWORK  RANGE
+gke-subnet  asia-northeast3  own-vpc  172.16.3.0/24
+```
+
+클라우드 콘솔을 사용한다면 다음과 같이 입력하면 된다.
+
+메뉴: VPC network > Create a VPC network
+
+입력 내용 (default는 생략)
+
+- `Name` own-vpc
+- `New subnet`
+  - `Name` gke-subnet
+  - `Region` asia-northeast3
+  - `IP address range` 172.16.3.0/24
+  - `Private Google access` On
+  - `Flow logs` On
+
+
+
 ### External Endpoint Cluster
 
 그냥 참고용이다.
