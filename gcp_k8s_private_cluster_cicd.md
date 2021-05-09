@@ -95,7 +95,9 @@ gke-subnet  asia-northeast3  own-vpc  172.16.3.0/24
   - `Private Google access` On
   - `Flow logs` On
 
+다음은 생성된 VPC Detail
 
+![vpc_subnet](.resources/gcp_k8s_private_cluster_cicd/vpc_subnet.png)
 
 ### External Endpoint Cluster
 
