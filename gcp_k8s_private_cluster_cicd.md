@@ -22,7 +22,9 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
 
 ## 어떻게 해결할 것인가?
 
-해결 방법
+Cloud Build가 아닌 management VM에서 kubectl을 하도록 한다. 그 장비는 private ip인 endpoint에 접속 가능해야 한다. 그리고 cloud build는 gcloud를 통해서 해당 장비에가 kubectl을 실행하게 한다.
+
+사실 management vm의 경우 cloud build의 proxy역할도 하지만 k8s 클러스터 관리를 위해서 어차피 생성해야 한다.
 
 ## 해보자
 
@@ -30,12 +32,16 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
 
 #### Network
 
+VPC, Subnet 생성
+
 #### GKE Cluster
 
 1. Cluster
 3. Pod 배포
 
 #### 배포할 소스코드 github
+
+
 
 ### 배포를 실패해보자
 
