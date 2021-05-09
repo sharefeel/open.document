@@ -25,44 +25,38 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
 Compute Engine을 gke 클러스터와 같은 서브넷 내에 생성한다. 이 VM은 private endpoint에도 kubectl 명령어를 실행할 수 있고, node와 pod에도 접속가능하다.
 Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실행한다.
 
-사실 CloudSDK를 사용해서는 k8s 관리가 충분하지 않기 때문에 어차피 클러스터를 관리할 VM이필요하다. Cloud SDK
+사실 CloudSDK를 사용해서는 k8s 관리가 충분하지 않기 때문에 어차피 클러스터를 관리할 가상머신이 필요하다. 배포를 위해 새로운 무언가를 만들어내는 것은 아니며 존재하는 VM을 활용하는 것이다.
 
 ## 해보자
 
-### 준비작업
+다음 순서로 할 것이다.
 
-#### Network
+1. 준비, 세팅
+   1. VPC, Subnet 설정
+   2. 배포할 컨테이너 소스코드
+   3. Pod 생성 방법
+2. External Endpoint
+   1. GKE Cluster 생성
+   2. 트리거
+   3. 배포 성공
+3. Private Endpoint
+   1. GKE Cluster 생성
+   2. 배포 실패 (트리거 수정 없음)
+4. Private Endpoint + Manager VM
+   1. Manager VM 추가
+   2. 트리거 수정
+   3. 배포 성공
 
-VPC, Subnet 생성
+### 준비, 세팅
 
-#### GKE Cluster
+### External Endpoint Cluster
 
-1. Cluster
-3. Pod 배포
+그냥 참고용이다.
 
-#### 배포할 소스코드 github
+### Private Endpoint
 
+Worker에서 kubectl 실행은 실패한다.
 
+### Private Endpoint + Manager VM
 
-### 배포를 실패해보자
-
-#### 트리거 작성
-
-#### 배포 실패
-
-봐라.. 에러 나지?
-
-External ip가 있으면 성공한다.
-
-### 그러면 성공하도록 고쳐보자
-
-핵심은 GKE Manager 에서 실행되도록 하는 것이다.
-
-같은 subnet 에 gke manager 를 만들자.
-
-CloudBuild 에서 kubectl 을 gcloud 로 감싸서 실행한다.
-
-#### 배포 성공
-
-어때 되지 않냐?
-
+CloudSDK를 통해서 manager vm에서 kubectl을 실행하도록 한다.
