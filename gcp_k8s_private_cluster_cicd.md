@@ -29,20 +29,20 @@ Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실�
 
 ## 해보자
 
-다음 순서로 할 것이다.
+다음 순서로 External Endpoint, Private Endpoint, Private Endpoint + Manager VM 세가지 방법을 비교할 것이다. 1번은 배포가 성공하지만 external ip란 문제가 있고, 2번은 배포가 실패한다. 최종적으로 3번방식 즉 manager vm을 추가하여 성공하는 방법을 보인다.
 
-1. 준비, 세팅
+0. 준비, 세팅
    1. VPC, Subnet 설정
    2. 배포할 컨테이너 소스코드
    3. Pod 생성 방법
-2. External Endpoint
+1. External Endpoint
    1. GKE Cluster 생성
    2. 트리거
    3. 배포 성공
-3. Private Endpoint
+2. Private Endpoint
    1. GKE Cluster 생성
    2. 배포 실패 (트리거 수정 없음)
-4. Private Endpoint + Manager VM
+3. Private Endpoint + Manager VM
    1. Manager VM 추가
    2. 트리거 수정
    3. 배포 성공
