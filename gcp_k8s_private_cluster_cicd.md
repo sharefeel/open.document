@@ -162,7 +162,37 @@ Pod 배포시 사용하기 위해 빌드 후 container registry에 push하는 cl
 
 ### External Endpoint Cluster
 
-그냥 참고용이다.
+Kubernetes standard cluster를 생성한다.  이 항목은 ontheterrace님 블로그의 [[GCP] GKE 구성하기 (2) - 클러스터 생성(2/1)](https://ontheterrace.tistory.com/entry/GKE-GKE-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EC%83%9D%EC%84%B1?category=825811) 포스트를 참고했다. 포스트의 내용 중 방화벽 등의 상세 내용은 생략하고 이 글의 관심사인 ci/cd와 관련된 부분만 발췌했다.
+
+```bash
+gcloud beta container --project "youngrok" clusters create "gke-cluster" --zone "asia-northeast3-c" --no-enable-basic-auth --cluster-version "1.18.17-gke.100" --release-channel "regular" --machine-type "e2-medium" --image-type "COS" --disk-type "pd-standard" --disk-size "100" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/cloud-platform" --num-nodes "2" --enable-stackdriver-kubernetes --enable-ip-alias --network "projects/youngrok/global/networks/own-vpc" --subnetwork "projects/youngrok/regions/asia-northeast3/subnetworks/gke-subnet" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "asia-northeast3-c"
+```
+
+각 옵션의 의미를 살펴보자.
+
+**`Cluster Basics`** 서울리전 c영역에 gke-cluster 라는 이름으로 생성한다. 지금 이 문서는 90일 트라이얼에서 작성중이기 때문에 인스턴스 수 할당량 제한에 걸리지 않도록 zonal로 생성한다. Regional로 할 경우 기본으로 최소 영역수만큼 인스턴스가 생성된다. 회사돈이라면 regional로 하자.
+
+- `Name` GKE 클러스터 이름
+- `Location` Zonal / asia-northeat3-c
+
+![클러스터 기본 설정](.resources/gcp_k8s_private_cluster_cicd/externalip_cluster_basics.png)
+
+**`Node Poll`** 노드풀과 풀을 구성하는 인스턴스의 스펙을 정하자. 노드풀은 하나만 사용한다.
+
+- `Name` 이름은 그냥 두자
+- `Number of nodes` 2
+
+![클러스터 기본 설정](.resources/gcp_k8s_private_cluster_cicd/externalip_cluster_nodepool.png)
+
+![클러스터 기본 설정](.resources/gcp_k8s_private_cluster_cicd/externalip_cluster_nodepool_security.png)
+
+가장 중요한 네트워킹 부분
+
+![클러스터 기본 설정](.resources/gcp_k8s_private_cluster_cicd/externalip_cluster_networking.png)
+
+생성된 클러스터
+
+![클러스터 기본 설정](.resources/gcp_k8s_private_cluster_cicd/externalip_cluster_detail.png)
 
 ### Private Endpoint
 
