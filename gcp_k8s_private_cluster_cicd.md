@@ -1,6 +1,6 @@
 # Google Kubernetes Engine Private Cluster Container Deployment with CloudBuild
 
-이 문서는 GKE Private cluster에 Cloud Build를 통해서 container를 배포하는 방법을 소개한다.
+이 문서는 GKE Private cluster에 Cloud Build를 통해서 container를 배포하는 방법을 소개한다. 매우 장문이므로 천천히 읽어보자.
 
 ## 문제가 무엇인가?
 
@@ -18,14 +18,24 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
    1. k8s 클러스터의 credential을 가져옴
    2. kubectl set image 를 통해서 pod의 컨테이너 이미지 교체
 
-이때 control plane의 endpoint가 external ip를 가지지 않은 경우 4.2 단계에서 실패하게 된다. 이는 Cloud Build의 워커장비 즉 kubectl을 호출하는 장비가 endpoint에 접속을 못하기 때문이다. 또 external ip를 부여한 후 방화벽으로 Cloud Build 의 접속만을 허용하는 방법도 사용할 수 없다. 이유는 Cloud Build 워커장비의 IP를 특정할 수 없기 때문이다.
+이때 control plane의 endpoint가 external ip를 가지지 않은 경우 4.2 단계에서 실패하게 된다. 이는 Cloud Build의 워커장비 즉 kubectl을 호출하는 장비가 endpoint에 접속을 못하기 때문이다. 또 external ip를 부여한 후 방화벽으로 CloudBuild의 접속만을 허용하는 방법도 사용할 수 없다. 이유는 Cloud Build 워커장비의 IP를 특정할 수 없기 때문이다.
 
 ## 어떻게 해결할 것인가?
 
-Compute Engine을 gke 클러스터와 같은 서브넷 내에 생성한다. 이 VM은 private endpoint에도 kubectl 명령어를 실행할 수 있고, node와 pod에도 접속가능하다.
-Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실행한다.
+### Management VM
+
+GKE 클러스터와 같은 서브넷 내에 private ip만 가지는 VM을 생성한다. 이 VM은 private endpoint에도 kubectl 명령어를 실행할 수 있다. CloudBuild에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실행함으로써 배포를 수행한다.
 
 사실 CloudSDK를 사용해서는 k8s 관리가 충분하지 않기 때문에 어차피 클러스터를 관리할 가상머신이 필요하다. 배포를 위해 새로운 무언가를 만들어내는 것은 아니며 존재하는 VM을 활용하는 것이다.
+
+### IAP Tunneling
+
+관리 VM을 통한 배포가 설립하기 위해서는 CloudBuild에서 VM에 ssh 명령을 수행할 수 있어야 한다. 즉 22번 포트로 접근 가능해야 하며 ssh key 교환이 이뤄져 있어야 한다. 위에서도 언급했듯이 CloudBuild는 IP를 특정할 수 없는 문제가 발생하는데 이는 CloudBuild가 관리 VM으로 IAP 터널을 생성하도록 설정하여 해결한다. 다음 두 설정이 필요하다.
+
+1. CloudBuild service account 의 권한 업데이트
+2. IAP 명령이 유입되는 대역에 대해서 22 포트 방화벽 허용
+
+설정 방법은 아래에서 다룬다.
 
 ## 해보자
 
@@ -34,19 +44,11 @@ Cloud Build에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실�
 0. 준비, 세팅
    1. VPC, Subnet 설정
    2. 배포할 컨테이너 소스코드
-1. External Endpoint
-   1. GKE Cluster 생성
-   2. 워크로드 배포 (초기 pod 배포)
-   3. 클라우드빌드 트리거 설정
-   4. 배포 성공
-2. Private Endpoint
-   1. GKE Cluster 생성
-   2. 워크로드 배포 (초기 pod 배포)
-   3. 배포 실패 (트리거 수정 없음)
-3. Private Endpoint + Manager VM
+1. Private Cluster / Private IP EndPoint의 배포 실패 
+2. 관리 VM을 통한 배포
    1. Manager VM 추가
-   2. 워크로드 배포 (초기 pod 배포)
-   3. 트리거 수정
+   2. Cloud Build 를 통한 배포 (실패 버전)
+   3. IAP 터널링 세팅
    4. 배포 성공
 
 ### 준비, 세팅
