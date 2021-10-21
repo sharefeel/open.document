@@ -1,3 +1,8 @@
+# 주의
+
+이 문서는 미완성 상태입니다.
+보지 마세요.
+
 # Google Kubernetes Engine Private Cluster Container Deployment with CloudBuild
 
 이 문서는 GKE Private cluster에 Cloud Build를 통해서 container를 배포하는 방법을 소개한다. 매우 장문이므로 천천히 읽어보자.
