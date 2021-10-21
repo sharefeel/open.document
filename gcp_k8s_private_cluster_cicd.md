@@ -26,8 +26,6 @@ GKE 클러스터에 보안상의 이유로 직접적인 접근을 제한하기 �
 
 GKE 클러스터와 같은 서브넷 내에 private ip만 가지는 VM을 생성한다. 이 VM은 private endpoint에도 kubectl 명령어를 실행할 수 있다. CloudBuild에서는 이 VM에 gcloud ssh를 통해서 kubectl 명령어를 실행함으로써 배포를 수행한다.
 
-사실 CloudSDK를 사용해서는 k8s 관리가 충분하지 않기 때문에 어차피 클러스터를 관리할 가상머신이 필요하다. 배포를 위해 새로운 무언가를 만들어내는 것은 아니며 존재하는 VM을 활용하는 것이다.
-
 ### IAP Tunneling
 
 관리 VM을 통한 배포가 설립하기 위해서는 CloudBuild에서 VM에 ssh 명령을 수행할 수 있어야 한다. 즉 22번 포트로 접근 가능해야 하며 ssh key 교환이 이뤄져 있어야 한다. 위에서도 언급했듯이 CloudBuild는 IP를 특정할 수 없는 문제가 발생하는데 이는 CloudBuild가 관리 VM으로 IAP 터널을 생성하도록 설정하여 해결한다. 다음 두 설정이 필요하다.
