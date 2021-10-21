@@ -17,15 +17,15 @@ Protocol Buffers (이하 protobuf)는 구글에서 만든 Interface Description 
 
 다음 그림은 모질라에서 북마크를 처리하는 과정을 보여주고 있다. Rust와 kotlin이라는 다른 언어로 작성된 프로그램이 데이터를 교환하는 방법을 보여준다. Rust 쪽이 생산자 kotlin 쪽이 소비자이다.
 
-![](.resources/grpc/protobuf_mozilla_bookmark.png)
+![mozilla bookmark](.resources/grpc/protobuf_mozilla_bookmark.png)
 
 이미지 출처: [Crossing the Rust FFI frontier with Protocol Buffers - Aprin 2, 2019](https://hacks.mozilla.org/2019/04/crossing-the-rust-ffi-frontier-with-protocol-buffers/)
 
 ## 한번 해보자
 
-Java에서 해보자. 이 문서는 기본적으로 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 옮긴 것이며, 실생활에 사용할 수 있도록 약간의 내용을 추가했다. 덤으로 구글이 잘난체하는 것 갈아서 좀 까기도 했다. 본문의 소스코드는 https://github.com/sharefeel/gist/ 에 가면 받을 수 있다.
+Java에서 해보자. 이 문서는 기본적으로 공식홈페이지의 튜토리얼 중 [Basic:Java](https://developers.google.com/protocol-buffers/docs/javatutorial) 부분을 옮긴 것이며, 실생활에 사용할 수 있도록 약간의 내용을 추가했다. 본문의 소스코드는 https://github.com/sharefeel/gist/ 에 가면 받을 수 있다.
 
-여담인데 (2020년기준) 나온지 11년이 지나도록 문서가 한글화되지 않았고 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 심지어 protobuf 버전3이 나왔지만 이 문서는 버전2를 다루고 있다.
+여담인데 (2020년기준) 나온지 11년이 지나도록 문서가 한글화되지 않았고 개인적으로는 2013년에 이 문서를 처음 접했는데 그 뒤로 내용이 바뀐 것도 없다. 의문인점은 proto3 버전이 있는데 튜토리얼은 proto2 문법으로 작성되어 있다. 왜일까? 구글 클라우드를 사용하다보면 grpc를 계속 사용중이란 것을 알 수 있는데, 왜 문서는 관리가 되고 있지 않은지 의문이다.
 
 ### 준비작업
 
@@ -141,9 +141,9 @@ $ protoc -I=src/main/proto --java_out=src/main/java addressbook.proto
 
 실행결과
 
-![](.resources/grpc/compiled_protobuf_class.png)
+![compile result](.resources/grpc/compiled_protobuf_class.png)
 
-adressbook.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBookMessage 클래스가 생성된 것을 볼 수 있다. 
+adressbook.proto에 정의된 대로 net.youngrok.gist.protos 패키지에 AddressBookMessage 클래스가 생성된 것을 볼 수 있다.
 
 #### 라이브러리
 
@@ -160,7 +160,7 @@ protoc 명령어를 실행하고나면 컴파일에러를 잔뜩 안고 있는 A
 
 ### 사용
 
-백문이 불여일견. 코더는 코드로 말한다. 다음 세개의 예를 통해 사용법을 간단히 보자.
+백문이 불여일견. 코드를 보는게 가장 쉽다. 다음 세개의 간단한 예를 통해 사용법을 살펴 보자.
 
 - `writeMessage()` rock, kai 두 Person이 포함되어 있는 AddressBook 메세지를 파일에 저장
 - `readMessage()` 파일에 저장된 AddressBook을 읽어서 화면에 출력. 기본제공되는 toString() 사용
@@ -190,7 +190,7 @@ public void writeMessage() {
 
 위 코드를 실행하면 serialize된 데이터가 다음과 같이 addressbook.message 파일에 저장된다. (Builder 기반으로 코드를 작성하긴 했는데 더 간결한 방법이 있는지는 모르겠다) 생성된 파일의 용량은 107바이트로써 같은 데이터 저장시 674바이트가 필요한 json보다 훨씬 작다.
 
-![](.resources/grpc/serialized_addressbook.png)
+![serialized addressbook](.resources/grpc/serialized_addressbook.png)
 
 #### 메세지 읽기
 
@@ -339,22 +339,21 @@ protoc를 직접 사용해서 컴파일할 수도 있겠지만 좀더 편하게 
 
 IntelliJ 를 사용한다면 [IntelliJ Protobuf Support plugin](https://plugins.jetbrains.com/plugin/8277-protobuf-support)을 설치하자. Syntax validation, syntax highlighting, code formatting 등의 개발 편의기능을 제공한다. 아래는 실제 적용한 예이며 formatting도 플러그인의 도움을 받았다.
 
-![](.resources/grpc/protobuf_plugin_screenshot.png)
+![ide plugin](.resources/grpc/protobuf_plugin_screenshot.png)
 
 또한 compile 후 생성된 클래스를 지울때 safe-delete 기능도 제공한다. 아래는 java_outer_classname에 클래스이름이 지정되어 있어서 지울수 없는 예시인데 사실 이 기능은 오히려 귀찮다. "Search in comments and strings"를 해제하면 삭제 가능하다.
 
-![](.resources/grpc/safe_delete_class.png)
+![safe deletion](.resources/grpc/safe_delete_class.png)
 
 #### 프로젝트간 .proto 공유
 
-Protobuf로 통신하려면 각 프로젝트간 .proto 공유가 되야한다.
+Protobuf로 통신하려면 각 프로젝트간 .proto 파일이 공유가 되야한다. 몇가지 방법이 떠오르지만 silver bullet이라고 할만한 것은 없다.
 
 - `그냥 파일복사해서 공유` 가장간단하지만 형상관리가 안되고 무식해보인다는 단점이 있다.
-- `별도 저장소` 별도 저장소를 만들고 하위경로에 clone 받는다면? 한 프로젝트에 .git 파일이 둘 생긴다는 면에서 이것도 별로다.
 - `svn` external을 사용하여 .proto가 위치한 디렉토리에 하드링크를 걸수 있다. 방법자체는 매우 깔끔하게 protobuf와 맞아떨어진다. 하지만 svn은 유행이 지났다.
 - `언어가 같다면?` .proto 파일이 아닌 .proto를 컴파일해서 나온 소스를 공유할수 있으나 언어제약이 있다.
-- `repo가 있는 언어면?` java라면 .proto를 컴파일한 소스를 빌드하여 여. jar를 배포한후 다운받아서 쓴다. scala 정도는 같이 쓸수 있으나 역시 범용하긴 힘들다.
-- `git` submodule로 가능할까? 테스트 필요.
+- `repo가 있는 언어면?` Java라면 .proto를 컴파일한 소스를 빌드한 후 jar를 저장소에 배포하고 다시 다운받아서 쓴다. Scala 정도는 같이 쓸수 있으나 역시 범용하긴 힘들다.
+- `submodule` submodule로 가능할까? 테스트 필요.
 
 하지만 이렇게 공유한다 하더라도 언어별 네이밍 컨벤션이나 파일 위치의 차이로 불만을 가지는 사람이 생긴다. 어떻게 보면 강제로 소스리뷰하는 상황이다. 결국 더 권력있는 사람의 환경과 언어에 맞춰지는 상황이 생겨버리기도 한다.
 
@@ -362,11 +361,11 @@ Protobuf로 통신하려면 각 프로젝트간 .proto 공유가 되야한다.
 
 ### JSON (and XML)
 
-![](.resources/grpc/json_OTL.png)
+![json otl](.resources/grpc/json_OTL.png)
 
 이미지 출처: [5 Reasons to Use Protocol buffers Instead of JSON for Your Next Service - June 5, 2014](https://codeclimate.com/blog/choose-protocol-buffers/)
 
-Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다. 
+Protobuf 홈페이지는 물론 관련한 많은 문서들이 json/xml과 protobuf를 비교하여 장점을 주창하고 있다.
 
 | | Json | ProtoBuf |
 |-|-|-|
@@ -406,7 +405,8 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 <details> <summary>그런데 그것이 실제로 있어나고 있습니다.</summary>
 
-![](.resources/grpc/ws-main.png)
+우린 이미 TCP/IP 정도는 native 언어 수준으로 읽을 수 있지 않은가?
+![wire shark](.resources/grpc/ws-main.png)
 
 </details>
 
@@ -414,8 +414,8 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 스키마정의/컴파일/(de)serialization 과정을 거친다는 면에서 avro와 protobuf의 기본적인 사용 패턴은 동일하다. 실제로 .avro와 .proto라는 파일명만 다를뿐 메세지를 만드는 과정은 완전히 동일하다. 하지만 serialize된 파일 포맷에 있어서 둘은 큰 차이를 가진다. Protobuf의 경우 serialize된 데이터는 value만을 가지고 있는 것과는 달리 avro는 self-describing 방식으로 value의 스키마 또는 스키마 버전을 포함하고 있다.
 
-- 당연히 value만 있는 것이 경량이며 통신에 유리하다. 하지만 이를 위해서는 생성자와 소비자가 동일한 스키마를 공유하고 있어야 하는 문제가 있다. 
-- 하지만 스키마가 변할 수 있는 경우 self-describing 방식이 더 적합하다. 특히 스키마의 life-cycle이 긴 경우 하위호환성 유지가 필수적이기 때문에 avro 쪽이 더 유리하다. 
+- 당연히 value만 있는 것이 경량이며 통신에 유리하다. 하지만 이를 위해서는 생성자와 소비자가 동일한 스키마를 공유하고 있어야 하는 문제가 있다.
+- 하지만 스키마가 변할 수 있는 경우 self-describing 방식이 더 적합하다. 특히 스키마의 life-cycle이 긴 경우 하위호환성 유지가 필수적이기 때문에 avro 쪽이 더 유리하다.
   - 장기간의 데이터를 하나의 테이블에 누적하여 저장하는 경우. 예) Hive table
   - 통신의 두 peer의 스키마 버전 업데이트 시점이 별개인 경우. 예) 업데이트된 서버가 업데이트 되지 않은 클라이언트를 지원
 
@@ -429,7 +429,7 @@ Json이 schema-less라고는 하지만 그로 인해서 작성해야 신택스 �
 
 Facebook이 개발하고 현재 apache에 호스팅되고 있다. 매우 많은 언어(액션스크립트, C, C++, C#, 카푸치노, 코코아, 델파이, 얼랭, Go, 하스켈, 자바, Node.js, 오브젝티브-C, OCaml, 펄, PHP, 파이썬, 루비, 스몰토크, ..)를 지원하며 그만큼 만은 곳에 사용되고 있다. 사실 thrift같은 경우 단순히 IDL은 아닌 것이 전송 레이어에 대한 구현을 포함하는 RPC framework이다. 즉 thrift는 기능적으로 보자면 protobuf가 아니라 grpc + protobuf에 대응한다고 할 수 있다.
 
-![](.resources/grpc/ThriftArchitecture.png)
+![thrift architecture](.resources/grpc/ThriftArchitecture.png)
 
 그림출처: [A Guided Tour Through Thrift - August 23, 2016](https://sookocheff.com/post/thrift/a-tour-through-thrift/)
 
