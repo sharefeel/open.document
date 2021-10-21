@@ -170,7 +170,7 @@ gcloud beta container --project "youngrok" clusters create "gke-cluster" --zone 
 
 각 옵션의 의미를 살펴보자.
 
-**`Cluster Basics`** 서울리전 c영역에 gke-cluster 라는 이름으로 생성한다. 지금 이 문서는 90일 트라이얼에서 작성중이기 때문에 인스턴스 수 할당량 제한에 걸리지 않도록 zonal로 생성한다. Regional로 할 경우 기본으로 최소 영역수만큼 인스턴스가 생성된다. 회사돈이라면 regional로 하자.
+**`Cluster Basics`** 서울리전 c영역에 gke-cluster 라는 이름으로 생성한다. (가난뱅이여서 zonal로 생성했다)
 
 - `Name` GKE 클러스터 이름
 - `Location` Zonal / asia-northeat3-c
